@@ -1,0 +1,5 @@
+# Não publicar documentos internos de estratégia/briefing no site estático.
+# Eles continuam versionados no repositório privado (fonte de verdade + contexto
+# para o Engenheiro), mas NÃO são servidos em quartohelo.vercel.app.
+*.md
+Arquivo de Contexto*.md
