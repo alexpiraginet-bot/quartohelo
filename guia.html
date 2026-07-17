@@ -20,6 +20,10 @@
     background:linear-gradient(160deg,#67232B 0%, #4A171F 60%, #381017 100%); overflow:hidden; position:relative}
   body::before{content:""; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px); background-size:22px 22px; opacity:.7}
   body::after{content:""; position:absolute; inset:0; background:radial-gradient(90% 70% at 70% 15%, rgba(210,181,142,.18), transparent 60%)}
+  /* Barrado com a Estampa Geométrica oficial na base — acabamento de tecido. */
+  .barrado{position:absolute; left:0; right:0; bottom:0; height:38px; z-index:3;
+    background:url("/images/estampa-geometrica.svg"); background-size:auto 38px; background-position:50% 100%; background-repeat:repeat-x;
+    border-top:1px solid rgba(231,223,199,.25)}
   .box{position:relative; z-index:2; padding:40px 24px; max-width:52ch}
   .logo img{width:min(300px,64vw); height:auto; margin:0 auto; display:block}
   .eyebrow{margin-top:30px; font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:#DEC7A4}
@@ -41,6 +45,7 @@
     <div class="rule"></div>
     <a class="back" href="/">Voltar ao início</a>
   </div>
+  <div class="barrado" aria-hidden="true"></div>
 <script src="https://alex-hub-three.vercel.app/support-widget.js" data-app="quartohelo" data-accent="#67232B" defer></script>
 </body>
 </html>

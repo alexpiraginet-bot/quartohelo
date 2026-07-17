@@ -108,6 +108,10 @@
   section{position:relative}
   .band{padding:clamp(64px,9vw,120px) 0}
   .band.alt{background:linear-gradient(180deg,var(--bone) 0%, var(--bone-2) 100%)}
+  /* Fita de tecido — a Estampa Listras oficial como divisor entre seções.
+     Fica FORA dos blocos de texto: textura sem custo de legibilidade. */
+  .ribbon{height:14px; background:url("/images/estampa-listras.svg"); background-size:300px 300px; background-position:center top;
+    border-top:1px solid rgba(74,23,31,.10); border-bottom:1px solid rgba(74,23,31,.10)}
   .eyebrow{font-size:11.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--olive); font-weight:400}
   .h2{font-family:"Fraunces",Georgia,serif; font-weight:400; letter-spacing:-.01em; font-size:clamp(28px,4.6vw,46px); line-height:1.1; color:var(--wine); margin:14px 0 0}
   .lead{color:var(--ink); font-weight:300; font-size:clamp(15px,1.8vw,18px); line-height:1.75; max-width:60ch}
@@ -119,7 +123,10 @@
   .svc{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:46px}
   @media (max-width:820px){ .svc{grid-template-columns:1fr} }
   .scard{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:clamp(26px,3vw,38px); box-shadow:var(--shadow-sm); position:relative; overflow:hidden}
-  .scard::before{content:""; position:absolute; inset:0 0 auto 0; height:3px; background:linear-gradient(90deg,var(--wine),var(--rose),var(--caramel))}
+  /* Friso de listras oficiais no topo do cartão — acabamento de tecido. */
+  .scard::before{content:""; position:absolute; inset:0 0 auto 0; height:9px;
+    background:url("/images/estampa-listras.svg"); background-size:230px 230px; background-position:center top;
+    border-bottom:1px solid var(--line)}
   .scard .tag{font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--olive)}
   .scard h3{font-family:"Fraunces",Georgia,serif; font-weight:500; font-size:clamp(24px,3vw,32px); color:var(--wine); margin:10px 0 0; line-height:1.12}
   .scard .desc{color:var(--muted); margin-top:12px; font-size:15px; line-height:1.7}
@@ -144,20 +151,24 @@
   .guia .btn.primary{margin-top:28px}
 
   /* CONTACT / FOOTER */
-  .contact{text-align:center}
+  /* Marca-d'água floral rosé quase invisível no clímax emocional (teto .05). */
+  #contato::before{content:""; position:absolute; inset:0; pointer-events:none;
+    background:url("/images/hero-floral.webp") 50% / 640px repeat; opacity:.05}
+  .contact{text-align:center; position:relative}
   .contact .h2{margin-inline:auto}
   .contact .lead{margin:16px auto 0; text-align:center}
   .contact .btn.primary{background:var(--wine); color:var(--bone-2); margin-top:26px}
   .contact .btn.primary:hover{background:var(--wine-deep)}
-  footer{border-top:1px solid var(--line); padding:34px 0 40px; margin-top:clamp(50px,8vw,90px)}
+  footer{padding:34px 0 40px}
   .foot-row{display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; color:var(--faint); font-size:12.5px; letter-spacing:.04em}
   .foot-row .logo img{height:24px; width:auto; display:block}
   .foot-row .soon{font-size:11px; letter-spacing:.2em; text-transform:uppercase}
 
-  /* reveal */
-  .rv{opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1)}
-  .rv.in{opacity:1; transform:none}
-  @media (prefers-reduced-motion:reduce){ .rv{opacity:1; transform:none; transition:none} .vinho,.hero-aside{animation:none} html{scroll-behavior:auto} }
+  /* reveal — visível por PADRÃO; só esconde quando o observer está de pé
+     (html.jsrv). Sem JS/observer, print ou leitor: conteúdo sempre lá. */
+  .rv{opacity:1; transform:none; transition:opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1)}
+  html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
+  @media (prefers-reduced-motion:reduce){ html.jsrv .rv:not(.in){opacity:1; transform:none} .rv{transition:none} .vinho,.hero-aside{animation:none} html{scroll-behavior:auto} }
 </style>
 </head>
 <body>
@@ -214,6 +225,8 @@
     <p class="close serif">Enquanto cuidamos de todos os detalhes, você vive a melhor parte: a espera.</p>
   </div>
 </section>
+
+<div class="ribbon" aria-hidden="true"></div>
 
 <!-- COMO TRABALHAMOS -->
 <section class="band alt" id="trabalho">
@@ -281,6 +294,8 @@
   </div>
 </section>
 
+<div class="ribbon" aria-hidden="true"></div>
+
 <footer>
   <div class="wrap foot-row">
     <span class="logo"><img src="/images/logo-horizontal.png" alt="Quarto da Helô"></span>
@@ -295,14 +310,15 @@
   var onScroll = function(){ nav.classList.toggle('solid', window.scrollY > 24); };
   onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
 
-  // reveal on scroll
+  // reveal on scroll — só arma o estado escondido quando o observer existe
   var rv = document.querySelectorAll('.rv');
   if ('IntersectionObserver' in window){
+    document.documentElement.classList.add('jsrv');
     var io = new IntersectionObserver(function(es){
       es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
     }, {threshold:.14, rootMargin:'0px 0px -8% 0px'});
     rv.forEach(function(el){ io.observe(el); });
-  } else { rv.forEach(function(el){ el.classList.add('in'); }); }
+  }
 </script>
 
 <!-- Suporte Lex — mesmo padrão dos outros sistemas -->
