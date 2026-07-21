@@ -26,6 +26,11 @@ export function normalizeSupabaseUrl(u?: string | null): string | undefined {
 const url = normalizeSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL) ?? DEFAULT_URL;
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? DEFAULT_ANON;
 
+// URL/chave públicas para chamar a Edge Function do admin (qh-admin), que
+// carrega a service role nativamente — a gravação não depende de env na Vercel.
+export const SUPA_URL = url;
+export const SUPA_ANON = anon;
+
 export const isDbConfigured = Boolean(url && anon);
 
 /** Cliente público (leitura). Null quando ainda não configurado. */

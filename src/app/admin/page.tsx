@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { getGuiaData } from "@/lib/content";
-import { serverClient } from "@/lib/db/supabase";
-import { adminPassword } from "@/lib/admin/auth";
 import type { ItemDecision } from "@/lib/types";
-import { PrepararBancoForm } from "./_components/AdminForms";
+import { TrocarSenhaForm } from "./_components/AdminForms";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +20,6 @@ export default async function AdminPage() {
   const reais = options.filter((o) => !o.exemplo).length;
   const exemplos = options.length - reais;
   const prontas = pages.filter((p) => p.ready).length;
-
-  const escrita = Boolean(serverClient());
-  const senha = Boolean(adminPassword());
 
   return (
     <div className="adm-wrap">
@@ -79,24 +74,23 @@ export default async function AdminPage() {
         <h2>Estado do sistema</h2>
         <div className="adm-cat">
           <div className="adm-items">
-            <span className={`it${senha ? " rich" : ""}`}>
-              {senha ? "✓ Senha do painel definida" : "Senha do painel: falta definir QH_ADMIN_SENHA na Vercel"}
-            </span>
-            <span className={`it${escrita ? " rich" : ""}`}>
-              {escrita
-                ? "✓ Chave de gravação configurada"
-                : "Gravação: falta a SUPABASE_SERVICE_ROLE_KEY na Vercel"}
-            </span>
-            <span className="it rich">✓ Leitura do guia no ar (com reserva local se o banco oscilar)</span>
+            <span className="it rich">✓ Banco conectado (Supabase LexFlow)</span>
+            <span className="it rich">✓ Edição e upload de fotos ativos</span>
+            <span className="it rich">✓ Registro de acessos ativo</span>
           </div>
           <p style={{ color: "var(--muted)", fontSize: 13.5, lineHeight: 1.7, margin: "10px 0 0" }}>
-            Primeira vez editando? 1) Rode o arquivo <code>supabase/schema.sql</code> no SQL Editor do Supabase;
-            2) defina as duas variáveis acima na Vercel; 3) toque em &quot;Preparar o banco&quot; aqui embaixo. Depois
-            disso é só editar — cada salvamento já vale no guia.
+            Tudo o que você salvar aqui vale na hora no guia. Não precisa configurar nada.
           </p>
-          <div style={{ marginTop: 12 }}>
-            <PrepararBancoForm />
-          </div>
+        </div>
+      </div>
+
+      <div className="adm-section">
+        <h2>Trocar a senha do painel</h2>
+        <div className="adm-cat">
+          <p style={{ color: "var(--muted)", fontSize: 13.5, lineHeight: 1.7, margin: "0 0 12px" }}>
+            Recomendado trocar a senha inicial por uma sua. Ao trocar, os acessos antigos são encerrados.
+          </p>
+          <TrocarSenhaForm />
         </div>
       </div>
 

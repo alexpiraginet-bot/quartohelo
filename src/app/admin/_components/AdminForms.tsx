@@ -8,10 +8,10 @@ import {
   type ActionState,
   entrarNoPainel,
   excluirOpcao,
-  prepararBanco,
   salvarOpcao,
   salvarPagina,
   salvarTextosItem,
+  trocarSenha,
 } from "../actions";
 
 /* Formulários do painel — pensados para uso leigo: campos com os nomes que a
@@ -50,14 +50,24 @@ export function LoginForm() {
   );
 }
 
-/* ------------------------- preparar o banco ------------------------- */
+/* --------------------------- trocar senha --------------------------- */
 
-export function PrepararBancoForm() {
-  const [state, action] = useFormState(prepararBanco, null);
+export function TrocarSenhaForm() {
+  const [state, action] = useFormState(trocarSenha, null);
   return (
-    <form action={action} className="adm-inline">
-      <SubmitBtn tone="soft">Preparar o banco (1ª vez)</SubmitBtn>
-      <Feedback state={state} />
+    <form action={action} className="adm-form" style={{ maxWidth: 420 }}>
+      <label>
+        Senha atual
+        <input type="password" name="atual" autoComplete="current-password" />
+      </label>
+      <label>
+        Nova senha (mínimo 6 caracteres)
+        <input type="password" name="nova" autoComplete="new-password" />
+      </label>
+      <div className="adm-actions">
+        <SubmitBtn tone="soft">Trocar senha</SubmitBtn>
+        <Feedback state={state} />
+      </div>
     </form>
   );
 }

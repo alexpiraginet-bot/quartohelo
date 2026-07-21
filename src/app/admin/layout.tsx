@@ -5,14 +5,16 @@ import { sairDoPainel } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-// Portão do painel: com senha definida e sessão ativa, edita; sem sessão, pede
-// a senha; sem senha definida, abre só em modo visualização (gravação bloqueada).
+// Portão do painel: sem sessão, mostra o login; com sessão, o painel completo.
+// A senha é verificada no banco pela Edge Function — não depende de env na Vercel.
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const mode = adminMode();
-
-  if (mode === "bloqueado") {
-    return <div className="admin center">{<LoginForm />}</div>;
+  if (adminMode() === "bloqueado") {
+    return (
+      <div className="admin center">
+        <LoginForm />
+      </div>
+    );
   }
 
   return (
@@ -30,23 +32,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <div className="adm-right">
           <Link href="/guia">Ver o guia →</Link>
-          {mode === "editor" ? (
-            <form action={sairDoPainel}>
-              <button type="submit" className="adm-sair">
-                Sair
-              </button>
-            </form>
-          ) : null}
+          <form action={sairDoPainel}>
+            <button type="submit" className="adm-sair">
+              Sair
+            </button>
+          </form>
         </div>
       </nav>
-      {mode === "aberto" ? (
-        <div className="adm-wrap" style={{ paddingBottom: 0 }}>
-          <div className="adm-state off">
-            <b>Modo visualização.</b> Para liberar a edição com segurança, defina a senha do painel
-            (variável <code>QH_ADMIN_SENHA</code>) na Vercel. Sem ela, nada pode ser gravado.
-          </div>
-        </div>
-      ) : null}
       {children}
     </div>
   );

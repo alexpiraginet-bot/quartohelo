@@ -1,4 +1,5 @@
-import { serverClient } from "@/lib/db/supabase";
+import { callAdminFn } from "@/lib/db/adminFn";
+import { adminToken } from "@/lib/admin/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -22,42 +23,20 @@ interface Row {
 }
 
 export default async function AnalyticsAdmin() {
-  const db = serverClient();
+  const r = await callAdminFn("analytics", { token: adminToken() });
 
-  if (!db) {
+  if (!r.ok) {
     return (
       <div className="adm-wrap">
         <h1 className="adm-h">Acessos e conversões</h1>
         <div className="adm-state off" style={{ marginTop: 18 }}>
-          <b>Coleta ainda não ativada.</b> Os eventos passam a ser gravados assim que a chave
-          <code> SUPABASE_SERVICE_ROLE_KEY</code> estiver configurada na Vercel. O site e o guia já estão preparados
-          para registrar visitas, entradas, escolhas e cliques.
+          <b>Não consegui carregar agora.</b> {r.msg ?? "Tente entrar de novo."}
         </div>
       </div>
     );
   }
 
-  const desde = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
-  const { data, error } = await db
-    .from("qh_analytics_events")
-    .select("kind, meta, created_at")
-    .gte("created_at", desde)
-    .order("created_at", { ascending: false })
-    .limit(20000);
-
-  if (error) {
-    return (
-      <div className="adm-wrap">
-        <h1 className="adm-h">Acessos e conversões</h1>
-        <div className="adm-state off" style={{ marginTop: 18 }}>
-          <b>Não consegui ler os eventos.</b> {error.message}. Se o banco ainda não foi provisionado, rode o
-          <code> supabase/schema.sql</code> no SQL Editor do Supabase.
-        </div>
-      </div>
-    );
-  }
-
-  const rows = (data ?? []) as Row[];
+  const rows = (r.rows ?? []) as Row[];
   const now = Date.now();
   const h24 = now - 24 * 3600 * 1000;
   const d7 = now - 7 * 24 * 3600 * 1000;
