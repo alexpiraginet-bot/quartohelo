@@ -1,10 +1,11 @@
 // Seed = a ESTRUTURA inicial do Quarto da Helô, destilada do material oficial
-// (branding + documento de produto). Serve dois papéis:
-//   1. o app funciona 100% sobre este seed enquanto o Supabase não está conectado;
-//   2. quando a Helô conecta o banco, este seed vira a carga inicial das tabelas.
-// Conteúdo (decisões, fornecedores, fotos) é preenchido/editado pelo admin.
+// (branding + documento de produto + orientações do Guia Digital v2). Serve dois papéis:
+//   1. o app funciona 100% sobre este seed enquanto o banco não tem a estrutura v2;
+//   2. quando o banco for provisionado, este seed vira a carga inicial das tabelas.
+// Conteúdo (decisões, opções com foto e preço, textos das páginas) é preenchido
+// e editado pela Helô no painel, aos poucos — a estrutura já fica pronta aqui.
 
-import type { Category, GuideMeta, Item, SiteContent } from "@/lib/types";
+import type { Category, GuideMeta, GuidePage, GuestProfile, Item, ProductOption, SiteContent } from "@/lib/types";
 
 let seq = 0;
 const uid = (p: string) => `${p}-${(++seq).toString(36)}`;
@@ -42,9 +43,21 @@ function cat(slug: string, name: string, intro: string, order: number, names: (s
   };
 }
 
+// As 22 categorias do menu (itens 6–27 do documento de orientações), na ordem
+// exata do documento, agrupadas em 4 blocos que viram separadores do menu.
 export const seedCategories: Category[] = [
-  cat("mobiliario", "Mobiliário", "A base do quarto: o que sustenta a rotina e a estética.", 1, [
-    item("cat-mobiliario", "Berço", {
+  cat("estrutura", "Estrutura & móveis", "A base do quarto: o que sustenta a rotina e a estética.", 1, [
+    item("cat-estrutura", "Papel de parede", {
+      summary: "O plano de fundo que define a atmosfera de todo o quarto.",
+      decision: {
+        quandoUsar: "Quando você quer dar identidade ao quarto sem depender só de objetos: o papel amarra paleta, clima e estilo de uma vez.",
+        quandoNao: "Evite estampas grandes e saturadas em quartos pequenos ou com muitos móveis à vista: o ambiente perde o descanso visual.",
+        erroComum: "Aplicar sem preparar a parede. Massa corrida e superfície lisa vêm antes: imperfeições marcam o papel e estragam o efeito.",
+        efeito: "É a primeira leitura do quarto. Tudo que entrar depois dialoga com ele.",
+        instalacao: "Prepare a parede (lixada, selada e seca) e confira o rendimento dos rolos com sobra para casar a estampa.",
+      },
+    }),
+    item("cat-estrutura", "Berço", {
       summary: "A peça central e a primeira decisão de proporção do quarto.",
       decision: {
         quandoUsar: "Quando você quer uma peça que acompanhe o crescimento (modelos que viram mini-cama ganham anos de uso).",
@@ -55,7 +68,8 @@ export const seedCategories: Category[] = [
     }),
     "Cama auxiliar",
     "Cômoda",
-    item("cat-mobiliario", "Poltrona de amamentação", {
+    "Armário",
+    item("cat-estrutura", "Poltrona de amamentação", {
       summary: "O ponto de conforto das madrugadas.",
       decision: {
         quandoUsar: "Priorize apoio de braço na altura certa e opção com balanço quando o espaço permite.",
@@ -65,22 +79,19 @@ export const seedCategories: Category[] = [
       },
     }),
     "Mesa lateral",
-    "Armário",
   ]),
   cat("texteis", "Têxteis", "O que traz maciez, cor e a textura que a foto não entrega.", 2, [
-    "Cortina",
     "Tapete",
+    "Cortina",
+    "Enxoval berço",
+    "Enxoval cama",
     "Almofadas decorativas",
     "Almofada de amamentação",
-    "Enxoval do berço",
-    "Mantas",
     "Trocador",
     "Porta-treco",
   ]),
   cat("iluminacao", "Iluminação", "A luz decide a atmosfera do quarto — de dia e, principalmente, à noite.", 3, [
-    "Pendente",
-    "Abajur",
-    item("cat-iluminacao", "Arandela", {
+    item("cat-iluminacao", "Arandelas", {
       summary: "A luz de apoio ao lado do berço, para as horas silenciosas.",
       decision: {
         quandoUsar: "Luz amarela acolhe e prepara o sono; escolha a temperatura certa para a troca de madrugada.",
@@ -90,24 +101,124 @@ export const seedCategories: Category[] = [
         instalacao: "Deixe o ponto elétrico previsto antes do acabamento da parede.",
       },
     }),
+    "Abajur",
+    "Pendente",
   ]),
-  cat("organizacao", "Organização", "O que faz o quarto funcionar sem perder a beleza.", 4, [
+  cat("complementos", "Complementos", "Os detalhes que completam o quarto — e a chegada.", 4, [
     "Kit higiene",
-    "Bandejas",
-    "Organizadores de gaveta",
-    "Caixas organizadoras",
-  ]),
-  cat("adornos", "Adornos", "Os detalhes que dão alma e identidade ao ambiente.", 5, [
-    "Estantes",
-    "Enfeites e objetos",
-    "Composições de parede",
-  ]),
-  cat("extras", "Itens extras", "O que vai além do quarto, para a chegada e os primeiros passeios.", 6, [
+    "Adornos",
     "Mala maternidade",
     "Bolsa de passeio",
-    "Canguru",
   ]),
 ];
+
+/* ------------------------------------------------------------------ *
+ *  Páginas de conteúdo do guia (menu 1–4). Texto PROVISÓRIO (ready:false):
+ *  o oficial está nas páginas 3–7 do guia original e entra pelo painel.
+ * ------------------------------------------------------------------ */
+export const seedGuidePages: GuidePage[] = [
+  {
+    slug: "sobre-nos",
+    title: "Sobre nós",
+    eyebrow: "Quarto da Helô",
+    paragraphs: [
+      "O Quarto da Helô é um estúdio criativo especializado em quartos da primeira infância: arquitetura, interiores, curadoria e produção com direção estética e criativa.",
+      "Acreditamos que a beleza é a forma mais pura de cuidado, e que o primeiro cenário de uma vida merece ser impecável.",
+      "Este guia carrega o nosso olhar: o método, o critério e o cuidado que colocamos em cada decisão de um quarto — agora nas suas mãos.",
+    ],
+    ready: false,
+    order: 1,
+  },
+  {
+    slug: "como-usar",
+    title: "Introdução — como usar este guia",
+    eyebrow: "Comece por aqui",
+    paragraphs: [
+      "O guia é organizado por categorias, na ordem em que as decisões devem acontecer: da estrutura aos complementos. Em cada categoria você encontra a nossa orientação de DECISÃO — quando usar, quando não usar, o erro mais comum e o efeito no quarto.",
+      "Escolha a variação do seu quarto (menina, neutro ou menino) e veja as opções curadas em três faixas de investimento, sempre visíveis lado a lado.",
+      "Ao marcar uma opção, ela entra automaticamente no seu MEU PROJETO: a foto vai para o moodboard e o valor entra na análise financeira. Você acompanha o quarto inteiro se montando, escolha a escolha.",
+    ],
+    ready: false,
+    order: 2,
+  },
+  {
+    slug: "antes-de-comecar",
+    title: "Antes de começar",
+    eyebrow: "Preparação",
+    paragraphs: [
+      "Meça o quarto antes de qualquer compra: largura das paredes, altura, posição de janelas, portas e pontos elétricos. As medidas decidem mais do que o gosto.",
+      "Defina a faixa de investimento total antes de se apaixonar por peças isoladas — o guia existe para o conjunto fechar com harmonia, sem sustos.",
+      "Comece pelas decisões estruturais (papel de parede, berço, marcenaria) e deixe adornos e detalhes para o final: eles respondem ao que já estiver definido.",
+    ],
+    ready: false,
+    order: 3,
+  },
+  {
+    slug: "cronograma",
+    title: "Cronograma de montagem",
+    eyebrow: "O tempo certo de cada coisa",
+    paragraphs: [
+      "Cada quarto tem seu ritmo, mas a ordem importa: estrutura e revestimentos primeiro, móveis sob medida e peças de maior prazo em seguida, têxteis e enxoval na sequência, adornos e detalhes por último.",
+      "Atenção aos prazos de produção: berço, marcenaria e peças personalizadas costumam levar de 30 a 90 dias. O cronograma oficial da Helô, com as janelas ideais por trimestre, entra nesta página em breve.",
+    ],
+    ready: false,
+    order: 4,
+  },
+];
+
+/* ------------------------------------------------------------------ *
+ *  Catálogo de opções — ESTRUTURA pronta para a Helô preencher no painel
+ *  (fotos, nomes, preços, aos poucos). Abaixo, um conjunto pequeno de
+ *  EXEMPLOS (exemplo:true) só para visualizar a grade 3×3, o moodboard e o
+ *  financeiro funcionando. São substituídos pela curadoria real.
+ * ------------------------------------------------------------------ */
+let opSeq = 0;
+function opt(
+  itemSlug: string,
+  genero: ProductOption["genero"],
+  tier: ProductOption["tier"],
+  name: string,
+  priceCents: number | null,
+  order: number,
+): ProductOption {
+  return {
+    id: `opt-${(++opSeq).toString(36)}`,
+    itemSlug,
+    genero,
+    tier,
+    name,
+    photoUrl: null,
+    priceCents,
+    url: null,
+    supplier: null,
+    note: "Exemplo para visualização — substitua pela curadoria real no painel.",
+    exemplo: true,
+    order,
+  };
+}
+
+export const seedProductOptions: ProductOption[] = [
+  // Berço · Neutro — grade completa de exemplo (3 faixas × 3 opções)
+  opt("berco", "neutro", "alto", "Berço Lume", 890000, 0),
+  opt("berco", "neutro", "alto", "Berço Alcova", 740000, 1),
+  opt("berco", "neutro", "alto", "Berço Ninho Real", 680000, 2),
+  opt("berco", "neutro", "medio", "Berço Nuvem", 390000, 0),
+  opt("berco", "neutro", "medio", "Berço Vime & Linho", 320000, 1),
+  opt("berco", "neutro", "medio", "Berço Aurora", 285000, 2),
+  opt("berco", "neutro", "acessivel", "Berço Essencial", 169000, 0),
+  opt("berco", "neutro", "acessivel", "Berço Trama", 145000, 1),
+  opt("berco", "neutro", "acessivel", "Berço Base", 119000, 2),
+  // Poltrona de amamentação · Neutro — uma opção por faixa, para o moodboard compor
+  opt("poltrona-de-amamentacao", "neutro", "alto", "Poltrona Nuvem", 520000, 0),
+  opt("poltrona-de-amamentacao", "neutro", "medio", "Poltrona Balanço Linho", 290000, 0),
+  opt("poltrona-de-amamentacao", "neutro", "acessivel", "Poltrona Serena", 175000, 0),
+];
+
+/** Perfil de pré-visualização (a personalização real por link é a Fase 4). */
+export const seedGuestProfile: GuestProfile = {
+  motherName: "Marina",
+  babyName: "Aurora",
+};
 
 export const seedGuide: GuideMeta = {
   name: "O Fim da Dúvida",
@@ -116,6 +227,10 @@ export const seedGuide: GuideMeta = {
   priceCents: null, // exibição pública só quando a Helô confirmar no admin
   hotmartUrl: null,
   status: "lista_espera",
+  collection: "Collection Nº 01",
+  coverTitle: "Do conceito ao último detalhe",
+  coverSub: "O guia completo para montar o quarto do seu bebê.",
+  precoDataBase: "julho de 2026",
 };
 
 // Landing — cópia oficial da marca (editável no admin). Segue o tom das 4 vozes:

@@ -42,6 +42,35 @@ create index if not exists qh_suppliers_item_idx on qh_suppliers(item_id);
 create table if not exists qh_site_content ( id text primary key, data jsonb not null );
 create table if not exists qh_guide_meta   ( id text primary key, data jsonb not null );
 
+-- ------------------------- GUIA v2 (Collection Nº 01) -------------------------
+-- Páginas de conteúdo do menu (Sobre nós, Como usar, Antes de começar, Cronograma).
+create table if not exists qh_guide_pages (
+  slug text primary key,
+  title text not null,
+  eyebrow text,
+  paragraphs jsonb not null default '[]'::jsonb,
+  ready boolean not null default false,      -- false = texto provisório
+  "order" int not null default 0
+);
+
+-- Catálogo de opções por categoria: gênero × faixa, com foto e preço.
+-- Ancorado por SLUG do item para a Helô preencher aos poucos pelo painel.
+create table if not exists qh_product_options (
+  id text primary key default gen_random_uuid()::text,
+  item_slug text not null,
+  genero text not null check (genero in ('menina','neutro','menino')),
+  tier text not null check (tier in ('acessivel','medio','alto')),
+  name text not null,
+  photo_url text,
+  price_cents int,                            -- null = valor em definição
+  url text,
+  supplier text,
+  note text,
+  exemplo boolean not null default false,     -- dado de demonstração
+  "order" int not null default 0
+);
+create index if not exists qh_options_item_idx on qh_product_options(item_slug, genero, tier);
+
 -- ------------------------- CLIENTES E JORNADA -------------------------
 create table if not exists qh_clients (
   id uuid primary key default gen_random_uuid(),
@@ -50,6 +79,10 @@ create table if not exists qh_clients (
   hotmart_transaction text,
   created_at timestamptz not null default now()
 );
+-- Personalização do guia por link (Fase 4): nome da mãe, do bebê e código de acesso.
+alter table qh_clients add column if not exists mother_name text;
+alter table qh_clients add column if not exists baby_name text;
+alter table qh_clients add column if not exists access_code text unique;
 
 -- A jornada personalizada: cada escolha da cliente vira o moodboard dela.
 create table if not exists qh_client_choices (
@@ -76,18 +109,22 @@ create index if not exists qh_analytics_kind_idx on qh_analytics_events(kind, cr
 
 -- ------------------------- RLS -------------------------
 -- Conteúdo é público para leitura; escrita só pela service role (bypassa RLS).
-alter table qh_categories   enable row level security;
-alter table qh_items        enable row level security;
-alter table qh_suppliers    enable row level security;
-alter table qh_site_content enable row level security;
-alter table qh_guide_meta   enable row level security;
+alter table qh_categories      enable row level security;
+alter table qh_items           enable row level security;
+alter table qh_suppliers       enable row level security;
+alter table qh_site_content    enable row level security;
+alter table qh_guide_meta      enable row level security;
+alter table qh_guide_pages     enable row level security;
+alter table qh_product_options enable row level security;
 
 do $$ begin
-  create policy "qh leitura publica" on qh_categories   for select using (true);
-  create policy "qh leitura publica" on qh_items        for select using (true);
-  create policy "qh leitura publica" on qh_suppliers    for select using (true);
-  create policy "qh leitura publica" on qh_site_content for select using (true);
-  create policy "qh leitura publica" on qh_guide_meta   for select using (true);
+  create policy "qh leitura publica" on qh_categories      for select using (true);
+  create policy "qh leitura publica" on qh_items           for select using (true);
+  create policy "qh leitura publica" on qh_suppliers       for select using (true);
+  create policy "qh leitura publica" on qh_site_content    for select using (true);
+  create policy "qh leitura publica" on qh_guide_meta      for select using (true);
+  create policy "qh leitura publica" on qh_guide_pages     for select using (true);
+  create policy "qh leitura publica" on qh_product_options for select using (true);
 exception when duplicate_object then null; end $$;
 
 -- qh_clients / qh_client_choices / qh_analytics_events ficam SEM policy pública:

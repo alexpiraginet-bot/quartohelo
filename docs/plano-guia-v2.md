@@ -48,8 +48,8 @@ Transcrição fiel → requisito rastreável. "R" = requisito.
 
 ### Navegação
 - **R5 — Menu lateral desde a primeira página** (referência visual: "Foto 1"
-  do documento). Ao lado do menu, a área principal mostra o conteúdo da página
-  inicial do guia.
+  do documento — recebida, ver §4a). Ao lado do menu, a área principal mostra o
+  conteúdo da página inicial do guia.
 - **R6 — Categorias de conteúdo no menu:**
   1. Sobre nós (conteúdo da pág. 3 do guia original)
   2. Introdução — Como usar esse guia (pág. 4)
@@ -119,6 +119,45 @@ manter esse formato, que está bom").
 
 ---
 
+## 4a. Referência visual do menu lateral ("Foto 1" — recebida em 21/07/2026)
+
+Frame de vídeo (15/07/2026) do protótipo inicial que serviu de referência para
+a Helô. O que ele define e vamos seguir:
+
+**Sidebar (coluna esquerda, fundo escuro):**
+- Logo "Helô" em script no topo.
+- Itens de menu com ícone pequeno + rótulo; item ativo com realce (fundo
+  destacado). No protótipo: Visão geral · Meu projeto · Cronograma · Moodboard
+  · Lista de compras · Orçamento · Fornecedores · Helô AI.
+- Rodapé fixo: avatar circular com a inicial da cliente ("M") + nome completo
+  ("Marina Albuquerque"). É a "bola com a letra M" citada no documento (R3) —
+  aqui entra o brasão da Helô ou a inicial, conforme definição pendente.
+
+**Área de conteúdo (coluna direita, fundo creme):**
+- Título grande serifado (ex.: "Lista de compras") — casa com a Fraunces já
+  usada no site.
+- Abas de filtro com contadores: "Todos · 24", "Aprovados", "Em análise",
+  "Pendentes".
+- Lista de produtos em linhas: nome (ex.: Berço Lume, Poltrona Nuvem, Pendente
+  orgânico, Tapete Trama Areia) + etiqueta da categoria à direita (Mobiliário,
+  Iluminação, Têxteis).
+
+**Como conciliar protótipo × documento de orientações:**
+- **Estrutura do menu: manda o documento** (Sobre nós, Introdução, Antes de
+  começar, Cronograma, MEU PROJETO + 22 categorias de produto). O protótipo é
+  anterior às orientações.
+- **Estilo visual: manda o protótipo** (sidebar escura com ícones e avatar no
+  rodapé, conteúdo creme serifado, abas com contadores).
+- Conceitos do protótipo absorvidos pelo documento: "Moodboard" e "Orçamento"
+  viraram partes internas do MEU PROJETO; "Lista de compras" vira a visão de
+  status das escolhas — os estados Aprovado / Em análise / Pendente do
+  protótipo mapeiam bem para os atuais escolhido / em dúvida / sem decisão.
+- Entradas do protótipo SEM correspondente no documento: "Fornecedores" (visão
+  transversal) e "Helô AI". Ficam fora das fases 1–5; anotadas como ideias a
+  validar com a Helô depois do lançamento.
+
+---
+
 ## 4. Plano de implementação por fases
 
 Cada fase é um PR independente, com o site sempre funcional (padrão do repo:
@@ -162,25 +201,75 @@ seed primeiro, banco depois).
 
 ---
 
-## 5. Pendências — o que precisamos receber para fechar 100%
+## 5. Pendências — estado em 21/07/2026
 
-1. **"Foto 1"** (referência visual do menu lateral): não veio no export do
-   Google Docs (imagens não são exportadas). Enviar a imagem ou aprovar a
-   proposta de menu que faremos na Fase 1.
-2. **Conteúdo das páginas do guia original** (págs. 1, 3, 4, 5–6, 7): textos de
-   Sobre nós, Introdução, Antes de começar e Cronograma de montagem. Entram como
-   placeholder editável até lá.
-3. **Catálogo de opções:** para cada uma das 22 categorias × 3 gêneros, as 9
-   opções (foto, nome, preço, link/fornecedor). Pode chegar aos poucos — a
-   estrutura aceita categoria incompleta.
-4. **Vídeo do móbile com música** (se for a escolha para a capa) ou confirmação
-   do fundo com brasão.
-5. **Definição R3:** brasão para todas as clientes ou inicial da mãe? (O layout
-   suportará os dois; precisamos do padrão.)
+1. ~~"Foto 1" do menu lateral~~ **Recebida** (frame do protótipo, ver §4a). O
+   menu v2 foi construído seguindo esse estilo, melhorado.
+2. **Conteúdo das páginas do guia original** (págs. 3–7): por orientação em
+   áudio (21/07), os textos JÁ EXISTEM no guia original e serão enviados/colados
+   depois. Até lá as páginas rodam com texto provisório marcado
+   ("Texto provisório") e serão editáveis pelo painel.
+3. **Catálogo de opções:** por orientação em áudio (21/07), a Helô quer
+   preencher ELA MESMA, aos poucos (fotos, nomes, preços), por uma área de
+   edição fácil e leiga. A estrutura já está pronta (grade 3×3 por gênero com
+   espaços "Em curadoria"); o editor leigo no painel é o PRÓXIMO passo, com
+   prioridade máxima.
+4. **Vídeo do móbile com música** (se for a escolha para a capa). A capa atual
+   usa o brasão sobre o vinho — aprovada como caminho até o vídeo existir.
+5. ~~Definição R3 (brasão × inicial)~~ **Resolvida na prática:** o brasão
+   oficial chegou em PDF (8 variações de cor) e foi adotado no avatar e na
+   capa. Trocar para a inicial da mãe é um ajuste simples se ela preferir.
 
 ---
 
-## 6. Riscos e cuidados
+## 6. Execução — diário
+
+### 21/07/2026 — Fundação do Guia v2 entregue (Fases 1–3 em uma base só)
+
+No ar na branch `claude/project-initial-analysis-gi6lmx`:
+
+- **Capa de entrada** (R1): brasão creme sobre vinho, "Do conceito ao último
+  detalhe", Collection Nº 01, botão Entrar (lembrada por dispositivo).
+- **Menu lateral** (R5–R7) no estilo do protótipo, melhorado: logo script,
+  Visão geral, 4 páginas do guia, MEU PROJETO com contador, 22 categorias em 4
+  grupos com progresso por grupo (0/7…), pontos de status por item, barra "N de
+  22 decididos" e perfil com brasão no rodapé. No celular vira gaveta.
+- **Página de categoria** (R8–R10): bloco "A decisão, pelo olhar da Helô",
+  seletor Menina/Neutro/Menino (lembrado), grade com as 3 faixas SEMPRE
+  visíveis (alto → médio → acessível), 3 espaços por faixa com card de foto,
+  preço e "Escolher"; espaços vazios mostram "Em curadoria". Navegação
+  anterior/próxima entre as 22 categorias.
+- **Meu projeto** (R11–R14): explicação no topo, moodboard com as escolhas
+  (foto quando houver; placeholder elegante até lá), análise financeira item a
+  item com total automático, valor editável com um toque (ajuste manual
+  persistido) e aviso da data-base dos preços.
+- **Personalização de pré-visualização** (R2–R4): "Olá, Marina.", "Quarto da
+  Aurora" na barra e avatar com brasão — a versão por link real é a Fase 4.
+- **Dados**: tipos e seed reestruturados (22 categorias, 4 páginas, catálogo de
+  opções por slug/gênero/faixa com exemplos marcados), `getGuiaData()` com
+  fallback integral para o seed, tabelas novas no `supabase/schema.sql`
+  (`qh_guide_pages`, `qh_product_options`, campos de cliente).
+- **Brasão oficial** extraído do PDF (vinho + creme) em `public/images/`.
+- Validado com build de produção + screenshots (desktop e mobile).
+
+### Próximo passo — PRIORIDADE: painel de edição fácil (leiga)
+
+Orientação por áudio + mensagem (21/07): a Helô quer uma área onde ELA edita
+tudo sem depender de ninguém técnico. Especificação:
+
+1. **Catálogo por categoria:** abrir a categoria → escolher gênero e faixa →
+   preencher os 3 espaços: foto (upload direto), nome, preço, link, fornecedor.
+   Salvar por espaço. Sem jargão: os campos com os mesmos nomes que ela usa.
+2. **Páginas do guia:** abrir a página → colar/editar o texto (um parágrafo por
+   caixa) → marcar "texto oficial" (tira o selo de provisório) → salvar.
+3. **Infra:** provisionar as tabelas v2 no Supabase (rodar `schema.sql`),
+   bucket de fotos no Storage, `SUPABASE_SERVICE_ROLE_KEY` na Vercel e rotas de
+   servidor para gravação. Sem a chave, o painel mostra aviso claro e fica em
+   modo leitura (nunca quebra).
+4. Depois do editor: carga do seed no banco, Fase 4 (link por cliente) e
+   ajustes finos.
+
+## 7. Riscos e cuidados
 
 - **Peso de imagens:** 22 × 3 × 9 = até ~594 fotos de produto. Usar imagens
   otimizadas (Supabase Storage + tamanhos definidos) desde a Fase 2.

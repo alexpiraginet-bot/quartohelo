@@ -1,7 +1,13 @@
 import "server-only";
 import { isDbConfigured, supabase } from "@/lib/db/supabase";
-import { seedCategories, seedGuide, seedSite } from "@/data/seed";
-import type { Category, GuideMeta, SiteContent } from "@/lib/types";
+import {
+  seedCategories,
+  seedGuide,
+  seedGuidePages,
+  seedProductOptions,
+  seedSite,
+} from "@/data/seed";
+import type { Category, GuideMeta, GuidePage, ProductOption, SiteContent } from "@/lib/types";
 
 /**
  * Camada de conteúdo. Uma porta única para landing, guia e admin lerem os dados.
@@ -29,6 +35,61 @@ export async function getGuide(): Promise<GuideMeta> {
     return (data?.data as GuideMeta) ?? seedGuide;
   } catch {
     return seedGuide;
+  }
+}
+
+/**
+ * Dados do Guia v2 em uma chamada. A estrutura v2 (páginas + catálogo de
+ * opções) só passa a vir do banco quando as tabelas novas existirem e tiverem
+ * conteúdo; até lá TUDO do guia vem do seed, para o menu e a grade nunca
+ * mostrarem uma estrutura pela metade. As opções ancoram por slug do item.
+ */
+export async function getGuiaData(): Promise<{
+  categories: Category[];
+  guide: GuideMeta;
+  pages: GuidePage[];
+  options: ProductOption[];
+}> {
+  const guide = await getGuide();
+  if (!supabase) {
+    return { categories: seedCategories, guide, pages: seedGuidePages, options: seedProductOptions };
+  }
+  try {
+    const { data: pagesRows, error: pagesErr } = await supabase
+      .from("qh_guide_pages")
+      .select("*")
+      .order("order");
+    if (pagesErr || !pagesRows?.length) {
+      // Banco ainda sem a estrutura v2 — o guia inteiro roda no seed.
+      return { categories: seedCategories, guide, pages: seedGuidePages, options: seedProductOptions };
+    }
+    const pages: GuidePage[] = pagesRows.map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      eyebrow: p.eyebrow,
+      paragraphs: Array.isArray(p.paragraphs) ? p.paragraphs : [],
+      ready: !!p.ready,
+      order: p.order ?? 0,
+    }));
+    const { data: optRows } = await supabase.from("qh_product_options").select("*").order("order");
+    const options: ProductOption[] = (optRows ?? []).map((o) => ({
+      id: o.id,
+      itemSlug: o.item_slug,
+      genero: o.genero,
+      tier: o.tier,
+      name: o.name,
+      photoUrl: o.photo_url,
+      priceCents: o.price_cents,
+      url: o.url,
+      supplier: o.supplier,
+      note: o.note,
+      exemplo: !!o.exemplo,
+      order: o.order ?? 0,
+    }));
+    const categories = await getCategories();
+    return { categories, guide, pages, options };
+  } catch {
+    return { categories: seedCategories, guide, pages: seedGuidePages, options: seedProductOptions };
   }
 }
 
