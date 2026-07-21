@@ -50,6 +50,8 @@ create table if not exists qh_guide_pages (
   title text not null,
   eyebrow text,
   paragraphs jsonb not null default '[]'::jsonb,
+  cards jsonb,                               -- cards numerados (ex.: "Como usar")
+  closing text,                              -- citação de fechamento
   ready boolean not null default false,      -- false = texto provisório
   "order" int not null default 0
 );

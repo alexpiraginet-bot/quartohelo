@@ -198,6 +198,15 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2steps .s span{display:block; margin-top:8px; color:var(--muted); font-size:13.5px; line-height:1.6}
 .g2prose{margin-top:22px; max-width:64ch}
 .g2prose p{color:var(--ink); font-weight:300; font-size:clamp(15px,1.8vw,16.5px); line-height:1.8; margin-top:16px}
+/* Cards numerados (ex.: "Como usar este guia") */
+.g2cards{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:28px}
+@media (max-width:640px){ .g2cards{grid-template-columns:1fr} }
+.g2cards .c{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px clamp(18px,2.2vw,24px)}
+.g2cards .c .n{font-weight:400; font-size:30px; color:var(--rose); line-height:1; letter-spacing:.02em}
+.g2cards .c b{display:block; margin-top:14px; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--wine)}
+.g2cards .c span{display:block; margin-top:8px; color:var(--muted); font-size:14px; line-height:1.65}
+/* Citação de fechamento */
+.g2quote{margin:30px 0 0; padding:6px 0 6px 22px; border-left:2px solid var(--caramel); font-style:italic; font-weight:300; color:var(--wine); font-size:clamp(17px,2.2vw,21px); line-height:1.5; max-width:60ch}
 
 /* Decisão da categoria */
 .g2dec{margin-top:26px}
