@@ -119,26 +119,54 @@ export const seedCategories: Category[] = [
 export const seedGuidePages: GuidePage[] = [
   {
     slug: "sobre-nos",
-    title: "Sobre nós",
+    title: "Quem somos",
     eyebrow: "Quarto da Helô",
     paragraphs: [
-      "O Quarto da Helô é um estúdio criativo especializado em quartos da primeira infância: arquitetura, interiores, curadoria e produção com direção estética e criativa.",
-      "Acreditamos que a beleza é a forma mais pura de cuidado, e que o primeiro cenário de uma vida merece ser impecável.",
-      "Este guia carrega o nosso olhar: o método, o critério e o cuidado que colocamos em cada decisão de um quarto — agora nas suas mãos.",
+      "O Quarto da Helô é um estúdio criativo especializado em arquitetura infantil que entrega curadoria refinada e direção estética e criativa.",
+      "Acreditamos que a beleza é a forma mais pura de cuidado e que o primeiro cenário de uma vida merece ser impecável.",
+      "Sabemos que montar o quarto do seu bebê envolve centenas de decisões. Nós existimos para que nenhuma delas pese sobre você. Assumimos o peso das decisões e devolvemos a você a leveza de esperar, sonhar e se encantar.",
+      "É assim que atuamos.",
+      "Vamos além do projeto. No nosso Projeto Conceito e na Curadoria Assinada, conduzimos cada definição diretamente com os fornecedores: modelos, acabamentos, cores, tecidos e bordados, escolhidos um a um. Você não precisa decidir nada sozinha, cada detalhe chega até você já pensado, resolvido e em harmonia com o todo.",
+      "Unimos solidez técnica e estética contemporânea para que o primeiro cenário de vida do seu filho seja um reflexo de primor, cuidado e absoluta confiança no processo.",
+      "Aqui no nosso guia completo para montar o quarto do seu bebê, fazemos uma curadoria prévia para você. Para cada item do quarto, reunimos opções cuidadosamente selecionadas, todas filtradas pelo olhar criterioso da Helô e organizadas por faixa de investimento, para que você escolha com liberdade, sem abrir mão da curadoria realizada pelo Quarto da Helô.",
+      "Assim, você não parte do zero nem se perde entre mil opções. Recebe apenas o que já passou pelo nosso crivo, e monta um quarto bonito, coerente e cheio de significado, do seu jeito e no seu tempo, com a segurança e o olhar de quem é apaixonado por cuidar dos mínimos detalhes e já pensou em cada um deles por você.",
     ],
-    ready: false,
+    closing: "Enquanto cuidamos de todos os detalhes, você vive a melhor parte: a espera.",
+    ready: true,
     order: 1,
   },
   {
     slug: "como-usar",
-    title: "Introdução — como usar este guia",
-    eyebrow: "Comece por aqui",
+    title: "Como usar este guia",
+    eyebrow: "Introdução — como usar",
     paragraphs: [
-      "O guia é organizado por categorias, na ordem em que as decisões devem acontecer: da estrutura aos complementos. Em cada categoria você encontra a nossa orientação de DECISÃO — quando usar, quando não usar, o erro mais comum e o efeito no quarto.",
-      "Escolha a variação do seu quarto (menina, neutro ou menino) e veja as opções curadas em três faixas de investimento, sempre visíveis lado a lado.",
-      "Ao marcar uma opção, ela entra automaticamente no seu MEU PROJETO: a foto vai para o moodboard e o valor entra na análise financeira. Você acompanha o quarto inteiro se montando, escolha a escolha.",
+      "Este guia foi construído para ser lido como um manual de decisão, não como uma lista de compras. Cada item do quarto do bebê tem sua própria seção: o momento certo de comprar, o que evitar, o erro mais comum e três fornecedores curados com rigor estético e técnico.",
     ],
-    ready: false,
+    cards: [
+      {
+        n: "01",
+        title: "Escolha sua variação",
+        text: "Este guia tem três versões: Menina, Menino e Neutro. Cada uma tem curadoria de fornecedores e referências estéticas específicas para a paleta do ambiente.",
+      },
+      {
+        n: "02",
+        title: "Siga o cronograma",
+        text: "O cronograma nas páginas seguintes mostra o momento exato de comprar cada item. Sem correria de última hora e sem tirar a magia de um momento tão especial.",
+      },
+      {
+        n: "03",
+        title: "Aplique a curadoria",
+        text: "Escolha dentre 3 fornecedores indicados por item: alto investimento, médio e acessível. Todos selecionados com rigor técnico e estético. Você escolhe, a Helô já filtrou.",
+      },
+      {
+        n: "04",
+        title: "Use o checklist",
+        text: "No final do guia há uma página de checklist com todos os itens. Imprima-a e vá marcando à medida que for executando. É o seu mapa de progresso.",
+      },
+    ],
+    closing:
+      "O critério já foi aplicado. O filtro já existe. O que resta é a leveza da escolha para que o primeiro cenário de vida do seu filho seja um reflexo de primor, personalidade, cuidado e absoluta confiança no processo.",
+    ready: true,
     order: 2,
   },
   {

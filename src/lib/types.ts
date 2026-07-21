@@ -52,15 +52,25 @@ export interface ProductOption {
   order: number;
 }
 
+/** Card numerado dentro de uma página do guia (ex.: os 4 passos do "Como usar"). */
+export interface GuidePageCard {
+  n: string;
+  title: string;
+  text: string;
+}
+
 /**
- * Página de conteúdo do guia (Sobre nós, Como usar, Antes de começar,
+ * Página de conteúdo do guia (Quem somos, Como usar, Antes de começar,
  * Cronograma). `ready=false` marca texto provisório até o oficial chegar.
+ * `cards` e `closing` são opcionais: parágrafos, depois cards, depois a citação.
  */
 export interface GuidePage {
   slug: string;
   title: string;
   eyebrow?: string | null;
   paragraphs: string[];
+  cards?: GuidePageCard[] | null;
+  closing?: string | null;
   ready: boolean;
   order: number;
 }

@@ -522,6 +522,18 @@ export default function GuiaApp({
             <p key={i}>{p}</p>
           ))}
         </div>
+        {page.cards?.length ? (
+          <div className="g2cards">
+            {page.cards.map((c, i) => (
+              <div className="c" key={i}>
+                <div className="n serif">{c.n}</div>
+                <b>{c.title}</b>
+                <span>{c.text}</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {page.closing ? <blockquote className="g2quote serif">{page.closing}</blockquote> : null}
         {page.slug === "cronograma" ? <CronogramaVivo /> : null}
       </div>
     );

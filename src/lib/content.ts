@@ -68,6 +68,8 @@ export async function getGuiaData(): Promise<{
       title: p.title,
       eyebrow: p.eyebrow,
       paragraphs: Array.isArray(p.paragraphs) ? p.paragraphs : [],
+      cards: Array.isArray(p.cards) ? p.cards : null,
+      closing: p.closing ?? null,
       ready: !!p.ready,
       order: p.order ?? 0,
     }));
