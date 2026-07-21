@@ -252,22 +252,56 @@ No ar na branch `claude/project-initial-analysis-gi6lmx`:
 - **Brasão oficial** extraído do PDF (vinho + creme) em `public/images/`.
 - Validado com build de produção + screenshots (desktop e mobile).
 
-### Próximo passo — PRIORIDADE: painel de edição fácil (leiga)
+### 21/07/2026 (2ª entrega) — Painel editor leigo + analytics + melhorias aprovadas
 
-Orientação por áudio + mensagem (21/07): a Helô quer uma área onde ELA edita
-tudo sem depender de ninguém técnico. Especificação:
+Tudo no ar na branch, commit `eae0ac2`:
 
-1. **Catálogo por categoria:** abrir a categoria → escolher gênero e faixa →
-   preencher os 3 espaços: foto (upload direto), nome, preço, link, fornecedor.
-   Salvar por espaço. Sem jargão: os campos com os mesmos nomes que ela usa.
-2. **Páginas do guia:** abrir a página → colar/editar o texto (um parágrafo por
-   caixa) → marcar "texto oficial" (tira o selo de provisório) → salvar.
-3. **Infra:** provisionar as tabelas v2 no Supabase (rodar `schema.sql`),
-   bucket de fotos no Storage, `SUPABASE_SERVICE_ROLE_KEY` na Vercel e rotas de
-   servidor para gravação. Sem a chave, o painel mostra aviso claro e fica em
-   modo leitura (nunca quebra).
-4. Depois do editor: carga do seed no banco, Fase 4 (link por cliente) e
-   ajustes finos.
+- **Editor leigo no `/admin`** (orientação dos áudios: "tudo editável"):
+  - Login por senha do painel (`QH_ADMIN_SENHA`, cookie httpOnly). Sem senha,
+    o painel fica em visualização e nada grava.
+  - Edição das 4 páginas do guia (colar texto + marcar "texto oficial").
+  - Edição dos textos de decisão das 22 categorias (quando usar, quando não,
+    erro comum, efeito, instalação).
+  - CRUD de opções por gênero × faixa: foto (upload direto para o Supabase
+    Storage, bucket `qh-fotos`), nome, preço, fornecedor, link. Adicionar,
+    editar e excluir; até 3 por faixa (pode deixar menos). Áudio 3 (21/07):
+    "editar a foto de cada berço, deletar campo, acrescentar campo, editar
+    nome e preço" — atendido.
+  - Botão "Preparar o banco": carga idempotente do seed, sem sobrescrever nada
+    que ela já tenha editado.
+- **Analytics próprio**: coleta anônima via `/api/evento` (visitas ao site e ao
+  guia, entradas pela capa, escolhas de item, Meu Projeto, cliques em
+  fornecedor, interesse na marcenaria) + dashboard "Acessos" no painel (cartões,
+  funil do guia, série diária, itens mais escolhidos). Sem chave de gravação os
+  eventos são descartados em silêncio (nunca quebra o site).
+- **Order bump da marcenaria** (melhoria aprovada): bloco no Meu Projeto +
+  versão compacta em Armário e Cômoda, com evento de interesse e CTA que abre a
+  conversa.
+- **Cronograma vivo** (melhoria aprovada): a mãe informa a data prevista da
+  chegada na página Cronograma; as janelas ganham datas reais, cruzadas com as
+  decisões dela ("você está aqui", "janela passada — priorize", ✓ concluída), e
+  a Visão geral mostra a contagem de semanas.
+
+### Ir ao ar — runbook (passos que exigem acesso humano)
+
+O código está pronto e o app já roda (lendo do seed). Para ligar banco ao vivo,
+editor gravável e analytics, faltam passos que só quem tem as credenciais faz —
+o ambiente de dev não consegue religar infra nem gravar segredos na Vercel:
+
+1. **Supabase — religar o projeto** `txdxtwmvehrzwharvgda` ("Novo"), que está
+   pausado (INACTIVE). Dashboard → Restore/Resume.
+2. **Supabase — criar as tabelas v2**: SQL Editor → colar e rodar
+   `supabase/schema.sql` (idempotente; só cria o que falta, prefixo `qh_`).
+3. **Vercel → Settings → Environment Variables** (Production):
+   - `SUPABASE_SERVICE_ROLE_KEY` = Supabase → Project Settings → API → service_role (secret).
+   - `QH_ADMIN_SENHA` = uma senha forte à escolha da Helô (libera o `/admin`).
+   - Redeploy para aplicar.
+4. **No `/admin`**: entrar com a senha → botão "Preparar o banco (1ª vez)" para
+   carregar as 22 categorias, as 4 páginas e os exemplos. Pronto: editar à
+   vontade e acompanhar os acessos.
+
+Depois disso: Fase 4 (link por cliente com nome do bebê e da mãe) e o restante
+das melhorias aprovadas (PDF do projeto, status de compra).
 
 ## 7. Riscos e cuidados
 
