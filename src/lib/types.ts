@@ -10,6 +10,14 @@ export const TIER_LABEL: Record<PriceTier, string> = {
   alto: "Alto padrão",
 };
 
+export type Genero = "menina" | "neutro" | "menino";
+
+export const GENERO_LABEL: Record<Genero, string> = {
+  menina: "Menina",
+  neutro: "Neutro",
+  menino: "Menino",
+};
+
 /** Fornecedor sugerido para um item, por faixa de investimento. */
 export interface Supplier {
   id: string;
@@ -19,6 +27,48 @@ export interface Supplier {
   url?: string | null;
   photoUrl?: string | null;
   note?: string | null;
+}
+
+/**
+ * Opção concreta de produto dentro de uma categoria do guia: a curadoria da
+ * Helô com foto, preço e fornecedor, por gênero e faixa de investimento.
+ * Ancorada pelo SLUG do item (estável entre seed e banco) para o catálogo
+ * poder ser preenchido aos poucos pelo painel sem depender de ids.
+ */
+export interface ProductOption {
+  id: string;
+  itemSlug: string;
+  genero: Genero;
+  tier: PriceTier;
+  name: string;
+  photoUrl?: string | null;
+  /** Preço em centavos na data-base do guia; null = ainda sem preço. */
+  priceCents: number | null;
+  url?: string | null;
+  supplier?: string | null;
+  note?: string | null;
+  /** Dado de demonstração — substituído pela curadoria real no painel. */
+  exemplo?: boolean;
+  order: number;
+}
+
+/**
+ * Página de conteúdo do guia (Sobre nós, Como usar, Antes de começar,
+ * Cronograma). `ready=false` marca texto provisório até o oficial chegar.
+ */
+export interface GuidePage {
+  slug: string;
+  title: string;
+  eyebrow?: string | null;
+  paragraphs: string[];
+  ready: boolean;
+  order: number;
+}
+
+/** Perfil exibido no guia (pré-visualização até o link por cliente entrar). */
+export interface GuestProfile {
+  motherName: string;
+  babyName: string;
 }
 
 /**
@@ -66,6 +116,12 @@ export interface GuideMeta {
   priceCents: number | null;
   hotmartUrl?: string | null;
   status: "rascunho" | "lista_espera" | "a_venda";
+  /** Capa do guia (Collection Nº 01). Opcionais: há fallback no app. */
+  collection?: string | null;
+  coverTitle?: string | null;
+  coverSub?: string | null;
+  /** Data-base dos preços do catálogo, exibida no Meu Projeto. */
+  precoDataBase?: string | null;
 }
 
 /* ------------------------------------------------------------------ *

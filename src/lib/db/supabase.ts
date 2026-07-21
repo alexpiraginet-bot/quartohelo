@@ -11,9 +11,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 // conteúdo; clientes/jornada/analytics ficam a cargo da service role). Ficam
 // aqui como padrão para o app conectar sem depender de config externa; se as
 // envs existirem (ex.: outro ambiente), elas têm prioridade.
-const DEFAULT_URL = "https://txdxtwmvehrzwharvgda.supabase.co";
+// Projeto: LexFlow (vpwjaciuwgiwntyoaozj), região sa-east-1 (São Paulo).
+// O quartohelo coabita com outros produtos neste projeto — por isso o prefixo
+// qh_ nas tabelas. A chave anon é pública por design (o RLS protege os dados).
+const DEFAULT_URL = "https://vpwjaciuwgiwntyoaozj.supabase.co";
 const DEFAULT_ANON =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4ZHh0d212ZWhyendoYXJ2Z2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDk3NTUsImV4cCI6MjA5NjYyNTc1NX0._iexl9iTZPCgfUFHXuAZbTEMLDYJbrKyTK8xcpjwgN8";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwd2phY2l1d2dpd250eW9hb3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MzUwMTMsImV4cCI6MjEwMDIxMTAxM30.o6BA6Zfx8793hC5XqNhzwgkCS7gQNXJXzK9aUrbowmQ";
 
 export function normalizeSupabaseUrl(u?: string | null): string | undefined {
   if (!u) return undefined;
@@ -22,6 +25,11 @@ export function normalizeSupabaseUrl(u?: string | null): string | undefined {
 
 const url = normalizeSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL) ?? DEFAULT_URL;
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? DEFAULT_ANON;
+
+// URL/chave públicas para chamar a Edge Function do admin (qh-admin), que
+// carrega a service role nativamente — a gravação não depende de env na Vercel.
+export const SUPA_URL = url;
+export const SUPA_ANON = anon;
 
 export const isDbConfigured = Boolean(url && anon);
 
