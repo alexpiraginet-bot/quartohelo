@@ -13,6 +13,8 @@ import type {
   ProductOption,
 } from "@/lib/types";
 import { GENERO_LABEL, TIER_LABEL } from "@/lib/types";
+import { openSupport } from "@/app/_components/Interactive";
+import { track } from "@/app/_components/Track";
 
 /* ------------------------------------------------------------------ *
  *  Guia Digital v2 — "Collection Nº 01".
@@ -39,6 +41,69 @@ type Choices = Record<string, LocalChoice>; // chave = slug do item
 const STORE_KEY = "qh_guia_v2_jornada";
 const ENTER_KEY = "qh_guia_v2_entrou";
 const GEN_KEY = "qh_guia_v2_genero";
+const DPP_KEY = "qh_guia_v2_dpp";
+
+/** Cronograma vivo: janelas de decisão/encomenda contadas a partir da data
+ *  prevista de chegada (prazos de produção de 30–90 dias considerados). */
+const CRONO: { semanas: number; titulo: string; desc: string; slugs: string[] }[] = [
+  {
+    semanas: 20,
+    titulo: "Conceito e papel de parede",
+    desc: "Defina a atmosfera do quarto e o papel de parede — tudo dialoga com ele.",
+    slugs: ["papel-de-parede"],
+  },
+  {
+    semanas: 16,
+    titulo: "Berço e marcenaria",
+    desc: "Berço, armário e cômoda levam de 30 a 90 dias de produção. É a hora de encomendar.",
+    slugs: ["berco", "armario", "comoda"],
+  },
+  {
+    semanas: 14,
+    titulo: "Assentos e apoios",
+    desc: "Poltrona de amamentação, cama auxiliar e mesa lateral.",
+    slugs: ["poltrona-de-amamentacao", "cama-auxiliar", "mesa-lateral"],
+  },
+  {
+    semanas: 10,
+    titulo: "Iluminação e pontos elétricos",
+    desc: "Arandelas, abajur e pendente — os pontos elétricos vêm antes do acabamento.",
+    slugs: ["arandelas", "abajur", "pendente"],
+  },
+  {
+    semanas: 8,
+    titulo: "Têxteis e enxoval",
+    desc: "Cortina, tapete, enxovais, almofadas, trocador e porta-treco.",
+    slugs: [
+      "tapete",
+      "cortina",
+      "enxoval-berco",
+      "enxoval-cama",
+      "almofadas-decorativas",
+      "almofada-de-amamentacao",
+      "trocador",
+      "porta-treco",
+    ],
+  },
+  {
+    semanas: 6,
+    titulo: "Complementos",
+    desc: "Kit higiene e adornos — os detalhes que fecham o ambiente.",
+    slugs: ["kit-higiene", "adornos"],
+  },
+  {
+    semanas: 4,
+    titulo: "Montagem final",
+    desc: "Quarto montado, enxoval lavado e cada coisa no seu lugar.",
+    slugs: [],
+  },
+  {
+    semanas: 2,
+    titulo: "Mala pronta",
+    desc: "Mala maternidade e bolsa de passeio prontas na porta.",
+    slugs: ["mala-maternidade", "bolsa-de-passeio"],
+  },
+];
 
 /** Ordem do documento: primeira linha os mais altos, última os acessíveis. */
 const TIER_ORDER: PriceTier[] = ["alto", "medio", "acessivel"];
@@ -98,6 +163,7 @@ export default function GuiaApp({
   const [hydrated, setHydrated] = useState(false);
   const [view, setView] = useState<View>({ kind: "inicio" });
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dpp, setDpp] = useState<string>("");
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -106,11 +172,21 @@ export default function GuiaApp({
       if (window.localStorage.getItem(ENTER_KEY) === "1") setEntered(true);
       const g = window.localStorage.getItem(GEN_KEY) as Genero | null;
       if (g && GENEROS.includes(g)) setGenero(g);
+      setDpp(window.localStorage.getItem(DPP_KEY) ?? "");
     } catch {
       /* segue sem persistência */
     }
     setHydrated(true);
+    track("visita_guia");
   }, []);
+
+  function saveDpp(v: string) {
+    setDpp(v);
+    try {
+      if (v) window.localStorage.setItem(DPP_KEY, v);
+      else window.localStorage.removeItem(DPP_KEY);
+    } catch {}
+  }
 
   useEffect(() => {
     if (!hydrated) return;
@@ -125,6 +201,7 @@ export default function GuiaApp({
     setMenuOpen(false);
     mainRef.current?.scrollTo?.({ top: 0 });
     window.scrollTo({ top: 0 });
+    if (view.kind === "projeto") track("projeto_visto");
   }, [view]);
 
   const allEntries = useMemo(
@@ -167,6 +244,9 @@ export default function GuiaApp({
   }
 
   function chooseOption(slug: string, opt: ProductOption) {
+    if (choices[slug]?.optionId !== opt.id) {
+      track("escolha_item", { item: slug, tier: opt.tier, genero: opt.genero });
+    }
     setChoices((prev) => {
       const cur = prev[slug];
       if (cur?.optionId === opt.id) {
@@ -217,6 +297,7 @@ export default function GuiaApp({
 
   function enter() {
     setEntered(true);
+    track("entrou_guia");
     try {
       window.localStorage.setItem(ENTER_KEY, "1");
     } catch {}
@@ -260,6 +341,98 @@ export default function GuiaApp({
     false;
 
   /* ------------------------------ visões ------------------------------ */
+
+  function OrderBump({ compact = false }: { compact?: boolean }) {
+    return (
+      <aside className={`g2bump${compact ? " mini" : ""}`}>
+        <div className="in">
+          <span className="k">Adicional · sob medida</span>
+          <b className="serif">Projeto de marcenaria avulso</b>
+          <p>
+            A marcenaria certa aproveita cada centímetro e amarra o quarto inteiro. A Helô desenha o projeto
+            executivo do seu quarto — armário, cômoda, nichos e acabamentos — pronto para o seu marceneiro executar.
+          </p>
+          <button
+            type="button"
+            className="btn wine"
+            onClick={() => {
+              track("interesse_marcenaria");
+              openSupport();
+            }}
+          >
+            Quero o projeto de marcenaria
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
+  const hoje = new Date();
+  const dppDate = dpp ? new Date(`${dpp}T12:00:00`) : null;
+  const semanasRestantes = dppDate ? Math.ceil((dppDate.getTime() - hoje.getTime()) / (7 * 24 * 3600 * 1000)) : null;
+  const fmtData = (d: Date) => new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(d);
+
+  function CronogramaVivo() {
+    const proxima = dppDate
+      ? CRONO.find((m) => new Date(dppDate.getTime() - m.semanas * 7 * 24 * 3600 * 1000) >= hoje)
+      : null;
+    return (
+      <section className="g2crono">
+        <div className="g2crono-head">
+          <div>
+            <b className="serif">O seu cronograma</b>
+            {dppDate ? (
+              <p>
+                {semanasRestantes != null && semanasRestantes > 0
+                  ? `Faltam ${semanasRestantes} ${semanasRestantes === 1 ? "semana" : "semanas"} para a chegada. As janelas abaixo já estão nas suas datas.`
+                  : "A chegada é agora! Priorize o que ainda estiver aberto."}
+              </p>
+            ) : (
+              <p>Conte quando o bebê chega e cada janela abaixo ganha a sua data certa, cruzada com as suas decisões.</p>
+            )}
+          </div>
+          <label className="g2dpp">
+            Data prevista da chegada
+            <input type="date" value={dpp} onChange={(e) => saveDpp(e.target.value)} />
+          </label>
+        </div>
+        <ol className="g2tl">
+          {CRONO.map((m) => {
+            const data = dppDate ? new Date(dppDate.getTime() - m.semanas * 7 * 24 * 3600 * 1000) : null;
+            const itens = m.slugs.map((s) => bySlug.get(s)).filter(Boolean);
+            const decididosNa = m.slugs.filter((s) => choices[s]?.status === "escolhido").length;
+            const completa = itens.length > 0 && decididosNa === itens.length;
+            const passada = data ? data < hoje && !completa : false;
+            const atual = proxima === m;
+            return (
+              <li
+                key={m.semanas}
+                className={`${completa ? "ok" : ""}${passada ? " late" : ""}${atual ? " now" : ""}`}
+              >
+                <span className="when">
+                  {data ? fmtData(data) : `${m.semanas} sem. antes`}
+                  {atual ? <i>você está aqui</i> : null}
+                </span>
+                <div className="what">
+                  <b>
+                    {m.titulo}
+                    {completa ? " ✓" : ""}
+                  </b>
+                  <p>{m.desc}</p>
+                  {itens.length ? (
+                    <span className="st">
+                      {decididosNa}/{itens.length} decididos
+                      {passada ? " · janela passada — priorize" : ""}
+                    </span>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+    );
+  }
 
   function renderInicio() {
     return (
@@ -318,6 +491,15 @@ export default function GuiaApp({
           </div>
         </div>
 
+        {dppDate && semanasRestantes != null ? (
+          <button type="button" className="g2countdown" onClick={navTo({ kind: "pagina", slug: "cronograma" })}>
+            {semanasRestantes > 0
+              ? `Faltam ${semanasRestantes} ${semanasRestantes === 1 ? "semana" : "semanas"} para a chegada da ${profile.babyName}`
+              : `A ${profile.babyName} chega a qualquer momento`}
+            <span>Ver o cronograma →</span>
+          </button>
+        ) : null}
+
         <p className="g2note">
           Pré-visualização: em breve este guia abre pelo seu link pessoal, já com o seu nome e o do seu bebê.
         </p>
@@ -340,6 +522,7 @@ export default function GuiaApp({
             <p key={i}>{p}</p>
           ))}
         </div>
+        {page.slug === "cronograma" ? <CronogramaVivo /> : null}
       </div>
     );
   }
@@ -461,7 +644,13 @@ export default function GuiaApp({
                           <div className="pr serif">{shownPrice != null ? brl(shownPrice) : "Valor em definição"}</div>
                           {o.supplier ? <div className="sp">{o.supplier}</div> : null}
                           {o.url ? (
-                            <a className="lk" href={o.url} target="_blank" rel="noreferrer">
+                            <a
+                              className="lk"
+                              href={o.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => track("clique_fornecedor", { item: slug, url: o.url })}
+                            >
                               Ver no fornecedor ↗
                             </a>
                           ) : null}
@@ -507,6 +696,8 @@ export default function GuiaApp({
             </button>
           </div>
         </section>
+
+        {slug === "armario" || slug === "comoda" ? <OrderBump compact /> : null}
 
         <nav className="g2pn">
           {prev ? (
@@ -659,6 +850,8 @@ export default function GuiaApp({
             mudou no fornecedor, toque no valor e ajuste — o total recalcula na hora.
           </p>
         </section>
+
+        <OrderBump />
       </div>
     );
   }

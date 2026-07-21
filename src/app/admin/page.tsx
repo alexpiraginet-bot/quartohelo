@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { dbReady, getCategories, getGuide, getSiteContent } from "@/lib/content";
-import { TIER_LABEL } from "@/lib/types";
+import { getGuiaData } from "@/lib/content";
+import { serverClient } from "@/lib/db/supabase";
+import { adminPassword } from "@/lib/admin/auth";
 import type { ItemDecision } from "@/lib/types";
+import { PrepararBancoForm } from "./_components/AdminForms";
 
 export const dynamic = "force-dynamic";
 
-// Painel da Helô. Nesta fundação ele já lê a mesma camada de conteúdo do site
-// (seed hoje, Supabase quando conectado) e mostra o estado real do backend e a
-// estrutura inteira do guia. A edição gravável entra sobre esta base.
+// Painel inicial: o estado de tudo em linguagem simples + os atalhos de edição.
 
 function richCount(decision: ItemDecision): number {
   return (["quandoUsar", "quandoNao", "erroComum", "efeito", "instalacao"] as const).filter((k) => decision?.[k])
@@ -15,137 +15,118 @@ function richCount(decision: ItemDecision): number {
 }
 
 export default async function AdminPage() {
-  const [categories, guide, site] = await Promise.all([getCategories(), getGuide(), getSiteContent()]);
+  const { categories, guide, pages, options } = await getGuiaData();
 
   const totalItems = categories.reduce((n, c) => n + c.items.length, 0);
-  const richItems = categories.reduce((n, c) => n + c.items.filter((i) => richCount(i.decision) > 0).length, 0);
-  const suppliers = categories.reduce(
-    (n, c) => n + c.items.reduce((m, i) => m + i.suppliers.length, 0),
-    0,
-  );
-  const statusLabel: Record<string, string> = {
-    rascunho: "Rascunho",
-    lista_espera: "Lista de espera",
-    a_venda: "À venda",
-  };
-  const price =
-    guide.priceCents != null
-      ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(guide.priceCents / 100)
-      : "A definir";
+  const comTexto = categories.reduce((n, c) => n + c.items.filter((i) => richCount(i.decision) > 0).length, 0);
+  const reais = options.filter((o) => !o.exemplo).length;
+  const exemplos = options.length - reais;
+  const prontas = pages.filter((p) => p.ready).length;
+
+  const escrita = Boolean(serverClient());
+  const senha = Boolean(adminPassword());
 
   return (
-    <div className="admin">
-      <nav className="adm-nav">
-        <span className="logo">
-          <img src="/images/logo-horizontal.png" alt="Quarto da Helô" />
-        </span>
-        <span className="t">Painel</span>
-        <Link href="/">Ver o site →</Link>
-      </nav>
+    <div className="adm-wrap">
+      <h1 className="adm-h">Painel de conteúdo</h1>
+      <p className="adm-sub">
+        Tudo que aparece no guia mora aqui: os textos, as categorias e o catálogo com fotos e preços. Nada é editado
+        no código.
+      </p>
 
-      <div className="adm-wrap">
-        {dbReady ? (
-          <div className="adm-state on">
-            <b>Backend conectado.</b> O conteúdo abaixo vem do Supabase. As alterações que você fizer aqui passam a
-            valer no site e no guia na hora.
+      <div className="adm-cards">
+        <div className="adm-card">
+          <div className="k">Guia</div>
+          <h3>{guide.name}</h3>
+          <p>
+            {guide.collection ?? "Collection Nº 01"} · {guide.tagline}
+          </p>
+        </div>
+        <div className="adm-card">
+          <div className="k">Páginas do guia</div>
+          <div className="big">
+            {prontas} de {pages.length}
           </div>
-        ) : (
-          <div className="adm-state off">
-            <b>Rodando na estrutura inicial.</b> O site e o guia já funcionam com o conteúdo semente. Quando o Supabase
-            for conectado (variáveis de ambiente no projeto), este mesmo painel passa a ler e gravar no banco, sem trocar
-            nada no código.
+          <p>com texto oficial. As demais mostram o aviso de texto provisório.</p>
+          <Link className="adm-go" href="/admin/paginas">
+            Editar páginas →
+          </Link>
+        </div>
+        <div className="adm-card">
+          <div className="k">Catálogo de opções</div>
+          <div className="big">{reais}</div>
+          <p>
+            opções reais cadastradas{exemplos ? ` (+ ${exemplos} exemplos para substituir)` : ""}. Fotos, nomes e
+            preços, categoria por categoria.
+          </p>
+          <Link className="adm-go" href="/admin/catalogo">
+            Editar catálogo →
+          </Link>
+        </div>
+        <div className="adm-card">
+          <div className="k">Textos das categorias</div>
+          <div className="big">
+            {comTexto} de {totalItems}
           </div>
-        )}
+          <p>itens com a decisão escrita (quando usar, erro comum, efeito…).</p>
+          <Link className="adm-go" href="/admin/catalogo">
+            Editar textos →
+          </Link>
+        </div>
+      </div>
 
-        <h1 className="adm-h">Painel de conteúdo</h1>
-        <p className="adm-sub">Tudo que aparece no site e no guia mora aqui. Nada é editado no código.</p>
-
-        <div className="adm-cards">
-          <div className="adm-card">
-            <div className="k">Guia</div>
-            <h3>{guide.name}</h3>
-            <p>{guide.tagline}</p>
+      <div className="adm-section">
+        <h2>Estado do sistema</h2>
+        <div className="adm-cat">
+          <div className="adm-items">
+            <span className={`it${senha ? " rich" : ""}`}>
+              {senha ? "✓ Senha do painel definida" : "Senha do painel: falta definir QH_ADMIN_SENHA na Vercel"}
+            </span>
+            <span className={`it${escrita ? " rich" : ""}`}>
+              {escrita
+                ? "✓ Chave de gravação configurada"
+                : "Gravação: falta a SUPABASE_SERVICE_ROLE_KEY na Vercel"}
+            </span>
+            <span className="it rich">✓ Leitura do guia no ar (com reserva local se o banco oscilar)</span>
           </div>
-          <div className="adm-card">
-            <div className="k">Situação do produto</div>
-            <div className="big">{statusLabel[guide.status] ?? guide.status}</div>
-            <p>Preço público: {price}</p>
-          </div>
-          <div className="adm-card">
-            <div className="k">Categorias · Itens</div>
-            <div className="big">
-              {categories.length} · {totalItems}
-            </div>
-            <p>{richItems} com decisão curada de um total de {totalItems}.</p>
-          </div>
-          <div className="adm-card">
-            <div className="k">Fornecedores cadastrados</div>
-            <div className="big">{suppliers}</div>
-            <p>
-              Por faixa: {TIER_LABEL.acessivel}, {TIER_LABEL.medio}, {TIER_LABEL.alto}.
-            </p>
+          <p style={{ color: "var(--muted)", fontSize: 13.5, lineHeight: 1.7, margin: "10px 0 0" }}>
+            Primeira vez editando? 1) Rode o arquivo <code>supabase/schema.sql</code> no SQL Editor do Supabase;
+            2) defina as duas variáveis acima na Vercel; 3) toque em &quot;Preparar o banco&quot; aqui embaixo. Depois
+            disso é só editar — cada salvamento já vale no guia.
+          </p>
+          <div style={{ marginTop: 12 }}>
+            <PrepararBancoForm />
           </div>
         </div>
+      </div>
 
-        <div className="adm-section">
-          <h2>Estrutura do guia</h2>
-          {categories.map((c) => (
-            <div className="adm-cat" key={c.id}>
-              <div className="ch">
-                <b>{c.name}</b>
-                <span>{c.items.length} itens</span>
-              </div>
-              {c.intro ? <span style={{ color: "var(--muted)", fontSize: 13 }}>{c.intro}</span> : null}
-              <div className="adm-items">
-                {c.items.map((i) => {
-                  const r = richCount(i.decision);
-                  return (
-                    <span className={`it${r > 0 ? " rich" : ""}`} key={i.id} title={r > 0 ? `${r}/5 campos de decisão` : "Sem decisão ainda"}>
-                      {i.name}
-                      {r > 0 ? ` · ${r}/5` : ""}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="adm-section">
-          <h2>Landing</h2>
-          <div className="adm-cat">
+      <div className="adm-section">
+        <h2>Estrutura do guia</h2>
+        {categories.map((c) => (
+          <div className="adm-cat" key={c.id}>
             <div className="ch">
-              <b>Blocos editáveis</b>
-              <span>texto e chamadas da página</span>
+              <b>{c.name}</b>
+              <span>{c.items.length} categorias</span>
             </div>
             <div className="adm-items">
-              {[
-                "Topo / herói",
-                "Quem somos",
-                "Como trabalhamos",
-                `Serviços (${site.services.length})`,
-                "Bloco do guia",
-                "Contato",
-                "Rodapé",
-              ].map((b) => (
-                <span className="it" key={b}>
-                  {b}
-                </span>
-              ))}
+              {c.items.map((i) => {
+                const n = options.filter((o) => o.itemSlug === i.slug && !o.exemplo).length;
+                const r = richCount(i.decision);
+                return (
+                  <Link
+                    className={`it lk${n > 0 || r > 0 ? " rich" : ""}`}
+                    key={i.slug}
+                    href={`/admin/catalogo/${i.slug}`}
+                    title="Abrir para editar"
+                  >
+                    {i.name}
+                    {n > 0 ? ` · ${n} opções` : ""}
+                  </Link>
+                );
+              })}
             </div>
           </div>
-        </div>
-
-        <div className="adm-section">
-          <h2>Próximo passo</h2>
-          <div className="adm-cat">
-            <p style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>
-              Com o Supabase conectado, cada card e cada item acima ganham edição direta: criar categorias, escrever as
-              decisões, subir fotos, cadastrar fornecedores por faixa e ajustar preço e textos da landing. A jornada de
-              cada cliente que comprar o guia fica registrada para você acompanhar as escolhas.
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

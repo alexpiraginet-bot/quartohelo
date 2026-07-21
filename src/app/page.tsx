@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSiteContent } from "@/lib/content";
 import { LandingFx, SupportButton } from "./_components/Interactive";
+import { Track } from "./_components/Track";
 
 export const dynamic = "force-dynamic"; // reflete o CMS assim que o Supabase entra
 
@@ -9,6 +10,7 @@ export default async function Home() {
   return (
     <>
       <LandingFx />
+      <Track kind="visita_site" />
       <nav className="nav" id="nav">
         <a className="logo" href="#top"><img src="/images/logo-horizontal.png" alt="Quarto da Helô" /></a>
         <div className="links">
