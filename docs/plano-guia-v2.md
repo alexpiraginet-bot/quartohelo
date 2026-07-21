@@ -282,23 +282,37 @@ Tudo no ar na branch, commit `eae0ac2`:
   decisões dela ("você está aqui", "janela passada — priorize", ✓ concluída), e
   a Visão geral mostra a contagem de semanas.
 
-### Ir ao ar — runbook (passos que exigem acesso humano)
+### Banco — migrado para a LexFlow e provisionado (21/07/2026)
 
-O código está pronto e o app já roda (lendo do seed). Para ligar banco ao vivo,
-editor gravável e analytics, faltam passos que só quem tem as credenciais faz —
-o ambiente de dev não consegue religar infra nem gravar segredos na Vercel:
+Por decisão do cliente, o quartohelo passou do projeto pausado "Novo" para o
+**projeto LexFlow** (`vpwjaciuwgiwntyoaozj`, sa-east-1, ativo), que hospeda
+vários produtos. Feito nesta sessão, já no ar:
 
-1. **Supabase — religar o projeto** `txdxtwmvehrzwharvgda` ("Novo"), que está
-   pausado (INACTIVE). Dashboard → Restore/Resume.
-2. **Supabase — criar as tabelas v2**: SQL Editor → colar e rodar
-   `supabase/schema.sql` (idempotente; só cria o que falta, prefixo `qh_`).
-3. **Vercel → Settings → Environment Variables** (Production):
-   - `SUPABASE_SERVICE_ROLE_KEY` = Supabase → Project Settings → API → service_role (secret).
+- `src/lib/db/supabase.ts` aponta para a LexFlow (URL + chave anon pública).
+- Tabelas `qh_*` criadas na LexFlow (schema v2 completo, idempotente, sem tocar
+  nas tabelas da LexFlow).
+- Seed carregado: 4 categorias, 22 itens (com as decisões curadas), 4 páginas,
+  12 opções de exemplo e a meta do guia.
+- Verificado: a chave anon lê o conteúdo (RLS "leitura pública") e as tabelas
+  privadas (clientes/jornada/analytics) ficam bloqueadas para o anon.
+
+O guia já lê ao vivo da LexFlow. (FYI de segurança: a tabela `_prisma_migrations`
+da própria LexFlow está com RLS desligado — pré-existente, não é do quartohelo;
+decisão do dono daquele app se quer habilitar.)
+
+### Ir ao ar — só falta a Vercel (2 variáveis)
+
+O banco está pronto e populado. Para ligar a ESCRITA (editor gravável + upload
+de fotos + analytics), faltam só dois segredos na Vercel — que o ambiente de dev
+não grava:
+
+1. **Vercel → Settings → Environment Variables** (Production):
+   - `SUPABASE_SERVICE_ROLE_KEY` = LexFlow → Project Settings → API → service_role (secret).
    - `QH_ADMIN_SENHA` = uma senha forte à escolha da Helô (libera o `/admin`).
-   - Redeploy para aplicar.
-4. **No `/admin`**: entrar com a senha → botão "Preparar o banco (1ª vez)" para
-   carregar as 22 categorias, as 4 páginas e os exemplos. Pronto: editar à
-   vontade e acompanhar os acessos.
+2. **Redeploy**. Pronto: o `/admin` abre com a senha, a Helô edita tudo, o upload
+   de fotos cria o bucket `qh-fotos` sozinho e o dashboard de Acessos começa a
+   registrar. Não precisa clicar em "Preparar o banco" — a carga já foi feita
+   (o botão continua lá, idempotente, para recargas futuras).
 
 Depois disso: Fase 4 (link por cliente com nome do bebê e da mãe) e o restante
 das melhorias aprovadas (PDF do projeto, status de compra).

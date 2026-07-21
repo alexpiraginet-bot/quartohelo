@@ -1,8 +1,9 @@
 -- Quarto da Helô — esquema do banco (Supabase / Postgres).
--- As tabelas usam prefixo qh_ porque coabitam com outro produto no mesmo
--- projeto Supabase. Leitura do conteúdo é pública (site + guia); escrita é só
--- pela service role (admin). Já está aplicado; este arquivo é a fonte fiel do
--- schema para reprovisionar quando precisar.
+-- Projeto: LexFlow (vpwjaciuwgiwntyoaozj), região sa-east-1. As tabelas usam
+-- prefixo qh_ porque coabitam com o app da LexFlow no mesmo projeto. Leitura do
+-- conteúdo é pública (site + guia); escrita é só pela service role (admin).
+-- Já aplicado na LexFlow (21/07/2026); este arquivo é a fonte fiel do schema
+-- para reprovisionar quando precisar (tudo idempotente).
 
 -- ------------------------- CONTEÚDO DO GUIA -------------------------
 create table if not exists qh_categories (
