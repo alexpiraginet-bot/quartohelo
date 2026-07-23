@@ -32,7 +32,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/analytics">Acessos</Link>
         </div>
         <div className="adm-right">
-          <Link href="/guia">Ver o guia →</Link>
+          <Link href="/" target="_blank" rel="noopener noreferrer">Ver a Landing Page →</Link>
+          <Link href="/guia" target="_blank" rel="noopener noreferrer">Ver o guia →</Link>
           <form action={sairDoPainel}>
             <button type="submit" className="adm-sair">
               Sair

@@ -59,10 +59,48 @@ export interface GuidePageCard {
   text: string;
 }
 
+/** Callout discreto "Dica da Helô". `label` é opcional (padrão: "Dica da Helô"),
+ *  para nunca renomear o conteúdo salvo silenciosamente. */
+export interface GuideDica {
+  label?: string | null;
+  body: string;
+}
+
+/** Uma linha da tabela de medidas (item · medida mínima · significado prático). */
+export interface MeasureRow {
+  item: string;
+  min: string;
+  meaning: string;
+}
+
+/** Tabela de medidas de uma página do guia: rótulos das 3 colunas + linhas +
+ *  uma dica opcional (renderizada como callout abaixo da tabela). */
+export interface GuidePageMeasures {
+  columns: { item: string; min: string; meaning: string };
+  rows: MeasureRow[];
+  tip?: GuideDica | null;
+}
+
+/** Textos editoriais (fixos) da tela "Meu projeto". Só rótulos/instruções — os
+ *  dados do projeto (itens, valores, totais) continuam dinâmicos por usuária.
+ *  `finNote` aceita o token {data}, trocado pela data-base dos preços. */
+export interface ProjectTexts {
+  howTitle?: string | null;
+  howText?: string | null;
+  moodTitle?: string | null;
+  moodEmpty?: string | null;
+  finTitle?: string | null;
+  finEmpty?: string | null;
+  totalLabel?: string | null;
+  finNote?: string | null;
+}
+
 /**
- * Página de conteúdo do guia (Quem somos, Como usar, Antes de começar,
+ * Página de conteúdo do guia (Visão geral, Quem somos, Como usar, Medidas,
  * Cronograma). `ready=false` marca texto provisório até o oficial chegar.
  * `cards` e `closing` são opcionais: parágrafos, depois cards, depois a citação.
+ * `measures` guarda a tabela de medidas (quando a página tiver uma).
+ * `backgroundUrl` é a imagem de fundo opcional (padrão: sem imagem).
  */
 export interface GuidePage {
   slug: string;
@@ -71,6 +109,10 @@ export interface GuidePage {
   paragraphs: string[];
   cards?: GuidePageCard[] | null;
   closing?: string | null;
+  measures?: GuidePageMeasures | null;
+  /** Textos editoriais da tela especial "Meu projeto" (só nessa página). */
+  project?: ProjectTexts | null;
+  backgroundUrl?: string | null;
   ready: boolean;
   order: number;
 }

@@ -120,6 +120,18 @@ export const seedCategories: Category[] = [
  * ------------------------------------------------------------------ */
 export const seedGuidePages: GuidePage[] = [
   {
+    slug: "visao-geral",
+    title: "Visão geral",
+    eyebrow: "Bem-vinda ao seu guia · Collection Nº 01",
+    paragraphs: [
+      "DO CONCEITO AO ÚLTIMO DETALHE: O guia completo para montar o quarto do seu bebê.",
+      "A beleza é a forma mais pura de cuidado e o primeiro cenário de uma vida merece ser impecável.",
+      "Aqui você encontrará o método, o critério e o olhar da Helô para você executar com primor.",
+    ],
+    ready: true,
+    order: 0,
+  },
+  {
     slug: "sobre-nos",
     title: "Quem somos",
     eyebrow: "Quarto da Helô",
@@ -173,14 +185,29 @@ export const seedGuidePages: GuidePage[] = [
   },
   {
     slug: "antes-de-comecar",
-    title: "Antes de começar",
-    eyebrow: "Preparação",
+    title: "Orientações sobre Medidas e Circulação",
+    eyebrow: "Antes de começar: A parte técnica que deve ser resolvida antes de qualquer escolha estética",
     paragraphs: [
-      "Meça o quarto antes de qualquer compra: largura das paredes, altura, posição de janelas, portas e pontos elétricos. As medidas decidem mais do que o gosto.",
-      "Defina a faixa de investimento total antes de se apaixonar por peças isoladas — o guia existe para o conjunto fechar com harmonia, sem sustos.",
-      "Comece pelas decisões estruturais (papel de parede, berço, marcenaria) e deixe adornos e detalhes para o final: eles respondem ao que já estiver definido.",
+      "A parte técnica que ninguém te conta — e que deve ser resolvida antes de qualquer escolha estética.",
     ],
-    ready: false,
+    measures: {
+      columns: { item: "Item", min: "Medida mínima", meaning: "O que isso significa na prática" },
+      rows: [
+        { item: "Circulação geral", min: "mínimo 60 cm", meaning: "Espaço mínimo para caminhar confortavelmente entre móveis. Abaixo disso, o quarto parece apertado mesmo que seja grande." },
+        { item: "Abertura de gaveta (cômoda)", min: "80 a 90 cm", meaning: "Frente à cômoda, garanta pelo menos 80 a 90 cm livres para abrir gavetas sem colidir com outro móvel e manuseá-la." },
+        { item: "Entre berço e parede", min: "60 cm", meaning: "O ideal é ter acesso ao bebê pelos dois lados do berço, facilitando o dia a dia. Caso o espaço seja menor, é possível optar pelo acesso por apenas um lado." },
+        { item: "Altura do trocador", min: "85 a 90 cm", meaning: "Depende da altura dos pais. Meça a altura do seu cotovelo dobrado — o trocador deve ficar 5 cm abaixo." },
+        { item: "Profundidade do trocador", min: "50 a 60 cm", meaning: "Mínimo de segurança para que o bebê não corra risco de cair." },
+        { item: "Berço (tamanho padrão)", min: "70 × 140 cm", meaning: "Sempre verifique o modelo do seu berço (padrão americano ou nacional) antes de comprar o colchão. Lembre também de verificar se o modelo possui certificação do INMETRO." },
+        { item: "Poltrona de amamentação", min: "80 × 85 cm", meaning: "Mais 30 cm laterais para repousar o braço e para a movimentação. Lembre-se de que poltronas com balanço precisam de 50 cm atrás." },
+        { item: "Abertura de porta", min: "—", meaning: "Cuidado: verifique se nenhum móvel obstrui a abertura total da porta." },
+      ],
+      tip: {
+        label: "Dica da Helô",
+        body: "Antes de comprar qualquer móvel: use fita crepe no chão para marcar as dimensões exatas do móvel que pretende comprar. Caminhe ao redor. Simule a abertura de gaveta. Esse exercício de 10 minutos evita arrependimentos que podem custar caro!",
+      },
+    },
+    ready: true,
     order: 3,
   },
   {
@@ -193,6 +220,26 @@ export const seedGuidePages: GuidePage[] = [
     ],
     ready: false,
     order: 4,
+  },
+  {
+    slug: "meu-projeto",
+    title: "Meu projeto",
+    eyebrow: "O seu quarto, escolha a escolha",
+    paragraphs: [],
+    project: {
+      howTitle: "Como funciona",
+      howText:
+        "Tudo que você marca nas categorias aparece aqui na hora: a foto compõe o seu moodboard e o valor entra na análise financeira, somado automaticamente. Toque em qualquer valor para ajustar — o ajuste vale só para o seu projeto.",
+      moodTitle: "Moodboard",
+      moodEmpty: "Seu moodboard ainda está em branco. Comece pelas categorias no menu — cada escolha aparece aqui na hora.",
+      finTitle: "Análise financeira",
+      finEmpty: "Os valores das suas escolhas aparecem aqui, item a item e somados.",
+      totalLabel: "Total do projeto",
+      finNote:
+        "Os valores têm como base os preços de {data}. Se algo mudou no fornecedor, toque no valor e ajuste — o total recalcula na hora.",
+    },
+    ready: true,
+    order: 99,
   },
 ];
 

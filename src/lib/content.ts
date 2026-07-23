@@ -65,16 +65,30 @@ export async function getGuiaData(): Promise<{
       // Banco ainda sem a estrutura v2 — o guia inteiro roda no seed.
       return { categories: seedCategories, guide, pages: seedGuidePages, options: seedProductOptions };
     }
-    const pages: GuidePage[] = pagesRows.map((p) => ({
+    const dbPages: GuidePage[] = pagesRows.map((p) => ({
       slug: p.slug,
       title: p.title,
       eyebrow: p.eyebrow,
       paragraphs: Array.isArray(p.paragraphs) ? p.paragraphs : [],
       cards: Array.isArray(p.cards) ? p.cards : null,
       closing: p.closing ?? null,
+      measures: p.measures && typeof p.measures === "object" && !Array.isArray(p.measures) ? (p.measures as GuidePage["measures"]) : null,
+      project: p.project && typeof p.project === "object" && !Array.isArray(p.project) ? (p.project as GuidePage["project"]) : null,
+      backgroundUrl: p.background_url ?? null,
       ready: !!p.ready,
       order: p.order ?? 0,
     }));
+    // "Visão geral" e "Meu projeto" são páginas como as outras. Se o banco ainda
+    // não as tiver (instalações anteriores), entram a partir do seed — assim
+    // sempre aparecem no painel e no guia, e passam a vir do banco quando salvas.
+    const ensureSeed = (list: GuidePage[], slug: string): GuidePage[] => {
+      if (list.some((p) => p.slug === slug)) return list;
+      const s = seedGuidePages.find((p) => p.slug === slug);
+      return s ? [...list, s] : list;
+    };
+    let pages = ensureSeed(dbPages, "visao-geral");
+    pages = ensureSeed(pages, "meu-projeto");
+    pages = [...pages].sort((a, b) => a.order - b.order);
     const { data: optRows } = await supabase.from("qh_product_options").select("*").order("order");
     const options: ProductOption[] = (optRows ?? []).map((o) => ({
       id: o.id,
