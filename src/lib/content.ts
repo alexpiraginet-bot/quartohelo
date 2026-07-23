@@ -22,7 +22,9 @@ export async function getSiteContent(): Promise<SiteContent> {
   if (!supabase) return seedSite;
   try {
     const { data } = await supabase.from("qh_site_content").select("data").eq("id", "landing").maybeSingle();
-    return (data?.data as SiteContent) ?? seedSite;
+    // Mescla com o seed: campos novos (landing v2) caem no padrão mesmo que a
+    // linha do banco seja antiga. O que a Helô editar no painel prevalece.
+    return data?.data ? { ...seedSite, ...(data.data as Partial<SiteContent>) } : seedSite;
   } catch {
     return seedSite;
   }

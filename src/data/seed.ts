@@ -266,16 +266,17 @@ export const seedGuide: GuideMeta = {
 // Landing — cópia oficial da marca (editável no admin). Segue o tom das 4 vozes:
 // acolhedor, especialista, inspirador, educativo. Sem travessão de IA.
 export const seedSite: SiteContent = {
-  heroEyebrow: "Estúdio criativo · Primeira infância",
-  heroTitleHtml: "Arquitetura, Interiores, Curadoria e Produção <i>infantil</i>.",
-  heroSub: "Com bossa, afeto e primor em cada detalhe. O primeiro cenário de uma vida merece ser impecável.",
+  heroEyebrow: "Arquitetura · Interiores · Curadoria · Produção",
+  heroTitleHtml: "O primeiro cenário de uma vida merece ser <i>impecável</i>.",
+  heroSub: "Quarto da Helô: onde cada detalhe acolhe a infância.",
   heroCats: ["Arquitetura", "Interiores", "Curadoria", "Produção"],
-  quemEyebrow: "Quem somos",
-  quemTitleHtml: "A beleza é a forma mais<br>pura de cuidado.",
+  quemEyebrow: "Sobre nós",
+  quemTitleHtml: "",
   quemParagraphs: [
-    "O Quarto da Helô é um estúdio criativo especializado em arquitetura infantil que entrega arquitetura, interiores, curadoria e produção com direção estética e criativa.",
-    "Acreditamos que a beleza é a forma mais pura de cuidado, e que o primeiro cenário de uma vida merece ser impecável.",
+    "O Quarto da Helô é um estúdio criativo especializado em arquitetura infantil que entrega curadoria refinada e direção estética e criativa.",
+    "Acreditamos que a beleza é a forma mais pura de cuidado e que o primeiro cenário de uma vida merece ser impecável.",
     "Sabemos que montar o quarto do seu bebê envolve centenas de decisões. Nós existimos para que nenhuma delas pese sobre você. Assumimos o peso das decisões e devolvemos a você a leveza de esperar, sonhar e se encantar.",
+    "É assim que atuamos.",
     "Vamos além do projeto. Conduzimos cada definição diretamente com os fornecedores: modelos, acabamentos, cores, tecidos e bordados, escolhidos um a um. Você não precisa decidir nada sozinha, cada detalhe chega até você já pensado, resolvido e em harmonia com o todo.",
     "Unimos solidez técnica e estética contemporânea para que o primeiro cenário de vida do seu filho seja um reflexo de primor, cuidado e absoluta confiança no processo.",
   ],
@@ -299,6 +300,8 @@ export const seedSite: SiteContent = {
       ],
       featured: true,
       featuredLabel: "Integração total entre arquitetura e curadoria",
+      ctaLabel: "Conheça o Projeto Conceito",
+      ctaHref: "/projeto-conceito",
     },
     {
       tag: "Definição estética",
@@ -312,6 +315,8 @@ export const seedSite: SiteContent = {
         "Intermediação direta: modelos, acabamentos, cores, bordados e tecidos, um a um",
       ],
       foot: "Você conduz com autonomia, a partir de um direcionamento claro e estruturado.",
+      ctaLabel: "Conheça a Curadoria Assinada",
+      ctaHref: "/curadoria-assinada",
     },
   ],
   guiaEyebrow: "Guia digital",
@@ -320,8 +325,52 @@ export const seedSite: SiteContent = {
   guiaText:
     "Um sistema de decisão estética para montar o quarto do seu bebê com escolhas seguras, bonitas e coerentes. Aqui você encontra o método, o critério e o olhar da Helô para executar com primor.",
   contatoEyebrow: "Contato",
-  contatoTitleHtml: "Vamos criar juntas o primeiro<br>cenário dessa vida.",
-  contatoLead:
-    "Conte sobre o seu quarto. Toque no botão de conversa aqui na tela e a gente começa por ali, com calma e cuidado.",
+  contatoTitleHtml: "Atendimento <i>personalizado</i>.",
+  contatoLead: "Fale conosco através do nosso WhatsApp.",
   footerTagline: "Arquitetura · Interiores · Curadoria · Produção — primeira infância",
+
+  /* ---- Landing v2 ---- */
+  sobrePhoto: "/images/estudio-sobre.jpg",
+  contatoPhoto: "/images/estudio-contato.jpg",
+  produtoDigital: {
+    tag: "Produto digital",
+    title: "O Fim da Dúvida",
+    desc:
+      "O guia interativo para montar o quarto do seu bebê com escolhas seguras, bonitas e coerentes — o método, o critério e o olhar da Helô, do conceito ao último detalhe.",
+    bullets: [
+      "22 categorias, das estruturais aos adornos",
+      "Curadoria por faixa de investimento, com preço e link",
+      "Cronograma de montagem mês a mês e Meu Projeto",
+    ],
+    ctaLabel: "Conhecer o produto digital",
+    ctaHref: "/produto-digital",
+  },
+  whatsapp: "(11) 93063-9390",
+  whatsappHref: "https://wa.me/5511930639390",
+  horario: "9h30 às 17h30",
+  email: "",
+  instagram: "",
+  facebook: "",
+  sobrePage: null,
+  curadoriaPage: {
+    eyebrow: "Como trabalhamos",
+    title: "Curadoria Assinada",
+    paragraphs: ["Conteúdo em breve — a Helô preenche esta página pelo painel."],
+    photo: null,
+  },
+  projetoPage: {
+    eyebrow: "Como trabalhamos",
+    title: "Projeto Conceito",
+    paragraphs: ["Conteúdo em breve — a Helô preenche esta página pelo painel."],
+    photo: null,
+  },
+  digitalPage: {
+    eyebrow: "Produto digital",
+    title: "O Fim da Dúvida",
+    paragraphs: [
+      "O guia interativo do Quarto da Helô para montar o quarto do seu bebê com escolhas seguras, bonitas e coerentes.",
+      "Do conceito ao último detalhe: método, critério e o olhar da Helô, com curadoria por faixa de investimento e cronograma de montagem.",
+    ],
+    photo: null,
+  },
 };

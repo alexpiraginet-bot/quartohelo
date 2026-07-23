@@ -148,6 +148,17 @@ export interface ServiceCard {
   foot?: string | null;
   featured?: boolean;
   featuredLabel?: string | null;
+  /** Rótulo e destino do botão "conheça mais" (leva à página do serviço). */
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
+}
+
+/** Página institucional simples (Sobre nós, Curadoria Assinada, etc.). */
+export interface SitePage {
+  eyebrow?: string | null;
+  title: string;
+  paragraphs: string[];
+  photo?: string | null;
 }
 
 export interface SiteContent {
@@ -171,6 +182,25 @@ export interface SiteContent {
   contatoTitleHtml: string;
   contatoLead: string;
   footerTagline: string;
+
+  /* ---- Landing v2 (doc "Alterações Landing Page") ---- */
+  // Fundos (fotos do estúdio)
+  sobrePhoto?: string | null;
+  contatoPhoto?: string | null;
+  // Card do produto digital, dentro de "Como trabalhamos"
+  produtoDigital?: ServiceCard | null;
+  // Contato — dados de atendimento (todos editáveis no painel)
+  whatsapp?: string | null;      // ex.: (11) 93063-9390
+  whatsappHref?: string | null;  // ex.: https://wa.me/5511930639390
+  horario?: string | null;       // ex.: 9h30 às 17h30
+  email?: string | null;
+  instagram?: string | null;     // URL
+  facebook?: string | null;      // URL
+  // Páginas próprias abertas pelos botões (em branco, editáveis)
+  sobrePage?: SitePage | null;
+  curadoriaPage?: SitePage | null;
+  projetoPage?: SitePage | null;
+  digitalPage?: SitePage | null;
 }
 
 /* ------------------------------------------------------------------ *

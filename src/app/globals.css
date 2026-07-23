@@ -503,3 +503,142 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2countdown{display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%; margin-top:22px; background:linear-gradient(155deg,var(--wine),var(--wine-deep)); color:#F0E2C6; border:0; border-radius:16px; padding:16px 20px; font-family:inherit; font-size:14.5px; cursor:pointer; text-align:left; transition:transform .2s}
 .g2countdown:hover{transform:translateY(-2px)}
 .g2countdown span{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--caramel); white-space:nowrap}
+
+/* ============================================================= *
+ *  LANDING v2 — doc "Alterações Landing Page"
+ *  Topo (☰/logo/brasão) + gaveta + barra inferior fixa +
+ *  hero vinho, Sobre nós, Como trabalhamos, Contato, páginas.
+ * ============================================================= */
+.land2{padding-bottom:86px; background:var(--bone)}
+.lwrap{max-width:1120px; margin:0 auto; padding:0 clamp(20px,5vw,52px)}
+
+/* --- barra do topo --- */
+.ltop{position:fixed; top:0; left:0; right:0; z-index:60; height:60px; display:grid;
+  grid-template-columns:1fr auto 1fr; align-items:center; padding:0 clamp(14px,4vw,26px);
+  transition:background .3s, box-shadow .3s; background:linear-gradient(180deg,rgba(74,23,31,.42),transparent)}
+.ltop.solid{background:var(--wine); box-shadow:0 10px 30px rgba(74,23,31,.28)}
+.ltop .burger{justify-self:start; width:40px; height:40px; border:0; background:transparent; cursor:pointer;
+  display:flex; flex-direction:column; justify-content:center; gap:5px; padding:8px}
+.ltop .burger span{height:1.6px; background:#F3E8CE; border-radius:2px}
+.ltop .mark{justify-self:center; display:flex; align-items:center}
+.ltop .mark img{height:30px; width:auto; filter:drop-shadow(0 1px 4px rgba(0,0,0,.25))}
+.ltop .crest{justify-self:end}
+.ltop .crest img{height:38px; width:auto}
+
+/* --- gaveta lateral --- */
+.ldrawer-scrim{position:fixed; inset:0; z-index:70; background:rgba(30,12,15,.5); backdrop-filter:blur(2px)}
+.ldrawer{position:fixed; z-index:71; top:0; bottom:0; left:0; width:min(85vw,352px);
+  background:linear-gradient(160deg,var(--wine),var(--wine-deep)); color:#F3E8CE;
+  transform:translateX(-100%); transition:transform .32s cubic-bezier(.2,.8,.2,1);
+  padding:26px 30px; display:flex; flex-direction:column; box-shadow:24px 0 60px rgba(0,0,0,.3)}
+.ldrawer.open{transform:none}
+.ldrawer .x{align-self:flex-end; border:0; background:transparent; color:#E9D9B8; font-size:30px; line-height:1; cursor:pointer; padding:2px 6px}
+.ldrawer .dcrest{width:64px; margin:6px 0 22px}
+.ldrawer .dlinks{display:flex; flex-direction:column; gap:2px}
+.ldrawer .dlinks a{font-family:"Fraunces",Georgia,serif; font-size:22px; color:#F3E8CE; text-decoration:none;
+  padding:11px 0; border-bottom:1px solid rgba(231,223,199,.12); transition:color .2s, padding-left .2s}
+.ldrawer .dlinks a:hover{color:#fff; padding-left:6px}
+.ldrawer .dfoot{margin-top:auto; font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:rgba(231,223,199,.55)}
+
+/* --- barra inferior fixa --- */
+.lbottom{position:fixed; z-index:60; left:50%; bottom:14px; transform:translateX(-50%);
+  display:flex; gap:2px; background:rgba(74,23,31,.94); backdrop-filter:blur(8px);
+  border:1px solid rgba(210,181,142,.3); border-radius:999px; padding:7px 8px; box-shadow:0 16px 40px rgba(74,23,31,.35)}
+.lbottom a{display:flex; flex-direction:column; align-items:center; gap:2px; text-decoration:none;
+  color:#E5D4B4; padding:6px 14px; border-radius:999px; min-width:64px; transition:background .2s, color .2s}
+.lbottom a:hover{background:rgba(210,181,142,.16); color:#FAF3E1}
+.lbottom svg{width:19px; height:19px}
+.lbottom span{font-size:10px; letter-spacing:.06em}
+
+/* --- hero vinho --- */
+.lhero{position:relative; overflow:hidden; min-height:88vh; display:flex; align-items:center;
+  background:radial-gradient(120% 90% at 70% 10%,var(--wine-soft),var(--wine) 45%,var(--wine-deep));
+  color:#F5EAD2; padding:110px 0 70px}
+.lhero-crest{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none}
+.lhero-crest img{width:min(78vw,620px); opacity:.09}
+.lhero-in{position:relative; text-align:center; max-width:820px}
+.lhero .eyebrow{color:var(--caramel); letter-spacing:.34em}
+.lhero-h1{font-weight:400; font-size:clamp(34px,6.4vw,68px); line-height:1.05; margin:20px 0 0; color:#FBF2DC}
+.lhero-h1 i{font-style:italic; color:var(--caramel)}
+.lhero-sub{margin:22px auto 0; font-size:clamp(15px,2vw,19px); font-weight:300; line-height:1.6; color:#EAD8BC; max-width:44ch}
+.lhero-cta{margin-top:34px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+
+/* --- Sobre nós --- */
+.lsobre{position:relative; padding:clamp(64px,9vw,120px) 0; background:#F1E5CF; overflow:hidden}
+.lsobre-photo{position:absolute; inset:0; background-size:cover; background-position:center; opacity:.22}
+.lsobre::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(241,229,207,.7),rgba(241,229,207,.94))}
+.lsobre-in{position:relative; z-index:1; max-width:720px}
+.lsobre-in .eyebrow{color:var(--wine-soft)}
+.lsobre-in .lead{margin-top:16px}
+.lsobre-in .lead:first-of-type{font-size:clamp(18px,2.4vw,23px); color:var(--wine); font-weight:400; line-height:1.5}
+.lsobre-in .close{margin-top:26px; font-size:clamp(19px,2.6vw,26px); color:var(--wine); font-style:italic}
+
+/* --- Como trabalhamos --- */
+.lserv{padding:clamp(64px,9vw,120px) 0; background:var(--bone)}
+.lserv-head{max-width:680px}
+.lserv-head .lead{margin-top:14px}
+.lserv-grid{margin-top:44px; display:grid; grid-template-columns:repeat(3,1fr); gap:22px; align-items:start}
+.lcard{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:30px 28px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; height:100%}
+.lcard.feat{background:linear-gradient(165deg,#fff,#F3EEDF); border-color:var(--caramel)}
+.lcard .tag{font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--olive)}
+.lcard h3{font-size:26px; font-weight:400; color:var(--wine); margin:8px 0 0}
+.lcard .desc{margin-top:12px; color:var(--ink); font-weight:300; font-size:14.5px; line-height:1.65}
+.lcard ul{margin:16px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px}
+.lcard ul li{position:relative; padding-left:20px; font-size:13.5px; color:var(--muted); line-height:1.5}
+.lcard ul li::before{content:"◆"; position:absolute; left:0; top:1px; font-size:9px; color:var(--caramel)}
+.lcard .plus{margin-top:16px; font-size:12px; color:var(--wine-soft); font-style:italic}
+.lcard .foot{margin-top:14px; font-size:13px; color:var(--faint); font-style:italic; line-height:1.5}
+.lcard .btn.sm{margin-top:auto; align-self:flex-start; padding:11px 20px; font-size:11px}
+.lcard .btn.ghost.sm{color:var(--wine); border-color:color-mix(in srgb,var(--wine) 34%,transparent)}
+.lcard .btn.ghost.sm:hover{border-color:var(--wine); background:color-mix(in srgb,var(--wine) 6%,transparent)}
+
+/* --- Contato --- */
+.lcontato{position:relative; overflow:hidden; padding:clamp(70px,10vw,130px) 0; color:#F5EAD2}
+.lcontato-photo{position:absolute; inset:0; background-size:cover; background-position:center}
+.lcontato::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(74,23,31,.82),rgba(74,23,31,.92))}
+.lcontato-in{position:relative; z-index:1; max-width:640px}
+.lcontato-in .eyebrow{color:var(--caramel)}
+.lcontato-in .h2{color:#FBF2DC}
+.lcontato-in .h2 i{font-style:italic; color:var(--caramel)}
+.lcontato-in .lead{color:#EAD8BC; margin-top:12px}
+.lcontato-in .btn{margin-top:24px}
+.lcontato-cards{margin-top:34px; display:flex; gap:16px; flex-wrap:wrap}
+.lcontato-cards .lc{background:rgba(255,255,255,.06); border:1px solid rgba(210,181,142,.28); border-radius:16px; padding:18px 22px; min-width:220px; display:flex; flex-direction:column; gap:4px}
+.lcontato-cards .lc b{font-size:14px; color:#FBF2DC; font-weight:500}
+.lcontato-cards .lc span{font-size:14px; color:#E3D2B6}
+.lsocial{margin-top:30px}
+.lsocial .k{font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(231,223,199,.7)}
+.lsocial .icons{margin-top:12px; display:flex; gap:12px}
+.lsocial .soc,.lsocial .soc.off{display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; border:1px solid rgba(210,181,142,.4); color:#F3E8CE; transition:background .2s, transform .2s}
+.lsocial .soc:hover{background:rgba(210,181,142,.18); transform:translateY(-2px)}
+.lsocial .soc.off{opacity:.4}
+.lsocial .soc svg{width:20px; height:20px}
+
+/* --- footer --- */
+.lfoot{background:var(--wine-deep); color:#E5D4B4; padding:26px 0}
+.lfoot .foot-row{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:12.5px}
+.lfoot .logo img{height:26px; filter:brightness(0) invert(1) opacity(.8)}
+
+/* --- botão flutuante WhatsApp --- */
+.wa-fab{position:fixed; z-index:59; right:18px; bottom:92px; width:54px; height:54px; border-radius:50%;
+  background:#25543a; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 12px 30px rgba(0,0,0,.3); transition:transform .2s}
+.wa-fab:hover{transform:scale(1.06)}
+.wa-fab svg{width:30px; height:30px}
+
+/* --- páginas próprias --- */
+.lpage{position:relative; overflow:hidden; min-height:78vh; padding:120px 0 70px;
+  background:radial-gradient(120% 90% at 72% 8%,var(--wine-soft),var(--wine) 48%,var(--wine-deep)); color:#F5EAD2}
+.lpage-crest{position:absolute; inset:0; display:flex; align-items:flex-start; justify-content:center; pointer-events:none}
+.lpage-crest img{width:min(70vw,520px); opacity:.08; margin-top:40px}
+.lpage-in{position:relative; z-index:1; max-width:720px}
+.lpage-in .eyebrow{color:var(--caramel)}
+.lpage-h1{font-weight:400; font-size:clamp(32px,5.4vw,56px); line-height:1.05; margin:16px 0 22px; color:#FBF2DC}
+.lpage-in .lead{color:#EAD8BC; margin-top:14px}
+.lpage-cta{margin-top:30px}
+.lback{display:inline-block; margin-top:34px; color:var(--caramel); text-decoration:none; font-size:13px; letter-spacing:.1em}
+.lback:hover{color:#FBF2DC}
+
+@media (max-width:820px){
+  .lserv-grid{grid-template-columns:1fr}
+  .ltop .crest img{height:34px}
+}
