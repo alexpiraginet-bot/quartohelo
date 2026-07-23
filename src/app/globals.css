@@ -581,14 +581,22 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .ldrawer .dfoot{margin-top:auto; font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:rgba(231,223,199,.55)}
 
 /* --- barra inferior fixa --- */
+/* Pílula flutuante — vidro fosco: só o FUNDO é translúcido (o desfoque revela
+ * suavemente a imagem atrás); textos e ícones seguem 100% opacos e nítidos. */
 .lbottom{position:fixed; z-index:60; left:50%; bottom:14px; transform:translateX(-50%);
-  display:flex; gap:0; background:rgba(74,23,31,.94); backdrop-filter:blur(8px);
-  border:1px solid rgba(210,181,142,.3); border-radius:999px; padding:7px 6px; box-shadow:0 16px 40px rgba(74,23,31,.35);
+  display:flex; gap:0; background:rgba(74,23,31,.6);
+  backdrop-filter:blur(18px) saturate(1.4); -webkit-backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid rgba(240,230,210,.32); border-radius:999px; padding:7px 6px; box-shadow:0 10px 30px rgba(74,23,31,.24);
   max-width:calc(100vw - 16px); overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch}
+/* Sem suporte a backdrop-filter: fundo bordô sólido o suficiente para a leitura. */
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .lbottom{background:rgba(74,23,31,.9)}
+}
 .lbottom::-webkit-scrollbar{display:none}
 .lbottom a{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:3px; text-decoration:none;
   color:#E5D4B4; padding:6px 7px; border-radius:999px; min-width:48px; transition:background .2s, color .2s}
 .lbottom a:hover{background:rgba(210,181,142,.16); color:#FAF3E1}
+.lbottom a:focus-visible{outline:2px solid rgba(240,230,210,.75); outline-offset:2px}
 .lbottom svg{width:18px; height:18px}
 .lbottom span{font-size:9.5px; letter-spacing:.02em; white-space:nowrap}
 
