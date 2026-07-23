@@ -76,6 +76,16 @@ export function TrocarSenhaForm() {
 
 export function PaginaForm({ page }: { page: GuidePage }) {
   const [state, action] = useFormState(salvarPagina, null);
+  const [cards, setCards] = useState<{ n: string; title: string; text: string }[]>(
+    (page.cards ?? []).map((c) => ({ n: c.n, title: c.title, text: c.text })),
+  );
+
+  const setCard = (i: number, patch: Partial<{ n: string; title: string; text: string }>) =>
+    setCards((prev) => prev.map((c, j) => (j === i ? { ...c, ...patch } : c)));
+  const addCard = () =>
+    setCards((prev) => [...prev, { n: String(prev.length + 1).padStart(2, "0"), title: "", text: "" }]);
+  const removeCard = (i: number) => setCards((prev) => prev.filter((_, j) => j !== i));
+
   return (
     <form action={action} className="adm-form">
       <input type="hidden" name="slug" value={page.slug} />
@@ -97,6 +107,52 @@ export function PaginaForm({ page }: { page: GuidePage }) {
           placeholder="Cole aqui o texto. Deixe uma linha em branco entre um parágrafo e outro."
         />
       </label>
+
+      <div className="adm-cards">
+        <div className="adm-cards-head">
+          <span>Cards numerados (opcional)</span>
+          <small>Os quadradinhos numerados da página — como os 4 passos do &quot;Como usar&quot;.</small>
+        </div>
+        <input type="hidden" name="cardCount" value={cards.length} />
+        {cards.map((c, i) => (
+          <div className="adm-cardrow" key={i}>
+            <input
+              className="num"
+              name={`card_n_${i}`}
+              value={c.n}
+              onChange={(e) => setCard(i, { n: e.target.value })}
+              aria-label="Número"
+            />
+            <div className="bd">
+              <input
+                name={`card_title_${i}`}
+                value={c.title}
+                onChange={(e) => setCard(i, { title: e.target.value })}
+                placeholder="Título do card"
+              />
+              <textarea
+                name={`card_text_${i}`}
+                rows={2}
+                value={c.text}
+                onChange={(e) => setCard(i, { text: e.target.value })}
+                placeholder="Texto do card"
+              />
+            </div>
+            <button type="button" className="rm" onClick={() => removeCard(i)} title="Remover card">
+              ×
+            </button>
+          </div>
+        ))}
+        <button type="button" className="adm-btn soft add" onClick={addCard}>
+          + adicionar card
+        </button>
+      </div>
+
+      <label>
+        Frase de fechamento (citação, opcional)
+        <textarea name="closing" rows={2} defaultValue={page.closing ?? ""} placeholder="Uma frase de encerramento em destaque." />
+      </label>
+
       <label className="adm-check">
         <input type="checkbox" name="ready" defaultChecked={page.ready} />
         Este é o texto oficial (tira o aviso de &quot;texto provisório&quot; do guia)
@@ -142,6 +198,16 @@ export function ItemTextosForm({ item }: { item: Item }) {
       <label>
         Dica de instalação (opcional)
         <textarea name="instalacao" rows={2} defaultValue={d.instalacao ?? ""} />
+      </label>
+      <label className="adm-dica">
+        Dica da Helô (card em destaque, opcional)
+        <textarea
+          name="dicaHelo"
+          rows={3}
+          defaultValue={d.dicaHelo ?? ""}
+          placeholder="A dica especial da Helô para este item. Deixe em branco para não mostrar o card."
+        />
+        <small>Vira um card destacado (fundo vinho) na página do item. Apague o texto para remover o card.</small>
       </label>
       <div className="adm-actions">
         <SubmitBtn>Salvar textos</SubmitBtn>

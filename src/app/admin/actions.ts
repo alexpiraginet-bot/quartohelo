@@ -71,12 +71,25 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
+  // Cards numerados (ex.: os 4 passos do "Como usar"). As linhas vêm indexadas
+  // do formulário; guardamos as que têm título ou texto, na ordem da tela.
+  const cards: { n: string; title: string; text: string }[] = [];
+  const cardCount = Number(str(fd, "cardCount")) || 0;
+  for (let i = 0; i < cardCount; i++) {
+    const title = str(fd, `card_title_${i}`);
+    const text = str(fd, `card_text_${i}`);
+    if (!title && !text) continue;
+    const n = str(fd, `card_n_${i}`) || String(cards.length + 1).padStart(2, "0");
+    cards.push({ n, title, text });
+  }
   const r = await callAdminFn("save_page", {
     token,
     slug: str(fd, "slug"),
     title: str(fd, "title"),
     eyebrow: str(fd, "eyebrow") || null,
     paragraphs,
+    cards,
+    closing: str(fd, "closing") || null,
     ready: fd.get("ready") === "on",
     order: Number(str(fd, "order")) || 0,
   });
@@ -102,6 +115,7 @@ export async function salvarTextosItem(_prev: ActionState | null, fd: FormData):
       erroComum: str(fd, "erroComum") || null,
       efeito: str(fd, "efeito") || null,
       instalacao: str(fd, "instalacao") || null,
+      dicaHelo: str(fd, "dicaHelo") || null,
     },
   });
   if (r.ok) {
