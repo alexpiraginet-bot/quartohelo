@@ -67,8 +67,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
           <T name="whatsapp" label="WhatsApp (como aparece)" def={s.whatsapp} ph="(11) 93063-9390" />
           <T name="whatsappHref" label="Link do WhatsApp" def={s.whatsappHref} ph="https://wa.me/5511930639390" />
           <T name="horario" label="Horário de atendimento" def={s.horario} ph="9h30 às 17h30" />
-          <T name="instagram" label="Instagram (link)" def={s.instagram} ph="https://instagram.com/…" />
-          <T name="facebook" label="Facebook (link)" def={s.facebook} ph="https://facebook.com/…" />
+          <T name="instagram" label="Instagram (@ ou link)" def={s.instagram} ph="@quartodahelo" />
         </div>
         <T name="contatoEyebrow" label="Rótulo" def={s.contatoEyebrow} />
         <T name="contatoTitleHtml" label="Título (use <i>…</i> para itálico)" def={s.contatoTitleHtml} />
