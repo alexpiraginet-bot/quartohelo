@@ -91,6 +91,8 @@ export interface ItemDecision {
   erroComum?: string | null;
   efeito?: string | null;
   instalacao?: string | null;
+  /** Card avulso, destacado (fundo vinho): a "Dica da Helô" do item. */
+  dicaHelo?: string | null;
 }
 
 export interface Item {
