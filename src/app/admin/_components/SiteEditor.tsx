@@ -64,8 +64,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
         <legend>Contato</legend>
         <T name="email" label="E-mail" def={s.email} ph="contato@quartodahelo.com" />
         <div className="adm-2col">
-          <T name="whatsapp" label="WhatsApp (como aparece)" def={s.whatsapp} ph="(11) 93063-9390" />
-          <T name="whatsappHref" label="Link do WhatsApp" def={s.whatsappHref} ph="https://wa.me/5511930639390" />
+          <T name="whatsapp" label="WhatsApp (número — o link é gerado automaticamente)" def={s.whatsapp} ph="(27) 99854-2106" />
           <T name="horario" label="Horário de atendimento" def={s.horario} ph="9h30 às 17h30" />
           <T name="instagram" label="Instagram (@ ou link)" def={s.instagram} ph="@quartodahelo" />
         </div>
