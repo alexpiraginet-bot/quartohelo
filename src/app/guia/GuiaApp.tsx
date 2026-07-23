@@ -471,9 +471,34 @@ export default function GuiaApp({
           <span className="g2chip">Texto provisório — o conteúdo oficial da Helô entra pelo painel</span>
         ) : null}
         <div className="g2prose">
-          {page.paragraphs.map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
+          {page.paragraphs.map((p, i) => {
+            const t = p.trim();
+            // Linha de dica (começa com ✦) → card destacado "Dica da Helô".
+            if (t.startsWith("✦")) {
+              const raw = t.replace(/^✦\s*/, "");
+              // Separa o rótulo "Dica da Helô" do corpo (separador — ou :).
+              const m = raw.match(/^Dica da Hel[ôo]\s*[—:-]\s*(.+)$/is);
+              const body = m ? m[1] : raw;
+              return (
+                <aside className="g2dica page" key={i}>
+                  <span className="ic" aria-hidden="true">◆</span>
+                  <div className="bd">
+                    <b className="serif">Dica da Helô</b>
+                    <p>{body}</p>
+                  </div>
+                </aside>
+              );
+            }
+            // Cabeçalho de mês (ex.: "4° MÊS — ...") → título de seção.
+            if (/^\d+\s*°?\s*m[êe]s\b/i.test(t)) {
+              return (
+                <h3 className="g2ph" key={i}>
+                  {t}
+                </h3>
+              );
+            }
+            return <p key={i}>{t}</p>;
+          })}
         </div>
         {page.cards?.length ? (
           <div className="g2cards">

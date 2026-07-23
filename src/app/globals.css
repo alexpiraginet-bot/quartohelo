@@ -199,6 +199,12 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2dica .ic{flex:none; width:34px; height:34px; border-radius:50%; border:1px solid rgba(210,181,142,.5); color:var(--caramel); display:flex; align-items:center; justify-content:center; font-size:13px}
 .g2dica .bd b{display:block; font-family:"Fraunces",Georgia,serif; font-style:italic; font-weight:400; font-size:21px; color:#FAF3E1}
 .g2dica .bd p{margin-top:8px; font-size:14px; line-height:1.75; color:#EAD8BC; white-space:pre-line}
+/* dica dentro de uma página de conteúdo (Medidas, Cronograma) */
+.g2dica.page{margin:18px 0; max-width:66ch}
+.g2dica.page .bd b{font-size:18px}
+.g2dica.page .bd p{margin-top:6px}
+/* cabeçalho de seção (ex.: mês) dentro de página */
+.g2ph{margin:26px 0 4px; font-family:"Fraunces",Georgia,serif; font-weight:500; font-size:clamp(17px,2.2vw,20px); color:var(--wine); letter-spacing:.01em}
 .g2chip{display:inline-block; margin-top:14px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--olive); background:color-mix(in srgb,var(--olive) 10%,transparent); border:1px solid color-mix(in srgb,var(--olive) 24%,transparent); border-radius:999px; padding:6px 12px}
 .g2chip.ok{color:#4A5B2A; background:#EEF4E4; border-color:#CBDCA9}
 .g2note{margin-top:26px; color:var(--faint); font-size:13px; font-style:italic; line-height:1.6}
