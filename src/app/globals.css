@@ -652,3 +652,20 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .adm-cardname{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--olive)}
 .adm-savebar{position:sticky; bottom:14px; display:flex; justify-content:flex-end; padding-top:6px}
 .adm-savebar .adm-btn{box-shadow:0 10px 26px rgba(74,23,31,.22)}
+
+/* ---- Painel: anexador de imagem (com otimização) ---- */
+.adm-img{display:flex; flex-direction:column; gap:8px}
+.adm-img > .lbl{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--olive)}
+.adm-img-row{display:flex; gap:14px; align-items:flex-start}
+.adm-img .prev{flex:none; width:150px; height:104px; border-radius:12px; border:1px solid var(--line); background:#F2ECDC repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(0,0,0,.02) 8px,rgba(0,0,0,.02) 16px); overflow:hidden; display:flex; align-items:center; justify-content:center}
+.adm-img .prev img{width:100%; height:100%; object-fit:cover}
+.adm-img .prev span{font-size:12px; color:var(--faint)}
+.adm-img .ops{display:flex; flex-direction:column; gap:8px; align-items:flex-start; padding-top:2px}
+.adm-img .adm-btn.up{position:relative; overflow:hidden; cursor:pointer}
+.adm-img .adm-btn.up.off{opacity:.6; cursor:progress}
+.adm-img .adm-btn.up input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer; font-size:0}
+.adm-img-rm{border:0; background:transparent; color:var(--wine-soft); font-size:12.5px; cursor:pointer; text-decoration:underline; padding:0}
+.adm-img-rm:hover{color:var(--wine)}
+.adm-img .ops small{font-size:12px; color:var(--faint); line-height:1.4; max-width:34ch}
+/* dentro do card de opção do catálogo, a foto ocupa a largura */
+.adm-opt .foto .adm-img{width:100%}

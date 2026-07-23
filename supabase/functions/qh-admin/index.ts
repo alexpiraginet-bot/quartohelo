@@ -56,6 +56,22 @@ async function uploadFoto(dataUrl: string, itemSlug: string, genero: string, tie
   return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+// Upload genérico de imagem (fundos do site, fotos do guia, etc.). A imagem já
+// chega otimizada do navegador (redimensionada + comprimida). Retorna a URL.
+async function uploadImage(dataUrl: string, folder: string): Promise<string> {
+  const m = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl);
+  if (!m) throw new Error("imagem inválida");
+  const mime = m[1];
+  const bytes = Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0));
+  const ext = (mime.split("/")[1] || "jpg").replace(/[^a-z0-9]/gi, "") || "jpg";
+  const safe = (folder || "site").toLowerCase().replace(/[^a-z0-9/_-]/g, "").replace(/^\/+|\/+$/g, "").slice(0, 48) || "site";
+  const rand = (crypto.randomUUID() as string).slice(0, 8);
+  const path = `${safe}/${Date.now()}-${rand}.${ext}`;
+  const { error } = await db.storage.from(BUCKET).upload(path, bytes, { contentType: mime, upsert: true });
+  if (error) throw new Error("upload: " + error.message);
+  return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ ok: false, msg: "Método inválido." }, 405);
@@ -252,7 +268,9 @@ Deno.serve(async (req) => {
         if ((count ?? 0) >= 3) return json({ ok: false, msg: "Esta faixa já tem 3 opções. Exclua uma antes de adicionar." });
       }
       let photoUrl: string | null = null;
-      if (typeof body.foto === "string" && body.foto.startsWith("data:")) {
+      if (typeof body.foto_url === "string" && body.foto_url.startsWith("http")) {
+        photoUrl = body.foto_url; // já anexada e otimizada pelo painel
+      } else if (typeof body.foto === "string" && body.foto.startsWith("data:")) {
         try { photoUrl = await uploadFoto(body.foto, itemSlug, genero, tier); }
         catch (e) { return json({ ok: false, msg: "A foto não subiu: " + (e as Error).message }); }
       }
@@ -290,6 +308,17 @@ Deno.serve(async (req) => {
       const { error } = await db.from("qh_site_content").upsert({ id: "landing", data });
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
       return json({ ok: true, msg: "Site salvo. Já está valendo na landing." });
+    }
+
+    // Anexar imagem (fundos do site, fotos do guia). Já chega otimizada do navegador.
+    if (action === "upload_image") {
+      if (typeof body.data !== "string" || !body.data.startsWith("data:")) return json({ ok: false, msg: "Imagem inválida." });
+      try {
+        const url = await uploadImage(body.data, S("folder"));
+        return json({ ok: true, url, msg: "Imagem enviada." });
+      } catch (e) {
+        return json({ ok: false, msg: "A imagem não subiu: " + (e as Error).message });
+      }
     }
 
     /* ---- clientes (admin) ---- */
