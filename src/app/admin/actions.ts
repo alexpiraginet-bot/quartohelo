@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { callAdminFn } from "@/lib/db/adminFn";
 import { adminToken, clearAdminSession, setAdminSession } from "@/lib/admin/auth";
+import { getSiteContent } from "@/lib/content";
+import type { ServiceCard, SiteContent, SitePage } from "@/lib/types";
 
 /**
  * Ações do painel da Helô. Todas encaminham para a Edge Function qh-admin
@@ -169,6 +171,76 @@ export async function excluirOpcao(_prev: ActionState | null, fd: FormData): Pro
   if (r.ok) {
     refreshAll();
     if (itemSlug) revalidatePath(`/admin/catalogo/${itemSlug}`);
+  }
+  return { ok: r.ok, msg: r.msg ?? "" };
+}
+
+/* --------------------------- site / landing --------------------------- */
+
+export async function salvarSite(_prev: ActionState | null, fd: FormData): Promise<ActionState> {
+  const token = adminToken();
+  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+  const cur = await getSiteContent();
+
+  const paras = (k: string) =>
+    str(fd, k).split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const lines = (k: string) =>
+    str(fd, k).split(/\n/).map((p) => p.trim()).filter(Boolean);
+  const page = (prefix: string, fallbackTitle: string): SitePage => ({
+    eyebrow: str(fd, `${prefix}_eyebrow`) || null,
+    title: str(fd, `${prefix}_title`) || fallbackTitle,
+    paragraphs: paras(`${prefix}_paras`),
+    photo: str(fd, `${prefix}_photo`) || null,
+  });
+  const card = (prefix: string, base?: ServiceCard | null): ServiceCard => ({
+    ...(base ?? { tag: "", title: "", desc: "", bullets: [] }),
+    tag: str(fd, `${prefix}_tag`),
+    title: str(fd, `${prefix}_title`),
+    desc: str(fd, `${prefix}_desc`),
+    bullets: lines(`${prefix}_bullets`),
+    ctaLabel: str(fd, `${prefix}_ctaLabel`) || null,
+    ctaHref: str(fd, `${prefix}_ctaHref`) || null,
+  });
+
+  const services = cur.services.map((sv, i) => card(`svc${i}`, sv));
+
+  const data: SiteContent = {
+    ...cur,
+    heroEyebrow: str(fd, "heroEyebrow"),
+    heroTitleHtml: str(fd, "heroTitleHtml"),
+    heroSub: str(fd, "heroSub"),
+    quemEyebrow: str(fd, "quemEyebrow"),
+    quemParagraphs: paras("quemParagraphs"),
+    quemClose: str(fd, "quemClose"),
+    sobrePhoto: str(fd, "sobrePhoto") || null,
+    trabalhoEyebrow: str(fd, "trabalhoEyebrow"),
+    trabalhoTitle: str(fd, "trabalhoTitle"),
+    trabalhoLead: str(fd, "trabalhoLead"),
+    services,
+    produtoDigital: card("pd", cur.produtoDigital),
+    contatoEyebrow: str(fd, "contatoEyebrow"),
+    contatoTitleHtml: str(fd, "contatoTitleHtml"),
+    contatoLead: str(fd, "contatoLead"),
+    whatsapp: str(fd, "whatsapp") || null,
+    whatsappHref: str(fd, "whatsappHref") || null,
+    horario: str(fd, "horario") || null,
+    email: str(fd, "email") || null,
+    instagram: str(fd, "instagram") || null,
+    facebook: str(fd, "facebook") || null,
+    contatoPhoto: str(fd, "contatoPhoto") || null,
+    footerTagline: str(fd, "footerTagline"),
+    curadoriaPage: page("cur", "Curadoria Assinada"),
+    projetoPage: page("proj", "Projeto Conceito"),
+    digitalPage: page("dig", "O Fim da Dúvida"),
+  };
+
+  const r = await callAdminFn("save_site", { token, data });
+  if (r.ok) {
+    revalidatePath("/");
+    revalidatePath("/curadoria-assinada");
+    revalidatePath("/projeto-conceito");
+    revalidatePath("/produto-digital");
+    revalidatePath("/admin/site");
   }
   return { ok: r.ok, msg: r.msg ?? "" };
 }

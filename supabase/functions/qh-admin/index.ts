@@ -283,6 +283,15 @@ Deno.serve(async (req) => {
       return json({ ok: true, rows: data ?? [] });
     }
 
+    // Conteúdo da landing (SiteContent inteiro em JSON) — a Helô edita pela aba Site.
+    if (action === "save_site") {
+      const data = body.data;
+      if (!data || typeof data !== "object" || Array.isArray(data)) return json({ ok: false, msg: "Conteúdo inválido." });
+      const { error } = await db.from("qh_site_content").upsert({ id: "landing", data });
+      if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
+      return json({ ok: true, msg: "Site salvo. Já está valendo na landing." });
+    }
+
     /* ---- clientes (admin) ---- */
     if (action === "create_client") {
       const mother = S("mother_name");
