@@ -401,6 +401,19 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 @media (max-width:700px){ .adm-2col{grid-template-columns:1fr} }
 .adm-check{flex-direction:row !important; align-items:center; gap:10px !important; text-transform:none !important; letter-spacing:normal !important; font-size:14px !important; color:var(--ink) !important; cursor:pointer}
 .adm-check input{width:18px; height:18px; accent-color:var(--wine)}
+/* editor de cards numerados da página */
+.adm-cards{border:1px dashed var(--line); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:12px; background:#FDFBF4}
+.adm-cards-head{display:flex; flex-direction:column; gap:3px}
+.adm-cards-head span{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--olive)}
+.adm-cards-head small{font-size:12.5px; color:var(--faint); text-transform:none; letter-spacing:normal}
+.adm-cardrow{display:grid; grid-template-columns:56px 1fr 34px; gap:10px; align-items:start}
+.adm-cardrow .num{text-align:center; font-weight:600}
+.adm-cardrow .bd{display:flex; flex-direction:column; gap:8px}
+.adm-cardrow .rm{border:1px solid var(--line); background:#fff; border-radius:10px; width:34px; height:38px; font-size:20px; line-height:1; color:var(--wine); cursor:pointer}
+.adm-cardrow .rm:hover{border-color:var(--wine); background:#fff}
+.adm-cards .add{align-self:flex-start}
+/* campo da Dica da Helô */
+.adm-dica small{font-size:12.5px; color:var(--faint); text-transform:none; letter-spacing:normal; margin-top:2px}
 
 /* ---- Painel: editor de opções ---- */
 .adm-gen{display:flex; gap:8px; margin:14px 0 4px}

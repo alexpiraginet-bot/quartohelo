@@ -70,6 +70,18 @@ Deno.serve(async (req) => {
   const token = body.token;
   const S = (k: string) => (typeof body[k] === "string" ? (body[k] as string).trim() : "");
 
+  // A área de clientes/jornada/cadastro (link pessoal + compra) só entra no ar
+  // quando QH_CLIENTS_ENABLED=1 for definida na função. Enquanto isso, essas
+  // ações ficam inertes — este deploy libera apenas a edição do painel.
+  const CLIENTS_ON = Deno.env.get("QH_CLIENTS_ENABLED") === "1";
+  const CLIENT_ACTIONS = new Set([
+    "signup", "client_by_code", "journey_get", "journey_set", "journey_meta",
+    "create_client", "list_clients", "delete_client", "set_client_status",
+  ]);
+  if (!CLIENTS_ON && CLIENT_ACTIONS.has(action)) {
+    return json({ ok: false, msg: "Ação desconhecida." }, 400);
+  }
+
   try {
     /* ============ PÚBLICO ============ */
 
@@ -179,9 +191,26 @@ Deno.serve(async (req) => {
       const title = S("title");
       if (!slug || !title) return json({ ok: false, msg: "A página precisa de um título." });
       const paragraphs = Array.isArray(body.paragraphs) ? body.paragraphs.map(String) : [];
-      const { error } = await db.from("qh_guide_pages").upsert({
+      const row: Record<string, unknown> = {
         slug, title, eyebrow: S("eyebrow") || null, paragraphs, ready: !!body.ready, order: Number(body.order) || 0,
-      });
+      };
+      // cards/closing só são gravados quando enviados — assim uma tela antiga
+      // (que não manda esses campos) nunca apaga os cards já existentes.
+      if (Array.isArray(body.cards)) {
+        const cards = (body.cards as unknown[])
+          .map((c) => (c && typeof c === "object" ? (c as Record<string, unknown>) : {}))
+          .map((c) => ({
+            n: String(c.n ?? "").trim(),
+            title: String(c.title ?? "").trim(),
+            text: String(c.text ?? "").trim(),
+          }))
+          .filter((c) => c.title || c.text);
+        row.cards = cards.length ? cards : null;
+      }
+      if ("closing" in body) {
+        row.closing = typeof body.closing === "string" && body.closing.trim() ? body.closing.trim() : null;
+      }
+      const { error } = await db.from("qh_guide_pages").upsert(row);
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
       return json({ ok: true, msg: "Página salva. Já está valendo no guia." });
     }
@@ -190,12 +219,18 @@ Deno.serve(async (req) => {
       const slug = S("slug");
       if (!slug) return json({ ok: false, msg: "Item inválido." });
       const d = (body.decision ?? {}) as Record<string, unknown>;
+      // Lê a decisão atual para preservar campos que a tela não enviar
+      // (ex.: a Dica da Helô, se vier de uma versão antiga do painel).
+      const { data: cur } = await db.from("qh_items").select("decision").eq("slug", slug).maybeSingle();
+      const prev = (cur?.decision ?? {}) as Record<string, unknown>;
       const decision = {
         quandoUsar: d.quandoUsar ? String(d.quandoUsar) : null,
         quandoNao: d.quandoNao ? String(d.quandoNao) : null,
         erroComum: d.erroComum ? String(d.erroComum) : null,
         efeito: d.efeito ? String(d.efeito) : null,
         instalacao: d.instalacao ? String(d.instalacao) : null,
+        // enviou a chave → usa (vazio apaga); não enviou → mantém o atual.
+        dicaHelo: "dicaHelo" in d ? (d.dicaHelo ? String(d.dicaHelo) : null) : (prev.dicaHelo ?? null),
       };
       const { data, error } = await db.from("qh_items").update({ summary: S("summary") || null, decision }).eq("slug", slug).select("id");
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
