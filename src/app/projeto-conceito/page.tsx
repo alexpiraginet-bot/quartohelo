@@ -8,5 +8,6 @@ const FALLBACK: SitePage = { eyebrow: "Como trabalhamos", title: "Projeto Concei
 
 export default async function Page() {
   const s = await getSiteContent();
-  return <PageShell page={s.projetoPage ?? FALLBACK} whatsappHref={s.whatsappHref} footerTagline={s.footerTagline} />;
+  const card = s.services?.find((c) => c.ctaHref === "/projeto-conceito") ?? null;
+  return <PageShell page={s.projetoPage ?? FALLBACK} card={card} whatsappHref={s.whatsappHref} footerTagline={s.footerTagline} />;
 }

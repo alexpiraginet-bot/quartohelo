@@ -399,16 +399,19 @@ export const seedSite: SiteContent = {
   instagram: "",
   facebook: "",
   sobrePage: null,
+  // Sem parágrafos por padrão: a página pública mostra um resumo útil montado a
+  // partir do card do serviço (a Helô preenche o texto próprio pelo painel quando
+  // quiser). Nunca exibimos frase operacional ao visitante.
   curadoriaPage: {
     eyebrow: "Como trabalhamos",
     title: "Curadoria Assinada",
-    paragraphs: ["Conteúdo em breve — a Helô preenche esta página pelo painel."],
+    paragraphs: [],
     photo: null,
   },
   projetoPage: {
     eyebrow: "Como trabalhamos",
     title: "Projeto Conceito",
-    paragraphs: ["Conteúdo em breve — a Helô preenche esta página pelo painel."],
+    paragraphs: [],
     photo: null,
   },
   digitalPage: {

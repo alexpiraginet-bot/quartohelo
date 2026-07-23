@@ -686,6 +686,11 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lpage-in .eyebrow{color:var(--caramel)}
 .lpage-h1{font-weight:400; font-size:clamp(32px,5.4vw,56px); line-height:1.05; margin:16px 0 22px; color:#FBF2DC}
 .lpage-in .lead{color:#EAD8BC; margin-top:14px}
+/* resumo do serviço (fallback público quando a página ainda não tem texto próprio) */
+.lpage-list{list-style:none; padding:0; margin:24px 0 0; display:grid; gap:11px; max-width:640px}
+.lpage-list li{position:relative; padding-left:22px; color:#EAD8BC; font-weight:300; font-size:clamp(14px,1.9vw,16px); line-height:1.55}
+.lpage-list li::before{content:"◆"; position:absolute; left:0; top:2px; font-size:10px; color:var(--caramel)}
+.lpage-note{margin-top:20px; color:var(--caramel); font-style:italic; font-family:"Fraunces",Georgia,serif; font-size:clamp(15px,2vw,18px); line-height:1.4}
 .lpage-cta{margin-top:30px}
 .lback{display:inline-block; margin-top:34px; color:var(--caramel); text-decoration:none; font-size:13px; letter-spacing:.1em}
 .lback:hover{color:#FBF2DC}
