@@ -8,6 +8,7 @@ import type {
   GuestProfile,
   GuideMeta,
   GuidePage,
+  GuidePageMeasures,
   Item,
   PriceTier,
   ProductOption,
@@ -143,6 +144,58 @@ const Ico = ({ d }: { d: string }) => (
 const I_HOME = "M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z";
 const I_BOOK = "M12 6C10 4 7 4 4 5v13c3-1 6-1 8 1 2-2 5-2 8-1V5c-3-1-6-1-8 1v13";
 const I_HEART = "M12 20S5 15.5 3 11c-1.2-2.8.6-6 3.8-6C9 5 10.7 6.6 12 8c1.3-1.4 3-3 5.2-3C20.4 5 22.2 8.2 21 11c-2 4.5-9 9-9 9z";
+
+/**
+ * Callout único e discreto de "Dica da Helô" — usado em toda parte (páginas,
+ * decisão do item, tabela de medidas). Complementar por definição: fundo claro,
+ * acento delicado, rótulo compacto. O rótulo é uma prop (padrão "Dica da Helô"),
+ * para nunca renomear em silêncio o conteúdo salvo.
+ */
+function DicaHelo({ body, label }: { body: string; label?: string | null }) {
+  if (!body || !body.trim()) return null;
+  return (
+    <aside className="g2dica">
+      <span className="ic" aria-hidden="true">✦</span>
+      <div className="bd">
+        <b>{label?.trim() || "Dica da Helô"}</b>
+        <p>{body}</p>
+      </div>
+    </aside>
+  );
+}
+
+/**
+ * Tabela de medidas: uma <table> acessível (thead/tbody/th[scope]) no desktop e
+ * tablet; no celular o CSS reempilha cada linha como cartão com os rótulos das
+ * colunas visíveis (data-label). Um único marcador, sem duplicar conteúdo.
+ */
+function MeasuresTable({ data }: { data: GuidePageMeasures }) {
+  const cols = data?.columns ?? { item: "Item", min: "Medida mínima", meaning: "O que isso significa na prática" };
+  const rows = Array.isArray(data?.rows) ? data.rows : [];
+  if (!rows.length) return null;
+  return (
+    <div className="g2measures">
+      <table className="g2mtable">
+        <thead>
+          <tr>
+            <th scope="col" className="c-item">{cols.item}</th>
+            <th scope="col" className="c-min">{cols.min}</th>
+            <th scope="col" className="c-mean">{cols.meaning}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i}>
+              <th scope="row" className="c-item" data-label={cols.item}>{r.item}</th>
+              <td className="c-min" data-label={cols.min}>{r.min}</td>
+              <td className="c-mean" data-label={cols.meaning}>{r.meaning}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default function GuiaApp({
   categories,
@@ -324,6 +377,12 @@ export default function GuiaApp({
   }
 
   const firstName = profile.motherName.split(" ")[0];
+  // "Visão geral" e "Meu projeto" são páginas editáveis como as outras, mas no
+  // guia têm telas próprias (entrada e projeto). Separamos para não duplicá-las
+  // no menu "O guia".
+  const visaoGeral = pages.find((p) => p.slug === "visao-geral");
+  const meuProjeto = pages.find((p) => p.slug === "meu-projeto");
+  const contentPages = pages.filter((p) => p.slug !== "visao-geral" && p.slug !== "meu-projeto");
 
   const statusDot = (slug: string) => {
     const st = choices[slug]?.status;
@@ -385,7 +444,6 @@ export default function GuiaApp({
       <section className="g2crono">
         <div className="g2crono-head">
           <div>
-            <b className="serif">O seu cronograma</b>
             {dppDate ? (
               <p>
                 {semanasRestantes != null && semanasRestantes > 0
@@ -440,21 +498,29 @@ export default function GuiaApp({
   }
 
   function renderInicio() {
+    const p = visaoGeral;
+    const eyebrow = p?.eyebrow?.trim() || `Bem-vinda ao seu guia · ${guide.collection ?? "Collection Nº 01"}`;
+    const paras = p?.paragraphs?.length
+      ? p.paragraphs
+      : [
+          "DO CONCEITO AO ÚLTIMO DETALHE: O guia completo para montar o quarto do seu bebê.",
+          "A beleza é a forma mais pura de cuidado e o primeiro cenário de uma vida merece ser impecável.",
+          "Aqui você encontrará o método, o critério e o olhar da Helô para você executar com primor.",
+        ];
     return (
-      <div className="g2view g2welcome">
+      <div className={`g2view g2welcome${p?.backgroundUrl ? " hasbg" : ""}`}>
+        {p?.backgroundUrl ? (
+          <div className="g2bg" style={{ backgroundImage: `url(${p.backgroundUrl})` }} aria-hidden="true" />
+        ) : null}
         <div className="brasao-bg" aria-hidden="true" />
         <div className="in">
-          <div className="eyebrow">Bem-vinda ao seu guia · {guide.collection ?? "Collection Nº 01"}</div>
+          <div className="eyebrow">{eyebrow}</div>
           <h1 className="serif g2h1">Olá, {firstName}.</h1>
-          <p className="lead-title serif">
-            DO CONCEITO AO ÚLTIMO DETALHE: O guia completo para montar o quarto do seu bebê.
-          </p>
-          <p className="lead-sub">
-            A beleza é a forma mais pura de cuidado e o primeiro cenário de uma vida merece ser impecável.
-          </p>
-          <p className="lead-sub">
-            Aqui você encontrará o método, o critério e o olhar da Helô para você executar com primor.
-          </p>
+          {paras.map((t, i) => (
+            <p key={i} className={i === 0 ? "lead-title serif" : "lead-sub"}>
+              {t}
+            </p>
+          ))}
         </div>
       </div>
     );
@@ -464,7 +530,10 @@ export default function GuiaApp({
     const page = pages.find((p) => p.slug === slug);
     if (!page) return null;
     return (
-      <div className="g2view">
+      <div className={`g2view${page.backgroundUrl ? " hasbg" : ""}`}>
+        {page.backgroundUrl ? (
+          <div className="g2bg" style={{ backgroundImage: `url(${page.backgroundUrl})` }} aria-hidden="true" />
+        ) : null}
         {page.eyebrow ? <div className="eyebrow">{page.eyebrow}</div> : null}
         <h1 className="serif g2h1">{page.title}</h1>
         {!page.ready ? (
@@ -473,21 +542,12 @@ export default function GuiaApp({
         <div className="g2prose">
           {page.paragraphs.map((p, i) => {
             const t = p.trim();
-            // Linha de dica (começa com ✦) → card destacado "Dica da Helô".
+            // Linha de dica (começa com ✦) → callout discreto "Dica da Helô".
             if (t.startsWith("✦")) {
               const raw = t.replace(/^✦\s*/, "");
-              // Separa o rótulo "Dica da Helô" do corpo (separador — ou :).
-              const m = raw.match(/^Dica da Hel[ôo]\s*[—:-]\s*(.+)$/is);
-              const body = m ? m[1] : raw;
-              return (
-                <aside className="g2dica page" key={i}>
-                  <span className="ic" aria-hidden="true">◆</span>
-                  <div className="bd">
-                    <b className="serif">Dica da Helô</b>
-                    <p>{body}</p>
-                  </div>
-                </aside>
-              );
+              // Separa o rótulo ("Dica da Helô" / "Guia da Helô") do corpo.
+              const m = raw.match(/^((?:Dica|Guia) da Hel[ôo])\s*[—:-]\s*(.+)$/is);
+              return <DicaHelo key={i} label={m ? m[1] : undefined} body={m ? m[2] : raw} />;
             }
             // Cabeçalho de mês (ex.: "4° MÊS — ...") → título de seção.
             if (/^\d+\s*°?\s*m[êe]s\b/i.test(t)) {
@@ -500,6 +560,14 @@ export default function GuiaApp({
             return <p key={i}>{t}</p>;
           })}
         </div>
+        {page.measures?.rows?.length ? (
+          <>
+            <MeasuresTable data={page.measures} />
+            {page.measures.tip?.body ? (
+              <DicaHelo label={page.measures.tip.label} body={page.measures.tip.body} />
+            ) : null}
+          </>
+        ) : null}
         {page.cards?.length ? (
           <div className="g2cards">
             {page.cards.map((c, i) => (
@@ -590,15 +658,7 @@ export default function GuiaApp({
           </section>
         )}
 
-        {d.dicaHelo ? (
-          <aside className="g2dica">
-            <span className="ic" aria-hidden="true">◆</span>
-            <div className="bd">
-              <b className="serif">Dica da Helô</b>
-              <p>{d.dicaHelo}</p>
-            </div>
-          </aside>
-        ) : null}
+        {d.dicaHelo ? <DicaHelo body={d.dicaHelo} /> : null}
 
         <section className="g2opts">
           <div className="g2gen">
@@ -776,22 +836,30 @@ export default function GuiaApp({
   }
 
   function renderProjeto() {
+    const pj = meuProjeto?.project ?? {};
+    const dataBase = guide.precoDataBase ?? "quando o guia foi elaborado";
+    const finNote = (
+      pj.finNote?.trim() ||
+      "Os valores têm como base os preços de {data}. Se algo mudou no fornecedor, toque no valor e ajuste — o total recalcula na hora."
+    ).replace(/\{data\}/g, dataBase);
     return (
-      <div className="g2view">
-        <div className="eyebrow">O seu quarto, escolha a escolha</div>
-        <h1 className="serif g2h1">Meu projeto</h1>
+      <div className={`g2view${meuProjeto?.backgroundUrl ? " hasbg" : ""}`}>
+        {meuProjeto?.backgroundUrl ? (
+          <div className="g2bg" style={{ backgroundImage: `url(${meuProjeto.backgroundUrl})` }} aria-hidden="true" />
+        ) : null}
+        <div className="eyebrow">{meuProjeto?.eyebrow?.trim() || "O seu quarto, escolha a escolha"}</div>
+        <h1 className="serif g2h1">{meuProjeto?.title?.trim() || "Meu projeto"}</h1>
 
         <div className="g2how">
-          <b>Como funciona</b>
+          <b>{pj.howTitle?.trim() || "Como funciona"}</b>
           <p>
-            Tudo que você marca nas categorias aparece aqui na hora: a foto compõe o seu moodboard e o valor entra na
-            análise financeira, somado automaticamente. Toque em qualquer valor para ajustar — o ajuste vale só para o
-            seu projeto.
+            {pj.howText?.trim() ||
+              "Tudo que você marca nas categorias aparece aqui na hora: a foto compõe o seu moodboard e o valor entra na análise financeira, somado automaticamente. Toque em qualquer valor para ajustar — o ajuste vale só para o seu projeto."}
           </p>
         </div>
 
         <section className="g2sec-b">
-          <h2 className="serif">Moodboard</h2>
+          <h2 className="serif">{pj.moodTitle?.trim() || "Moodboard"}</h2>
           {decididos.length ? (
             <div className="g2mb">
               {decididos.map(({ item, cat }) => {
@@ -819,13 +887,14 @@ export default function GuiaApp({
             </div>
           ) : (
             <p className="g2empty">
-              Seu moodboard ainda está em branco. Comece pelas categorias no menu — cada escolha aparece aqui na hora.
+              {pj.moodEmpty?.trim() ||
+                "Seu moodboard ainda está em branco. Comece pelas categorias no menu — cada escolha aparece aqui na hora."}
             </p>
           )}
         </section>
 
         <section className="g2sec-b">
-          <h2 className="serif">Análise financeira</h2>
+          <h2 className="serif">{pj.finTitle?.trim() || "Análise financeira"}</h2>
           {decididos.length ? (
             <div className="g2fin">
               {decididos.map(({ item, cat }) => (
@@ -833,7 +902,7 @@ export default function GuiaApp({
               ))}
               <div className="g2frow total">
                 <div className="fi">
-                  <b>Total do projeto</b>
+                  <b>{pj.totalLabel?.trim() || "Total do projeto"}</b>
                   <span>
                     {decididos.length} {decididos.length === 1 ? "item" : "itens"} · {pct}% do guia decidido
                   </span>
@@ -843,12 +912,9 @@ export default function GuiaApp({
               </div>
             </div>
           ) : (
-            <p className="g2empty">Os valores das suas escolhas aparecem aqui, item a item e somados.</p>
+            <p className="g2empty">{pj.finEmpty?.trim() || "Os valores das suas escolhas aparecem aqui, item a item e somados."}</p>
           )}
-          <p className="g2note">
-            Os valores têm como base os preços de {guide.precoDataBase ?? "quando o guia foi elaborado"}. Se algo
-            mudou no fornecedor, toque no valor e ajuste — o total recalcula na hora.
-          </p>
+          <p className="g2note">{finNote}</p>
         </section>
 
         <OrderBump />
@@ -869,11 +935,11 @@ export default function GuiaApp({
         <nav className="g2nav">
           <button type="button" className={`g2link${isActive({ kind: "inicio" }) ? " act" : ""}`} onClick={navTo({ kind: "inicio" })}>
             <Ico d={I_HOME} />
-            <span>Visão geral</span>
+            <span>{visaoGeral?.title?.trim() || "Visão geral"}</span>
           </button>
 
           <div className="g2sec">O guia</div>
-          {pages.map((p) => (
+          {contentPages.map((p) => (
             <button
               key={p.slug}
               type="button"
@@ -887,7 +953,7 @@ export default function GuiaApp({
 
           <button type="button" className={`g2link proj${isActive({ kind: "projeto" }) ? " act" : ""}`} onClick={navTo({ kind: "projeto" })}>
             <Ico d={I_HEART} />
-            <span>Meu projeto</span>
+            <span>{meuProjeto?.title?.trim() || "Meu projeto"}</span>
             {decididos.length ? <em>{decididos.length}</em> : null}
           </button>
 

@@ -72,6 +72,55 @@ async function uploadImage(dataUrl: string, folder: string): Promise<string> {
   return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+// Normaliza a tabela de medidas vinda do painel: só strings (nunca HTML — os
+// caracteres < e > são removidos), linhas vazias descartadas, dica opcional.
+// Devolve null quando não há linha com conteúdo.
+function sanitizeMeasures(m: unknown): unknown {
+  if (!m || typeof m !== "object" || Array.isArray(m)) return null;
+  const o = m as Record<string, unknown>;
+  const clean = (v: unknown) => String(v ?? "").replace(/[<>]/g, "").trim().slice(0, 600);
+  const colsIn = (o.columns && typeof o.columns === "object" ? o.columns : {}) as Record<string, unknown>;
+  const columns = {
+    item: clean(colsIn.item) || "Item",
+    min: clean(colsIn.min) || "Medida mínima",
+    meaning: clean(colsIn.meaning) || "O que isso significa na prática",
+  };
+  const rowsIn = Array.isArray(o.rows) ? o.rows : [];
+  const rows = rowsIn
+    .map((r) => (r && typeof r === "object" ? (r as Record<string, unknown>) : {}))
+    .map((r) => ({ item: clean(r.item), min: clean(r.min), meaning: clean(r.meaning) }))
+    .filter((r) => r.item || r.min || r.meaning)
+    .slice(0, 40);
+  if (!rows.length) return null;
+  let tip: { label: string | null; body: string } | null = null;
+  if (o.tip && typeof o.tip === "object") {
+    const t = o.tip as Record<string, unknown>;
+    const body = clean(t.body);
+    if (body) tip = { label: clean(t.label) || null, body };
+  }
+  return { columns, rows, tip };
+}
+
+// Normaliza os textos fixos do "Meu projeto" — só strings (sem HTML). Devolve
+// null quando nenhum campo tem conteúdo (equivale a usar os textos padrão).
+function sanitizeProject(p: unknown): unknown {
+  if (!p || typeof p !== "object" || Array.isArray(p)) return null;
+  const o = p as Record<string, unknown>;
+  const clean = (v: unknown) => {
+    const s = String(v ?? "").replace(/[<>]/g, "").trim();
+    return s ? s.slice(0, 1200) : null;
+  };
+  const keys = ["howTitle", "howText", "moodTitle", "moodEmpty", "finTitle", "finEmpty", "totalLabel", "finNote"];
+  const out: Record<string, string | null> = {};
+  let any = false;
+  for (const k of keys) {
+    const v = clean(o[k]);
+    out[k] = v;
+    if (v) any = true;
+  }
+  return any ? out : null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ ok: false, msg: "Método inválido." }, 405);
@@ -225,6 +274,18 @@ Deno.serve(async (req) => {
       }
       if ("closing" in body) {
         row.closing = typeof body.closing === "string" && body.closing.trim() ? body.closing.trim() : null;
+      }
+      // Tabela de medidas e fundo — só gravados quando enviados, para uma tela
+      // antiga (que não manda esses campos) nunca apagar o que já existe.
+      if ("measures" in body) {
+        row.measures = sanitizeMeasures(body.measures);
+      }
+      if ("project" in body) {
+        row.project = sanitizeProject(body.project);
+      }
+      if ("background_url" in body) {
+        const bg = body.background_url;
+        row.background_url = typeof bg === "string" && /^https?:\/\//i.test(bg) ? bg : null;
       }
       const { error } = await db.from("qh_guide_pages").upsert(row);
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });

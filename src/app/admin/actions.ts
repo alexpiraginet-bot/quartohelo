@@ -84,7 +84,21 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
     const n = str(fd, `card_n_${i}`) || String(cards.length + 1).padStart(2, "0");
     cards.push({ n, title, text });
   }
-  const r = await callAdminFn("save_page", {
+  // Tabela de medidas: chega como JSON do editor. Fazemos só o parse aqui; a
+  // Edge Function valida/normaliza os campos (fronteira de dados com service role).
+  let measures: unknown = null;
+  const rawMeasures = str(fd, "measures");
+  if (rawMeasures) {
+    try {
+      const m = JSON.parse(rawMeasures);
+      if (m && typeof m === "object" && Array.isArray((m as { rows?: unknown }).rows)) measures = m;
+    } catch {
+      measures = null;
+    }
+  }
+
+  // Textos fixos do "Meu projeto" — só chegam quando é essa página especial.
+  const payload: Record<string, unknown> = {
     token,
     slug: str(fd, "slug"),
     title: str(fd, "title"),
@@ -92,9 +106,22 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
     paragraphs,
     cards,
     closing: str(fd, "closing") || null,
+    measures,
+    background_url: str(fd, "background_url") || null,
     ready: fd.get("ready") === "on",
     order: Number(str(fd, "order")) || 0,
-  });
+  };
+  const rawProject = str(fd, "project");
+  if (rawProject) {
+    try {
+      const pj = JSON.parse(rawProject);
+      if (pj && typeof pj === "object" && !Array.isArray(pj)) payload.project = pj;
+    } catch {
+      /* ignora JSON inválido */
+    }
+  }
+
+  const r = await callAdminFn("save_page", payload);
   if (r.ok) {
     refreshAll();
     revalidatePath(`/admin/paginas/${str(fd, "slug")}`);
