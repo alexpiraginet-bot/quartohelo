@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSiteContent } from "@/lib/content";
+import { waDisplay, waHref, WA_MSG } from "@/lib/whatsapp";
 import { LandingFx } from "./_components/Interactive";
 import { SiteNav } from "./_components/SiteNav";
 import { Track } from "./_components/Track";
@@ -46,6 +47,10 @@ function Card({ c }: { c: ServiceCard }) {
 export default async function Home() {
   const s = await getSiteContent();
   const cards: ServiceCard[] = [...s.services, ...(s.produtoDigital ? [s.produtoDigital] : [])];
+  // WhatsApp: número exibido e todos os links vêm do MESMO campo (s.whatsapp).
+  const waShow = waDisplay(s.whatsapp);
+  const waMain = waHref(s.whatsapp, WA_MSG.geral);
+  const waPlain = waHref(s.whatsapp);
   return (
     <div className="land2">
       <LandingFx />
@@ -94,14 +99,14 @@ export default async function Home() {
           <div className="eyebrow">{s.contatoEyebrow}</div>
           <h2 className="h2 serif" dangerouslySetInnerHTML={{ __html: s.contatoTitleHtml }} />
           <p className="lead">{s.contatoLead}</p>
-          {s.whatsappHref ? (
-            <a className="btn primary" href={s.whatsappHref} target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+          {waMain ? (
+            <a className="btn primary" href={waMain} target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
           ) : null}
           <div className="lcontato-cards">
             <div className="lc">
               <b>WhatsApp</b>
               {s.horario ? <span>Horário de atendimento: {s.horario}</span> : null}
-              {s.whatsapp ? <span>{s.whatsapp}</span> : null}
+              {waShow ? <span>{waShow}</span> : null}
             </div>
             {s.email ? (
               <div className="lc"><b>E-mail</b><span>{s.email}</span></div>
@@ -111,7 +116,7 @@ export default async function Home() {
             <span className="k">Siga nossas redes</span>
             <div className="icons">
               <Social d={IG} href={igHref(s.instagram)} label="Instagram" />
-              <Social d={WA} href={s.whatsappHref} label="WhatsApp" />
+              <Social d={WA} href={waPlain} label="WhatsApp" />
             </div>
           </div>
         </div>
@@ -124,8 +129,8 @@ export default async function Home() {
         </div>
       </footer>
 
-      {s.whatsappHref ? (
-        <a className="wa-fab" href={s.whatsappHref} target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp">
+      {waMain ? (
+        <a className="wa-fab" href={waMain} target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={WA} /></svg>
         </a>
       ) : null}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSiteContent } from "@/lib/content";
+import { WA_MSG } from "@/lib/whatsapp";
 import { PageShell } from "../_components/PageShell";
 import type { SitePage } from "@/lib/types";
 
@@ -10,7 +11,7 @@ const FALLBACK: SitePage = { eyebrow: "Produto digital", title: "O Fim da Dúvid
 export default async function Page() {
   const s = await getSiteContent();
   return (
-    <PageShell page={s.digitalPage ?? FALLBACK} whatsappHref={s.whatsappHref} footerTagline={s.footerTagline}>
+    <PageShell page={s.digitalPage ?? FALLBACK} whatsapp={s.whatsapp} waMessage={WA_MSG.guia} footerTagline={s.footerTagline}>
       <div className="lpage-cta">
         <Link className="btn primary" href="/guia">Entrar no guia</Link>
       </div>

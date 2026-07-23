@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { callAdminFn } from "@/lib/db/adminFn";
 import { adminToken, clearAdminSession, setAdminSession } from "@/lib/admin/auth";
 import { getSiteContent } from "@/lib/content";
+import { waHref } from "@/lib/whatsapp";
 import type { ServiceCard, SiteContent, SitePage } from "@/lib/types";
 
 /**
@@ -241,7 +242,8 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     contatoTitleHtml: str(fd, "contatoTitleHtml"),
     contatoLead: str(fd, "contatoLead"),
     whatsapp: str(fd, "whatsapp") || null,
-    whatsappHref: str(fd, "whatsappHref") || null,
+    // Link derivado do próprio número — nunca diverge do que é exibido.
+    whatsappHref: waHref(str(fd, "whatsapp")) || null,
     horario: str(fd, "horario") || null,
     email: str(fd, "email") || null,
     instagram: str(fd, "instagram") || null,
