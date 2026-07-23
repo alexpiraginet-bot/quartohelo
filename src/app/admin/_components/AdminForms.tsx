@@ -13,6 +13,7 @@ import {
   salvarTextosItem,
   trocarSenha,
 } from "../actions";
+import { ImageField } from "./ImageField";
 
 /* Formulários do painel — pensados para uso leigo: campos com os nomes que a
  * Helô usa, resposta em português claro e nada de jargão técnico. */
@@ -243,15 +244,7 @@ function OpcaoForm({
         <input type="hidden" name="tier" value={tier} />
         <input type="hidden" name="order" value={option?.order ?? order} />
         <div className="foto">
-          {option?.photoUrl ? (
-            <img src={option.photoUrl} alt={option.name} />
-          ) : (
-            <span>{option ? "Sem foto ainda" : "Nova opção"}</span>
-          )}
-          <label className="upload">
-            {option?.photoUrl ? "Trocar foto" : "Enviar foto"}
-            <input type="file" name="foto" accept="image/*" />
-          </label>
+          <ImageField name="foto_url" label="Foto do produto" value={option?.photoUrl} folder={`opcoes/${itemSlug}`} hint="Anexe a foto — ela é otimizada automaticamente." />
           {option?.exemplo ? <i className="ex">exemplo — vira real ao salvar</i> : null}
         </div>
         <div className="campos">

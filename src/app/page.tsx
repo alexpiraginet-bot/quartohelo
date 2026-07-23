@@ -8,8 +8,18 @@ import type { ServiceCard } from "@/lib/types";
 export const dynamic = "force-dynamic"; // reflete o CMS assim que o Supabase entra
 
 const IG = "M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Zm5.2-.9a.9.9 0 1 1-1.8 0 .9.9 0 0 1 1.8 0ZM7 3.5h10A3.5 3.5 0 0 1 20.5 7v10A3.5 3.5 0 0 1 17 20.5H7A3.5 3.5 0 0 1 3.5 17V7A3.5 3.5 0 0 1 7 3.5Z";
-const FB = "M13.5 21v-7h2.3l.4-2.7h-2.7V9.4c0-.8.3-1.3 1.4-1.3h1.4V5.7c-.7-.1-1.5-.2-2.2-.2-2.2 0-3.6 1.3-3.6 3.7v2.1H8.3V14h2.6v7h2.6Z";
 const WA = "M12 3.5a8.4 8.4 0 0 0-7.2 12.7L4 20.5l4.4-1.1A8.4 8.4 0 1 0 12 3.5Zm4.8 11.9c-.2.6-1.2 1.1-1.7 1.1-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.5c-.2.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.2.1.4.1.6-.1l.7-.9c.2-.2.4-.2.6-.1l1.9.9c.3.1.4.2.5.3.1.2.1.6-.1 1.1Z";
+
+/** Aceita o Instagram do jeito que a Helô digitar: link completo, "@usuario"
+ *  ou só o nome. Sempre devolve uma URL que abre o perfil (ou null se vazio). */
+function igHref(v?: string | null): string | null {
+  const t = (v ?? "").trim();
+  if (!t) return null;
+  if (/^https?:\/\//i.test(t)) return t;
+  if (t.includes("instagram.com")) return `https://${t.replace(/^\/+/, "")}`;
+  const handle = t.replace(/^@+/, "").replace(/^\/+/, "").trim();
+  return handle ? `https://instagram.com/${handle}` : null;
+}
 
 function Social({ d, href, label }: { d: string; href?: string | null; label: string }) {
   const svg = (
@@ -100,8 +110,7 @@ export default async function Home() {
           <div className="lsocial">
             <span className="k">Siga nossas redes</span>
             <div className="icons">
-              <Social d={IG} href={s.instagram} label="Instagram" />
-              <Social d={FB} href={s.facebook} label="Facebook" />
+              <Social d={IG} href={igHref(s.instagram)} label="Instagram" />
               <Social d={WA} href={s.whatsappHref} label="WhatsApp" />
             </div>
           </div>

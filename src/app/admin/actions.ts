@@ -133,15 +133,7 @@ export async function salvarOpcao(_prev: ActionState | null, fd: FormData): Prom
   const token = adminToken();
   if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
 
-  // Foto vira data URL (base64) para a função subir ao Storage.
-  let foto: string | null = null;
-  const file = fd.get("foto");
-  if (file instanceof File && file.size > 0) {
-    if (file.size > 6 * 1024 * 1024) return { ok: false, msg: "A foto passou de 6 MB. Envie uma versão menor." };
-    const buf = Buffer.from(await file.arrayBuffer());
-    foto = `data:${file.type || "image/jpeg"};base64,${buf.toString("base64")}`;
-  }
-
+  // A foto já foi anexada e otimizada pelo ImageField (chega como URL pronta).
   const itemSlug = str(fd, "itemSlug");
   const r = await callAdminFn("save_option", {
     token,
@@ -154,7 +146,7 @@ export async function salvarOpcao(_prev: ActionState | null, fd: FormData): Prom
     url: str(fd, "url") || null,
     supplier: str(fd, "supplier") || null,
     order: Number(str(fd, "order")) || 0,
-    foto,
+    foto_url: str(fd, "foto_url") || null,
   });
   if (r.ok) {
     refreshAll();
@@ -243,4 +235,23 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     revalidatePath("/admin/site");
   }
   return { ok: r.ok, msg: r.msg ?? "" };
+}
+
+/* --------------------------- upload de imagem --------------------------- */
+
+export interface UploadState {
+  ok: boolean;
+  url?: string;
+  msg?: string;
+}
+
+/** Recebe a imagem já otimizada (data URL) do navegador e sobe pela função,
+ *  devolvendo a URL pública. Usada pelo anexador de imagem do painel. */
+export async function subirImagem(dataUrl: string, folder: string): Promise<UploadState> {
+  const token = adminToken();
+  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+  if (typeof dataUrl !== "string" || !dataUrl.startsWith("data:")) return { ok: false, msg: "Imagem inválida." };
+  if (dataUrl.length > 8 * 1024 * 1024) return { ok: false, msg: "Imagem muito grande mesmo após otimizar." };
+  const r = await callAdminFn("upload_image", { token, data: dataUrl, folder: folder || "site" });
+  return { ok: r.ok, url: typeof r.url === "string" ? r.url : undefined, msg: r.msg };
 }

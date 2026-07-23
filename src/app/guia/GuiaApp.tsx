@@ -862,7 +862,7 @@ export default function GuiaApp({
     <div className="g2">
       <aside className={`g2side${menuOpen ? " open" : ""}`}>
         <div className="brand">
-          <img src="/images/helo-script-caramelo.png" alt="Helô" className="script" />
+          <img src="/images/logo-quarto-helo.png" alt="Quarto da Helô" className="script" />
           <span className="col">{guide.collection ?? "Collection Nº 01"}</span>
         </div>
 

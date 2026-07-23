@@ -3,6 +3,7 @@
 import { useFormState, useFormStatus } from "react-dom";
 import type { ServiceCard, SiteContent } from "@/lib/types";
 import { salvarSite, type ActionState } from "../actions";
+import { ImageField } from "./ImageField";
 
 /* Editor da landing (aba "Site"). Um único formulário com todas as seções;
  * salva o SiteContent inteiro de uma vez (a ação mescla com o atual). */
@@ -66,13 +67,12 @@ export function SiteEditor({ content }: { content: SiteContent }) {
           <T name="whatsapp" label="WhatsApp (como aparece)" def={s.whatsapp} ph="(11) 93063-9390" />
           <T name="whatsappHref" label="Link do WhatsApp" def={s.whatsappHref} ph="https://wa.me/5511930639390" />
           <T name="horario" label="Horário de atendimento" def={s.horario} ph="9h30 às 17h30" />
-          <T name="instagram" label="Instagram (link)" def={s.instagram} ph="https://instagram.com/…" />
-          <T name="facebook" label="Facebook (link)" def={s.facebook} ph="https://facebook.com/…" />
+          <T name="instagram" label="Instagram (@ ou link)" def={s.instagram} ph="@quartodahelo" />
         </div>
         <T name="contatoEyebrow" label="Rótulo" def={s.contatoEyebrow} />
         <T name="contatoTitleHtml" label="Título (use <i>…</i> para itálico)" def={s.contatoTitleHtml} />
         <T name="contatoLead" label="Frase" def={s.contatoLead} />
-        <T name="contatoPhoto" label="Foto de fundo (caminho)" def={s.contatoPhoto} ph="/images/estudio-contato.jpg" />
+        <ImageField name="contatoPhoto" label="Foto de fundo do Contato" value={s.contatoPhoto} folder="site" hint="Aparece atrás do Contato (véu vinho por cima). Ideal na horizontal." />
       </fieldset>
 
       <fieldset className="adm-sec">
@@ -87,7 +87,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
         <T name="quemEyebrow" label="Rótulo" def={s.quemEyebrow} />
         <A name="quemParagraphs" label="Texto (deixe uma linha em branco entre parágrafos)" def={s.quemParagraphs.join("\n\n")} rows={12} />
         <T name="quemClose" label="Frase de fechamento (destaque)" def={s.quemClose} />
-        <T name="sobrePhoto" label="Foto de fundo (caminho)" def={s.sobrePhoto} ph="/images/estudio-sobre.jpg" />
+        <ImageField name="sobrePhoto" label="Foto de fundo do Sobre nós" value={s.sobrePhoto} folder="site" hint="Aparece suave atrás do texto do Sobre nós." />
       </fieldset>
 
       <fieldset className="adm-sec">
