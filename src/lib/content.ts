@@ -41,6 +41,26 @@ export async function getGuide(): Promise<GuideMeta> {
 }
 
 /**
+ * Normalização retrocompatível e conservadora (não toca o banco): quando uma
+ * página tem tabela de medidas, as linhas de texto que apenas repetem a tabela
+ * (conteúdo legado, importado como "texto corrido") deixam de ser renderizadas —
+ * mantemos só a introdução, que vem antes da primeira linha de medida. Novas
+ * edições pelo painel já salvam apenas a introdução, então isto é um "de-dup" de
+ * leitura para dados antigos; o factual continua íntegro (vive na tabela).
+ */
+function normalizeMeasuresParagraphs(p: GuidePage): GuidePage {
+  const rows = p.measures?.rows;
+  if (!rows?.length || p.paragraphs.length <= 1) return p;
+  const items = rows.map((r) => (r.item ?? "").trim()).filter(Boolean);
+  if (!items.length) return p;
+  const cut = p.paragraphs.findIndex((para) => {
+    const t = (para ?? "").trim();
+    return items.some((it) => t.startsWith(it));
+  });
+  return cut > 0 ? { ...p, paragraphs: p.paragraphs.slice(0, cut) } : p;
+}
+
+/**
  * Dados do Guia v2 em uma chamada. A estrutura v2 (páginas + catálogo de
  * opções) só passa a vir do banco quando as tabelas novas existirem e tiverem
  * conteúdo; até lá TUDO do guia vem do seed, para o menu e a grade nunca
@@ -54,7 +74,7 @@ export async function getGuiaData(): Promise<{
 }> {
   const guide = await getGuide();
   if (!supabase) {
-    return { categories: seedCategories, guide, pages: seedGuidePages, options: seedProductOptions };
+    return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs), options: seedProductOptions };
   }
   try {
     const { data: pagesRows, error: pagesErr } = await supabase
@@ -63,7 +83,7 @@ export async function getGuiaData(): Promise<{
       .order("order");
     if (pagesErr || !pagesRows?.length) {
       // Banco ainda sem a estrutura v2 — o guia inteiro roda no seed.
-      return { categories: seedCategories, guide, pages: seedGuidePages, options: seedProductOptions };
+      return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs), options: seedProductOptions };
     }
     const dbPages: GuidePage[] = pagesRows.map((p) => ({
       slug: p.slug,
@@ -88,7 +108,7 @@ export async function getGuiaData(): Promise<{
     };
     let pages = ensureSeed(dbPages, "visao-geral");
     pages = ensureSeed(pages, "meu-projeto");
-    pages = [...pages].sort((a, b) => a.order - b.order);
+    pages = [...pages].sort((a, b) => a.order - b.order).map(normalizeMeasuresParagraphs);
     const { data: optRows } = await supabase.from("qh_product_options").select("*").order("order");
     const options: ProductOption[] = (optRows ?? []).map((o) => ({
       id: o.id,
@@ -107,7 +127,7 @@ export async function getGuiaData(): Promise<{
     const categories = await getCategories();
     return { categories, guide, pages, options };
   } catch {
-    return { categories: seedCategories, guide, pages: seedGuidePages, options: seedProductOptions };
+    return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs), options: seedProductOptions };
   }
 }
 
