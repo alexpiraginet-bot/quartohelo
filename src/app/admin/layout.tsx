@@ -26,6 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <span className="t">Painel</span>
         <div className="adm-links">
           <Link href="/admin">Início</Link>
+          <Link href="/admin/site">Site (landing)</Link>
           <Link href="/admin/paginas">Páginas do guia</Link>
           <Link href="/admin/catalogo">Catálogo</Link>
           <Link href="/admin/analytics">Acessos</Link>
