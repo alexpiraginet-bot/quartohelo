@@ -346,11 +346,16 @@ export default function GuiaApp({
     return (
       <aside className={`g2bump${compact ? " mini" : ""}`}>
         <div className="in">
-          <span className="k">Adicional · sob medida</span>
-          <b className="serif">Projeto de marcenaria avulso</b>
+          <span className="k">Curadoria Assinada · Projeto Conceito</span>
+          <b className="serif">Prefere que a gente cuide de tudo?</b>
           <p>
-            A marcenaria certa aproveita cada centímetro e amarra o quarto inteiro. A Helô desenha o projeto
-            executivo do seu quarto — armário, cômoda, nichos e acabamentos — pronto para o seu marceneiro executar.
+            Este guia foi feito para você montar o quarto com autonomia e segurança. Mas se em algum momento você
+            sentir que prefere entregar tudo em nossas mãos, nós estamos aqui.
+          </p>
+          <p>
+            Na Curadoria Assinada e no Projeto Conceito, cuidamos de cada detalhe por você: do conceito ao último
+            bordado, com a intermediação direta junto aos fornecedores. Você não decide nada sozinha, cada escolha
+            chega pronta e em harmonia com o todo.
           </p>
           <button
             type="button"
@@ -360,7 +365,7 @@ export default function GuiaApp({
               openSupport();
             }}
           >
-            Quero o projeto de marcenaria
+            Para conhecer, é só falar com a gente
           </button>
         </div>
       </aside>
@@ -436,73 +441,21 @@ export default function GuiaApp({
 
   function renderInicio() {
     return (
-      <div className="g2view">
-        <div className="eyebrow">
-          Bem-vinda ao seu guia · {guide.collection ?? "Collection Nº 01"}
+      <div className="g2view g2welcome">
+        <div className="brasao-bg" aria-hidden="true" />
+        <div className="in">
+          <div className="eyebrow">Bem-vinda ao seu guia · {guide.collection ?? "Collection Nº 01"}</div>
+          <h1 className="serif g2h1">Olá, {firstName}.</h1>
+          <p className="lead-title serif">
+            DO CONCEITO AO ÚLTIMO DETALHE: O guia completo para montar o quarto do seu bebê.
+          </p>
+          <p className="lead-sub">
+            A beleza é a forma mais pura de cuidado e o primeiro cenário de uma vida merece ser impecável.
+          </p>
+          <p className="lead-sub">
+            Aqui você encontrará o método, o critério e o olhar da Helô para você executar com primor.
+          </p>
         </div>
-        <h1 className="serif g2h1">
-          Olá, {firstName}.
-        </h1>
-        <p className="g2lead">{guide.promise}</p>
-
-        <div className="g2panel">
-          <div className="g2prog-line">
-            <div className="bar">
-              <i style={{ width: `${pct}%` }} />
-            </div>
-            <span>
-              {decididos.length} de {total} decisões no seu projeto
-            </span>
-          </div>
-          <div className="g2cta">
-            <button type="button" className="btn wine" onClick={() => {
-              const next = allEntries.find(({ item }) => choices[item.slug]?.status !== "escolhido");
-              setView(next ? { kind: "categoria", slug: next.item.slug } : { kind: "projeto" });
-            }}>
-              {decididos.length ? "Continuar de onde parei" : "Começar pelo papel de parede"}
-            </button>
-            <button type="button" className="btn ghost2" onClick={navTo({ kind: "projeto" })}>
-              Ver meu projeto
-            </button>
-          </div>
-        </div>
-
-        <div className="g2steps">
-          <div className="s">
-            <b>1 · Decida com critério</b>
-            <span>
-              Em cada categoria, o olhar da Helô: quando usar, quando não usar, o erro mais comum e o efeito no
-              quarto.
-            </span>
-          </div>
-          <div className="s">
-            <b>2 · Escolha na sua faixa</b>
-            <span>
-              Selecione a variação do quarto (menina, neutro ou menino) e veja as opções curadas em três faixas de
-              investimento, lado a lado.
-            </span>
-          </div>
-          <div className="s">
-            <b>3 · Veja o quarto nascer</b>
-            <span>
-              Cada escolha entra no MEU PROJETO: a foto vai para o moodboard e o valor para a análise financeira,
-              somado na hora.
-            </span>
-          </div>
-        </div>
-
-        {dppDate && semanasRestantes != null ? (
-          <button type="button" className="g2countdown" onClick={navTo({ kind: "pagina", slug: "cronograma" })}>
-            {semanasRestantes > 0
-              ? `Faltam ${semanasRestantes} ${semanasRestantes === 1 ? "semana" : "semanas"} para a chegada da ${profile.babyName}`
-              : `A ${profile.babyName} chega a qualquer momento`}
-            <span>Ver o cronograma →</span>
-          </button>
-        ) : null}
-
-        <p className="g2note">
-          Pré-visualização: em breve este guia abre pelo seu link pessoal, já com o seu nome e o do seu bebê.
-        </p>
       </div>
     );
   }
@@ -611,6 +564,16 @@ export default function GuiaApp({
             <p className="empty">A curadoria desta decisão está sendo preparada.</p>
           </section>
         )}
+
+        {d.dicaHelo ? (
+          <aside className="g2dica">
+            <span className="ic" aria-hidden="true">◆</span>
+            <div className="bd">
+              <b className="serif">Dica da Helô</b>
+              <p>{d.dicaHelo}</p>
+            </div>
+          </aside>
+        ) : null}
 
         <section className="g2opts">
           <div className="g2gen">
@@ -941,12 +904,12 @@ export default function GuiaApp({
             </span>
           </div>
           <div className="g2user">
-            <span className="av">
+            <span className="av plain">
               <img src="/images/brasao-creme.png" alt="" aria-hidden="true" />
             </span>
             <span className="who">
               <b>{profile.motherName}</b>
-              <span>Mamãe da {profile.babyName}</span>
+              <span>Quarto da {profile.babyName}</span>
             </span>
           </div>
         </div>

@@ -33,9 +33,16 @@ export const SUPA_ANON = anon;
 
 export const isDbConfigured = Boolean(url && anon);
 
-/** Cliente público (leitura). Null quando ainda não configurado. */
+/** Cliente público (leitura). Null quando ainda não configurado.
+ *  fetch com `no-store`: o Next não cacheia as leituras, então qualquer
+ *  mudança de conteúdo (pelo painel ou direto no banco) reflete na hora. */
 export const supabase: SupabaseClient | null = isDbConfigured
-  ? createClient(url as string, anon as string, { auth: { persistSession: false } })
+  ? createClient(url as string, anon as string, {
+      auth: { persistSession: false },
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, { ...init, cache: "no-store" }),
+      },
+    })
   : null;
 
 /** Cliente de servidor (escrita no admin) usando a service role. */

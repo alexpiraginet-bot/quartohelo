@@ -40,7 +40,7 @@ export function LoginForm() {
   const [state, action] = useFormState(entrarNoPainel, null);
   return (
     <form action={action} className="adm-login">
-      <img src="/images/brasao-vinho.png" alt="" aria-hidden="true" />
+      <img src="/images/brasao-creme.png" alt="" aria-hidden="true" />
       <h1 className="serif">Painel da Helô</h1>
       <p>Digite a senha do painel para editar o guia e o site.</p>
       <input type="password" name="senha" placeholder="Senha" autoFocus />

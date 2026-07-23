@@ -64,6 +64,8 @@ export const seedCategories: Category[] = [
         quandoNao: "Evite o berço super dimensionado em quartos pequenos: ele engole a circulação e desequilibra a composição.",
         erroComum: "Escolher pela foto e ignorar a altura do estrado e a distância entre as ripas (segurança + praticidade na troca).",
         efeito: "Define o eixo visual do quarto. Tudo se organiza a partir dele.",
+        dicaHelo:
+          "Antes de comprar qualquer berço, marque suas dimensões no chão com fita crepe. Em seguida, verifique se haverá pelo menos 60 cm de circulação livre em uma das laterais para garantir conforto e praticidade no uso diário. Se a sua intenção é conseguir colocar o bebê no berço pelos dois lados, faça essa verificação em ambas as laterais, e não apenas em uma delas. Esse simples exercício ajuda a visualizar o espaço que o móvel realmente ocupará no ambiente e evita um dos erros mais frequentes — e mais caros — na montagem do quartinho: descobrir, após a compra, que o berço ficou desproporcional para o espaço ou comprometeu a circulação do ambiente.",
       },
     }),
     "Cama auxiliar",
