@@ -57,6 +57,8 @@ export interface GuidePageCard {
   n: string;
   title: string;
   text: string;
+  /** Imagem opcional do card (sem imagem / topo / fundo 50%). */
+  image?: CardImage | null;
 }
 
 /** Callout discreto "Dica da Helô". `label` é opcional (padrão: "Dica da Helô"),
@@ -182,6 +184,16 @@ export interface GuideMeta {
  *  CMS da landing — a Helô edita textos e fotos sem depender de dev.
  * ------------------------------------------------------------------ */
 
+/** Imagem opcional de um card, configurável por card no painel.
+ *  mode: "none" (padrão) · "top" (foto no topo) · "background" (fundo a 50%). */
+export type CardImageMode = "none" | "top" | "background";
+export interface CardImage {
+  url?: string | null;
+  mode?: CardImageMode;
+  /** Texto alternativo (usado no modo "top"; vazio = decorativa). */
+  alt?: string | null;
+}
+
 export interface ServiceCard {
   tag: string;
   title: string;
@@ -193,6 +205,8 @@ export interface ServiceCard {
   /** Rótulo e destino do botão "conheça mais" (leva à página do serviço). */
   ctaLabel?: string | null;
   ctaHref?: string | null;
+  /** Imagem opcional do card (sem imagem / topo / fundo 50%). */
+  image?: CardImage | null;
 }
 
 /** Página institucional simples (Sobre nós, Curadoria Assinada, etc.). */

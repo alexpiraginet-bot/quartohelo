@@ -5,7 +5,7 @@ import { callAdminFn } from "@/lib/db/adminFn";
 import { adminToken, clearAdminSession, setAdminSession } from "@/lib/admin/auth";
 import { getSiteContent } from "@/lib/content";
 import { waHref } from "@/lib/whatsapp";
-import type { ServiceCard, SiteContent, SitePage } from "@/lib/types";
+import type { CardImage, CardImageMode, ServiceCard, SiteContent, SitePage } from "@/lib/types";
 
 /**
  * Ações do painel da Helô. Todas encaminham para a Edge Function qh-admin
@@ -212,6 +212,14 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     paragraphs: paras(`${prefix}_paras`),
     photo: str(fd, `${prefix}_photo`) || null,
   });
+  // Imagem opcional do card: o formulário sempre manda o modo (none/top/
+  // background). Só guardamos algo quando há URL e o modo não é "none".
+  const cardImage = (prefix: string): CardImage | null => {
+    const mode = str(fd, `${prefix}_img_mode`);
+    const url = str(fd, `${prefix}_img_url`);
+    if (!url || (mode !== "top" && mode !== "background")) return null;
+    return { url, mode: mode as CardImageMode, alt: str(fd, `${prefix}_img_alt`) || null };
+  };
   const card = (prefix: string, base?: ServiceCard | null): ServiceCard => ({
     ...(base ?? { tag: "", title: "", desc: "", bullets: [] }),
     tag: str(fd, `${prefix}_tag`),
@@ -220,6 +228,7 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     bullets: lines(`${prefix}_bullets`),
     ctaLabel: str(fd, `${prefix}_ctaLabel`) || null,
     ctaHref: str(fd, `${prefix}_ctaHref`) || null,
+    image: cardImage(prefix),
   });
 
   const services = cur.services.map((sv, i) => card(`svc${i}`, sv));

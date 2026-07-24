@@ -4,6 +4,7 @@ import { waDisplay, waHref, WA_MSG } from "@/lib/whatsapp";
 import { LandingFx } from "./_components/Interactive";
 import { SiteNav } from "./_components/SiteNav";
 import { Track } from "./_components/Track";
+import { CardMediaBg, CardMediaTop, cardHasBg } from "./_components/CardMedia";
 import type { ServiceCard } from "@/lib/types";
 
 export const dynamic = "force-dynamic"; // reflete o CMS assim que o Supabase entra
@@ -32,7 +33,9 @@ function Social({ d, href, label }: { d: string; href?: string | null; label: st
 
 function Card({ c }: { c: ServiceCard }) {
   return (
-    <article className={`lcard rv${c.featured ? " feat" : ""}`}>
+    <article className={`lcard rv${c.featured ? " feat" : ""}${cardHasBg(c.image) ? " has-bg" : ""}`}>
+      <CardMediaBg image={c.image} />
+      <CardMediaTop image={c.image} />
       <div className="tag">{c.tag}</div>
       <h3 className="serif">{c.title}</h3>
       <p className="desc">{c.desc}</p>

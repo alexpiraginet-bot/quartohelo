@@ -192,9 +192,11 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 @media (max-width:760px){ .g2welcome .brasao-bg{background-position:center; opacity:.045} }
 .g2welcome .in{position:relative; z-index:1; max-width:62ch}
 .g2welcome .lead-title{margin-top:22px; color:var(--wine); font-weight:400; font-style:italic; font-size:clamp(21px,3vw,32px); line-height:1.28; max-width:22ch}
-/* título principal em 2 blocos (o ":" quebra a linha; cada bloco reflui sozinho no mobile) */
-.g2welcome .lead-title.two-lines{max-width:26ch}
-.g2welcome .lead-title.two-lines .lt-line{display:block}
+/* Título principal em 2 blocos (parte antes do ":" e o restante). Largura
+ * folgada para, no desktop, o rótulo caber numa linha; no celular quebra pela
+ * tela. text-wrap:balance evita linha órfã curta quando um bloco reflui. */
+.g2welcome .lead-title.two-lines{max-width:48ch}
+.g2welcome .lead-title.two-lines .lt-line{display:block; text-wrap:balance}
 .g2welcome .lead-title.two-lines .lt-line + .lt-line{margin-top:2px}
 .g2welcome .lead-sub{margin-top:16px; color:var(--muted); font-weight:300; font-size:clamp(15px,1.9vw,17.5px); line-height:1.8; max-width:54ch}
 /* Callout único "Dica da Helô" — discreto e complementar: nunca compete com o
@@ -664,6 +666,16 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lcard .btn.sm{margin-top:auto; align-self:flex-start; padding:11px 20px; font-size:11px}
 .lcard .btn.ghost.sm{color:var(--wine); border-color:color-mix(in srgb,var(--wine) 34%,transparent)}
 .lcard .btn.ghost.sm:hover{border-color:var(--wine); background:color-mix(in srgb,var(--wine) 6%,transparent)}
+/* Imagem do card — modo "topo": faixa que sangra até as bordas do card */
+.card-media-top{margin:-30px -28px 14px; border-radius:19px 19px 0 0; overflow:hidden; aspect-ratio:16/10; background:var(--bone)}
+.card-media-top img{display:block; width:100%; height:100%; object-fit:cover}
+/* Imagem do card — modo "fundo": camada atrás do conteúdo a 50% (o texto e os
+ * botões seguem 100% opacos; nunca aplicamos opacity no card inteiro) */
+.lcard.has-bg{position:relative; overflow:hidden; isolation:isolate}
+.card-media-bg{position:absolute; inset:0; z-index:0; pointer-events:none}
+.card-media-bg .ph{position:absolute; inset:0; background-size:cover; background-position:center; opacity:.5}
+.card-media-bg .veil{position:absolute; inset:0; background:linear-gradient(180deg, rgba(250,247,236,.15), rgba(250,247,236,.5))}
+.lcard.has-bg > *:not(.card-media-bg){position:relative; z-index:1}
 
 /* --- Contato --- */
 .lcontato{position:relative; overflow:hidden; padding:clamp(70px,10vw,130px) 0; color:#F5EAD2}
@@ -728,6 +740,15 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .adm-sec > legend{font-family:"Fraunces",Georgia,serif; font-size:19px; color:var(--wine); padding:0 8px}
 .adm-cardbox{border:1px dashed var(--line); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:12px; background:#fff}
 .adm-cardname{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--olive)}
+/* Configuração de imagem por card (dentro do editor de cards) */
+.adm-cardimg{display:flex; flex-direction:column; gap:9px; grid-column:1/-1}
+.adm-cardimg > .lbl{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--olive)}
+.adm-cardimg-modes{display:flex; flex-wrap:wrap; gap:8px}
+.adm-radio{display:inline-flex; align-items:center; gap:7px; padding:7px 13px; border:1px solid var(--line); border-radius:999px; font-size:13px; cursor:pointer; background:#fff; transition:border-color .15s ease, background .15s ease, color .15s ease}
+.adm-radio:hover{border-color:var(--caramel)}
+.adm-radio.sel{border-color:var(--wine); background:color-mix(in srgb,var(--wine) 8%,#fff); color:var(--wine)}
+.adm-radio input{accent-color:var(--wine); margin:0}
+.adm-cardimg-alt{display:flex; flex-direction:column; gap:5px; font-size:13px; color:var(--muted)}
 .adm-savebar{position:sticky; bottom:14px; display:flex; justify-content:flex-end; padding-top:6px}
 .adm-savebar .adm-btn{box-shadow:0 10px 26px rgba(74,23,31,.22)}
 
