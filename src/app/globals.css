@@ -192,6 +192,10 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 @media (max-width:760px){ .g2welcome .brasao-bg{background-position:center; opacity:.045} }
 .g2welcome .in{position:relative; z-index:1; max-width:62ch}
 .g2welcome .lead-title{margin-top:22px; color:var(--wine); font-weight:400; font-style:italic; font-size:clamp(21px,3vw,32px); line-height:1.28; max-width:22ch}
+/* título principal em 2 blocos (o ":" quebra a linha; cada bloco reflui sozinho no mobile) */
+.g2welcome .lead-title.two-lines{max-width:26ch}
+.g2welcome .lead-title.two-lines .lt-line{display:block}
+.g2welcome .lead-title.two-lines .lt-line + .lt-line{margin-top:2px}
 .g2welcome .lead-sub{margin-top:16px; color:var(--muted); font-weight:300; font-size:clamp(15px,1.9vw,17.5px); line-height:1.8; max-width:54ch}
 /* Callout único "Dica da Helô" — discreto e complementar: nunca compete com o
  * título nem com o texto principal. Fundo claro sutil + acento delicado. */

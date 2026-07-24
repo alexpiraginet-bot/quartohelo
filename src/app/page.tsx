@@ -63,10 +63,6 @@ export default async function Home() {
           <div className="eyebrow">{s.heroEyebrow}</div>
           <h1 className="serif lhero-h1" dangerouslySetInnerHTML={{ __html: s.heroTitleHtml }} />
           <p className="lhero-sub">{s.heroSub}</p>
-          <div className="lhero-cta">
-            <a className="btn primary" href="#servicos">Como trabalhamos</a>
-            <Link className="btn ghost" href="/produto-digital">Produto digital</Link>
-          </div>
         </div>
       </header>
 

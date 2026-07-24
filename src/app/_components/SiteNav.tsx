@@ -34,8 +34,8 @@ const BOTTOM: { label: string; href: string; d: string }[] = [
   { label: "Início", href: "/#top", d: I.home },
   { label: "Sobre", href: "/#sobre", d: I.sobre },
   { label: "Serviços", href: "/#servicos", d: I.serv },
-  { label: "Curadoria", href: "/curadoria-assinada", d: I.curadoria },
-  { label: "Projeto", href: "/projeto-conceito", d: I.projeto },
+  { label: "Curadoria Assinada", href: "/curadoria-assinada", d: I.curadoria },
+  { label: "Projeto Conceito", href: "/projeto-conceito", d: I.projeto },
   { label: "Digital", href: "/produto-digital", d: I.digital },
   { label: "Contato", href: "/#contato", d: I.contato },
 ];
