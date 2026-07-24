@@ -696,9 +696,10 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lcontato-cards .lc{background:rgba(255,255,255,.06); border:1px solid rgba(210,181,142,.28); border-radius:16px; padding:18px 22px; min-width:220px; display:flex; flex-direction:column; gap:4px}
 .lcontato-cards .lc b{font-size:14px; color:#FBF2DC; font-weight:500}
 .lcontato-cards .lc span{font-size:14px; color:#E3D2B6}
-.lsocial{margin-top:30px}
+/* "Siga nossas redes" + ícones centralizados como um conjunto (desktop e mobile) */
+.lsocial{margin-top:30px; display:flex; flex-direction:column; align-items:center; text-align:center}
 .lsocial .k{font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(231,223,199,.7)}
-.lsocial .icons{margin-top:12px; display:flex; gap:12px}
+.lsocial .icons{margin-top:12px; display:flex; gap:12px; justify-content:center}
 .lsocial .soc,.lsocial .soc.off{display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; border:1px solid rgba(210,181,142,.4); color:#F3E8CE; transition:background .2s, transform .2s}
 .lsocial .soc:hover{background:rgba(210,181,142,.18); transform:translateY(-2px)}
 .lsocial .soc.off{opacity:.4}

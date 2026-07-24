@@ -7,7 +7,7 @@ import {
   seedProductOptions,
   seedSite,
 } from "@/data/seed";
-import type { Category, GuideMeta, GuidePage, ProductOption, SiteContent } from "@/lib/types";
+import type { Category, GuideMeta, GuidePage, ProductOption, ServiceCard, SiteContent } from "@/lib/types";
 
 /**
  * Camada de conteúdo. Uma porta única para landing, guia e admin lerem os dados.
@@ -18,13 +18,45 @@ import type { Category, GuideMeta, GuidePage, ProductOption, SiteContent } from 
 
 export const dbReady = isDbConfigured;
 
+/* Normalização de leitura da landing (retrocompatível, não reescreve o banco).
+ * A v1 trouxe frases/valores que a Amanda pediu para remover/atualizar. Como o
+ * conteúdo ao vivo vive no blob (que sobrepõe o seed) e estes campos não são
+ * editáveis no painel (featuredLabel/foot) — ou o valor legado é apenas uma
+ * cópia do seed antigo (horário) — aplicamos a limpeza na leitura. Um "Salvar"
+ * no painel consolida os valores já normalizados. */
+const normText = (v: string) => v.trim().replace(/\.$/, "").toLowerCase();
+const DEPRECATED_CARD_LINES = new Set(
+  [
+    "Integração total entre arquitetura e curadoria",
+    "Você conduz com autonomia, a partir de um direcionamento claro e estruturado",
+  ].map(normText),
+);
+const LEGACY_HORARIO = "9h30 às 17h30";
+
+function stripDeprecated(v?: string | null): string | null {
+  return v && DEPRECATED_CARD_LINES.has(normText(v)) ? null : (v ?? null);
+}
+function normalizeCard(c: ServiceCard): ServiceCard {
+  return { ...c, featuredLabel: stripDeprecated(c.featuredLabel), foot: stripDeprecated(c.foot) };
+}
+function normalizeSite(s: SiteContent): SiteContent {
+  return {
+    ...s,
+    services: Array.isArray(s.services) ? s.services.map(normalizeCard) : s.services,
+    produtoDigital: s.produtoDigital ? normalizeCard(s.produtoDigital) : s.produtoDigital,
+    // Horário: migra a cópia legada do seed antigo para o valor atual (do seed).
+    horario: s.horario && s.horario.trim() === LEGACY_HORARIO ? seedSite.horario : s.horario,
+  };
+}
+
 export async function getSiteContent(): Promise<SiteContent> {
   if (!supabase) return seedSite;
   try {
     const { data } = await supabase.from("qh_site_content").select("data").eq("id", "landing").maybeSingle();
     // Mescla com o seed: campos novos (landing v2) caem no padrão mesmo que a
     // linha do banco seja antiga. O que a Helô editar no painel prevalece.
-    return data?.data ? { ...seedSite, ...(data.data as Partial<SiteContent>) } : seedSite;
+    const merged = data?.data ? { ...seedSite, ...(data.data as Partial<SiteContent>) } : seedSite;
+    return normalizeSite(merged);
   } catch {
     return seedSite;
   }
