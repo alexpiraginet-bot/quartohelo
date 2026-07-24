@@ -14,6 +14,7 @@ import type {
   ProductOption,
 } from "@/lib/types";
 import { GENERO_LABEL, TIER_LABEL } from "@/lib/types";
+import { CardMediaBg, CardMediaTop, cardHasBg } from "@/app/_components/CardMedia";
 import { openSupport } from "@/app/_components/Interactive";
 import { track } from "@/app/_components/Track";
 
@@ -452,7 +453,9 @@ export default function GuiaApp({
         {page.cards?.length ? (
           <div className="g2cards">
             {page.cards.map((c, i) => (
-              <div className="c" key={i}>
+              <div className={`c${cardHasBg(c.image) ? " has-bg" : ""}`} key={i}>
+                <CardMediaBg image={c.image} />
+                <CardMediaTop image={c.image} />
                 <div className="n serif">{c.n}</div>
                 <b>{c.title}</b>
                 <span>{c.text}</span>
@@ -500,13 +503,17 @@ export default function GuiaApp({
             <div className="lbl">A decisão, pelo olhar da Helô</div>
             <div className="grid">
               {d.quandoUsar ? (
-                <div className="d">
+                <div className={`d${cardHasBg(d.quandoUsarImg) ? " has-bg" : ""}`}>
+                  <CardMediaBg image={d.quandoUsarImg} />
+                  <CardMediaTop image={d.quandoUsarImg} />
                   <b>◆ Quando usar</b>
                   <span>{d.quandoUsar}</span>
                 </div>
               ) : null}
               {d.quandoNao ? (
-                <div className="d">
+                <div className={`d${cardHasBg(d.quandoNaoImg) ? " has-bg" : ""}`}>
+                  <CardMediaBg image={d.quandoNaoImg} />
+                  <CardMediaTop image={d.quandoNaoImg} />
                   <b>✕ Quando não usar</b>
                   <span>{d.quandoNao}</span>
                 </div>

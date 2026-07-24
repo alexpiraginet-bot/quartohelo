@@ -121,6 +121,19 @@ function sanitizeProject(p: unknown): unknown {
   return any ? out : null;
 }
 
+// Normaliza a imagem opcional de um card (landing/guia/decisão). Só aceita
+// modo "top"/"background" e URL http(s) (as fotos sobem otimizadas para o
+// bucket). Devolve null para "sem imagem" ou dado inválido.
+function sanitizeCardImage(v: unknown): { url: string; mode: string; alt: string | null } | null {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return null;
+  const o = v as Record<string, unknown>;
+  const url = typeof o.url === "string" ? o.url.trim() : "";
+  const mode = o.mode === "top" || o.mode === "background" ? o.mode : "";
+  if (!url || !/^https?:\/\//i.test(url) || !mode) return null;
+  const alt = String(o.alt ?? "").replace(/[<>]/g, "").trim().slice(0, 300) || null;
+  return { url, mode, alt };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ ok: false, msg: "Método inválido." }, 405);
@@ -268,6 +281,7 @@ Deno.serve(async (req) => {
             n: String(c.n ?? "").trim(),
             title: String(c.title ?? "").trim(),
             text: String(c.text ?? "").trim(),
+            image: sanitizeCardImage(c.image),
           }))
           .filter((c) => c.title || c.text);
         row.cards = cards.length ? cards : null;
@@ -308,6 +322,10 @@ Deno.serve(async (req) => {
         instalacao: d.instalacao ? String(d.instalacao) : null,
         // enviou a chave → usa (vazio apaga); não enviou → mantém o atual.
         dicaHelo: "dicaHelo" in d ? (d.dicaHelo ? String(d.dicaHelo) : null) : (prev.dicaHelo ?? null),
+        // Imagens das células "Quando usar/não usar" — mesmo padrão: enviou a
+        // chave → usa/apaga; telas antigas (sem a chave) preservam o atual.
+        quandoUsarImg: "quandoUsarImg" in d ? sanitizeCardImage(d.quandoUsarImg) : (prev.quandoUsarImg ?? null),
+        quandoNaoImg: "quandoNaoImg" in d ? sanitizeCardImage(d.quandoNaoImg) : (prev.quandoNaoImg ?? null),
       };
       const { data, error } = await db.from("qh_items").update({ summary: S("summary") || null, decision }).eq("slug", slug).select("id");
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });

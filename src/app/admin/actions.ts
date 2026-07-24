@@ -33,6 +33,16 @@ const str = (fd: FormData, k: string) => {
   return typeof v === "string" ? v.trim() : "";
 };
 
+/** Lê a imagem opcional de um card do formulário (mesmo esquema em landing,
+ *  cards do guia e decisão do item). O painel sempre manda o modo; só guardamos
+ *  algo quando há URL e o modo não é "none". A Edge Function valida de novo. */
+function cardImageFrom(fd: FormData, prefix: string): CardImage | null {
+  const mode = str(fd, `${prefix}_img_mode`);
+  const url = str(fd, `${prefix}_img_url`);
+  if (!url || (mode !== "top" && mode !== "background")) return null;
+  return { url, mode: mode as CardImageMode, alt: str(fd, `${prefix}_img_alt`) || null };
+}
+
 function refreshAll() {
   revalidatePath("/guia");
   revalidatePath("/admin");
@@ -76,14 +86,14 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
     .filter(Boolean);
   // Cards numerados (ex.: os 4 passos do "Como usar"). As linhas vêm indexadas
   // do formulário; guardamos as que têm título ou texto, na ordem da tela.
-  const cards: { n: string; title: string; text: string }[] = [];
+  const cards: { n: string; title: string; text: string; image: CardImage | null }[] = [];
   const cardCount = Number(str(fd, "cardCount")) || 0;
   for (let i = 0; i < cardCount; i++) {
     const title = str(fd, `card_title_${i}`);
     const text = str(fd, `card_text_${i}`);
     if (!title && !text) continue;
     const n = str(fd, `card_n_${i}`) || String(cards.length + 1).padStart(2, "0");
-    cards.push({ n, title, text });
+    cards.push({ n, title, text, image: cardImageFrom(fd, `card_${i}`) });
   }
   // Tabela de medidas: chega como JSON do editor. Fazemos só o parse aqui; a
   // Edge Function valida/normaliza os campos (fronteira de dados com service role).
@@ -146,6 +156,8 @@ export async function salvarTextosItem(_prev: ActionState | null, fd: FormData):
       efeito: str(fd, "efeito") || null,
       instalacao: str(fd, "instalacao") || null,
       dicaHelo: str(fd, "dicaHelo") || null,
+      quandoUsarImg: cardImageFrom(fd, "qUsarImg"),
+      quandoNaoImg: cardImageFrom(fd, "qNaoImg"),
     },
   });
   if (r.ok) {
@@ -212,14 +224,6 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     paragraphs: paras(`${prefix}_paras`),
     photo: str(fd, `${prefix}_photo`) || null,
   });
-  // Imagem opcional do card: o formulário sempre manda o modo (none/top/
-  // background). Só guardamos algo quando há URL e o modo não é "none".
-  const cardImage = (prefix: string): CardImage | null => {
-    const mode = str(fd, `${prefix}_img_mode`);
-    const url = str(fd, `${prefix}_img_url`);
-    if (!url || (mode !== "top" && mode !== "background")) return null;
-    return { url, mode: mode as CardImageMode, alt: str(fd, `${prefix}_img_alt`) || null };
-  };
   const card = (prefix: string, base?: ServiceCard | null): ServiceCard => ({
     ...(base ?? { tag: "", title: "", desc: "", bullets: [] }),
     tag: str(fd, `${prefix}_tag`),
@@ -228,7 +232,7 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     bullets: lines(`${prefix}_bullets`),
     ctaLabel: str(fd, `${prefix}_ctaLabel`) || null,
     ctaHref: str(fd, `${prefix}_ctaHref`) || null,
-    image: cardImage(prefix),
+    image: cardImageFrom(fd, prefix),
   });
 
   const services = cur.services.map((sv, i) => card(`svc${i}`, sv));

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import type { GuideDica, GuidePage, Genero, Item, MeasureRow, PriceTier, ProductOption, ProjectTexts } from "@/lib/types";
+import type { CardImage, GuideDica, GuidePage, Genero, Item, MeasureRow, PriceTier, ProductOption, ProjectTexts } from "@/lib/types";
 import { GENERO_LABEL, TIER_LABEL } from "@/lib/types";
+import { CardImageField } from "./CardImageField";
 import {
   type ActionState,
   entrarNoPainel,
@@ -132,14 +133,18 @@ function ProjetoTextos({
 
 export function PaginaForm({ page }: { page: GuidePage }) {
   const [state, action] = useFormState(salvarPagina, null);
-  const [cards, setCards] = useState<{ n: string; title: string; text: string }[]>(
-    (page.cards ?? []).map((c) => ({ n: c.n, title: c.title, text: c.text })),
+  // uid estável por card: garante que o estado interno do anexador de imagem
+  // (CardImageField/ImageField) acompanhe o card certo ao adicionar/remover.
+  const cardUid = useRef(0);
+  type CardRow = { uid: number; n: string; title: string; text: string; image: CardImage | null };
+  const [cards, setCards] = useState<CardRow[]>(() =>
+    (page.cards ?? []).map((c) => ({ uid: cardUid.current++, n: c.n, title: c.title, text: c.text, image: c.image ?? null })),
   );
 
-  const setCard = (i: number, patch: Partial<{ n: string; title: string; text: string }>) =>
+  const setCard = (i: number, patch: Partial<CardRow>) =>
     setCards((prev) => prev.map((c, j) => (j === i ? { ...c, ...patch } : c)));
   const addCard = () =>
-    setCards((prev) => [...prev, { n: String(prev.length + 1).padStart(2, "0"), title: "", text: "" }]);
+    setCards((prev) => [...prev, { uid: cardUid.current++, n: String(prev.length + 1).padStart(2, "0"), title: "", text: "", image: null }]);
   const removeCard = (i: number) => setCards((prev) => prev.filter((_, j) => j !== i));
 
   // Tabela de medidas (opcional): rótulos das 3 colunas + linhas + dica.
@@ -214,7 +219,7 @@ export function PaginaForm({ page }: { page: GuidePage }) {
         </div>
         <input type="hidden" name="cardCount" value={cards.length} />
         {cards.map((c, i) => (
-          <div className="adm-cardrow" key={i}>
+          <div className="adm-cardrow" key={c.uid}>
             <input
               className="num"
               name={`card_n_${i}`}
@@ -236,6 +241,7 @@ export function PaginaForm({ page }: { page: GuidePage }) {
                 onChange={(e) => setCard(i, { text: e.target.value })}
                 placeholder="Texto do card"
               />
+              <CardImageField prefix={`card_${i}`} value={c.image} folder={`paginas/${page.slug}/cards`} />
             </div>
             <button type="button" className="rm" onClick={() => removeCard(i)} title="Remover card">
               ×
@@ -332,14 +338,20 @@ export function ItemTextosForm({ item }: { item: Item }) {
         <input name="summary" defaultValue={item.summary ?? ""} />
       </label>
       <div className="adm-2col">
-        <label>
-          Quando usar
-          <textarea name="quandoUsar" rows={3} defaultValue={d.quandoUsar ?? ""} />
-        </label>
-        <label>
-          Quando não usar
-          <textarea name="quandoNao" rows={3} defaultValue={d.quandoNao ?? ""} />
-        </label>
+        <div className="adm-decfield">
+          <label>
+            Quando usar
+            <textarea name="quandoUsar" rows={3} defaultValue={d.quandoUsar ?? ""} />
+          </label>
+          <CardImageField prefix="qUsarImg" value={d.quandoUsarImg} folder={`itens/${item.slug}`} />
+        </div>
+        <div className="adm-decfield">
+          <label>
+            Quando não usar
+            <textarea name="quandoNao" rows={3} defaultValue={d.quandoNao ?? ""} />
+          </label>
+          <CardImageField prefix="qNaoImg" value={d.quandoNaoImg} folder={`itens/${item.slug}`} />
+        </div>
         <label>
           Erro mais comum
           <textarea name="erroComum" rows={3} defaultValue={d.erroComum ?? ""} />
