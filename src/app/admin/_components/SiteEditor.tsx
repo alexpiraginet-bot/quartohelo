@@ -4,6 +4,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import type { ServiceCard, SiteContent } from "@/lib/types";
 import { salvarSite, type ActionState } from "../actions";
 import { ImageField } from "./ImageField";
+import { CardImageField } from "./CardImageField";
 
 /* Editor da landing (aba "Site"). Um único formulário com todas as seções;
  * salva o SiteContent inteiro de uma vez (a ação mescla com o atual). */
@@ -48,6 +49,7 @@ function CardFields({ prefix, c }: { prefix: string; c?: ServiceCard | null }) {
       <A name={`${prefix}_bullets`} label="Itens (um por linha)" def={(c?.bullets ?? []).join("\n")} rows={5} />
       <T name={`${prefix}_ctaLabel`} label="Texto do botão" def={c?.ctaLabel} ph="Conheça mais" />
       <T name={`${prefix}_ctaHref`} label="Link do botão" def={c?.ctaHref} ph="/curadoria-assinada" />
+      <CardImageField prefix={prefix} value={c?.image} folder="cards/site" />
     </div>
   );
 }

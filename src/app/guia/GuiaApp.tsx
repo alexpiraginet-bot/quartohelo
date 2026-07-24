@@ -42,69 +42,6 @@ type Choices = Record<string, LocalChoice>; // chave = slug do item
 const STORE_KEY = "qh_guia_v2_jornada";
 const ENTER_KEY = "qh_guia_v2_entrou";
 const GEN_KEY = "qh_guia_v2_genero";
-const DPP_KEY = "qh_guia_v2_dpp";
-
-/** Cronograma vivo: janelas de decisão/encomenda contadas a partir da data
- *  prevista de chegada (prazos de produção de 30–90 dias considerados). */
-const CRONO: { semanas: number; titulo: string; desc: string; slugs: string[] }[] = [
-  {
-    semanas: 20,
-    titulo: "Conceito e papel de parede",
-    desc: "Defina a atmosfera do quarto e o papel de parede — tudo dialoga com ele.",
-    slugs: ["papel-de-parede"],
-  },
-  {
-    semanas: 16,
-    titulo: "Berço e marcenaria",
-    desc: "Berço, armário e cômoda levam de 30 a 90 dias de produção. É a hora de encomendar.",
-    slugs: ["berco", "armario", "comoda"],
-  },
-  {
-    semanas: 14,
-    titulo: "Assentos e apoios",
-    desc: "Poltrona de amamentação, cama auxiliar e mesa lateral.",
-    slugs: ["poltrona-de-amamentacao", "cama-auxiliar", "mesa-lateral"],
-  },
-  {
-    semanas: 10,
-    titulo: "Iluminação e pontos elétricos",
-    desc: "Arandelas, abajur e pendente — os pontos elétricos vêm antes do acabamento.",
-    slugs: ["arandelas", "abajur", "pendente"],
-  },
-  {
-    semanas: 8,
-    titulo: "Têxteis e enxoval",
-    desc: "Cortina, tapete, enxovais, almofadas, trocador e porta-treco.",
-    slugs: [
-      "tapete",
-      "cortina",
-      "enxoval-berco",
-      "enxoval-cama",
-      "almofadas-decorativas",
-      "almofada-de-amamentacao",
-      "trocador",
-      "porta-treco",
-    ],
-  },
-  {
-    semanas: 6,
-    titulo: "Complementos",
-    desc: "Kit higiene e adornos — os detalhes que fecham o ambiente.",
-    slugs: ["kit-higiene", "adornos"],
-  },
-  {
-    semanas: 4,
-    titulo: "Montagem final",
-    desc: "Quarto montado, enxoval lavado e cada coisa no seu lugar.",
-    slugs: [],
-  },
-  {
-    semanas: 2,
-    titulo: "Mala pronta",
-    desc: "Mala maternidade e bolsa de passeio prontas na porta.",
-    slugs: ["mala-maternidade", "bolsa-de-passeio"],
-  },
-];
 
 /** Ordem do documento: primeira linha os mais altos, última os acessíveis. */
 const TIER_ORDER: PriceTier[] = ["alto", "medio", "acessivel"];
@@ -216,7 +153,6 @@ export default function GuiaApp({
   const [hydrated, setHydrated] = useState(false);
   const [view, setView] = useState<View>({ kind: "inicio" });
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dpp, setDpp] = useState<string>("");
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -225,21 +161,12 @@ export default function GuiaApp({
       if (window.localStorage.getItem(ENTER_KEY) === "1") setEntered(true);
       const g = window.localStorage.getItem(GEN_KEY) as Genero | null;
       if (g && GENEROS.includes(g)) setGenero(g);
-      setDpp(window.localStorage.getItem(DPP_KEY) ?? "");
     } catch {
       /* segue sem persistência */
     }
     setHydrated(true);
     track("visita_guia");
   }, []);
-
-  function saveDpp(v: string) {
-    setDpp(v);
-    try {
-      if (v) window.localStorage.setItem(DPP_KEY, v);
-      else window.localStorage.removeItem(DPP_KEY);
-    } catch {}
-  }
 
   useEffect(() => {
     if (!hydrated) return;
@@ -431,72 +358,6 @@ export default function GuiaApp({
     );
   }
 
-  const hoje = new Date();
-  const dppDate = dpp ? new Date(`${dpp}T12:00:00`) : null;
-  const semanasRestantes = dppDate ? Math.ceil((dppDate.getTime() - hoje.getTime()) / (7 * 24 * 3600 * 1000)) : null;
-  const fmtData = (d: Date) => new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(d);
-
-  function CronogramaVivo() {
-    const proxima = dppDate
-      ? CRONO.find((m) => new Date(dppDate.getTime() - m.semanas * 7 * 24 * 3600 * 1000) >= hoje)
-      : null;
-    return (
-      <section className="g2crono">
-        <div className="g2crono-head">
-          <div>
-            {dppDate ? (
-              <p>
-                {semanasRestantes != null && semanasRestantes > 0
-                  ? `Faltam ${semanasRestantes} ${semanasRestantes === 1 ? "semana" : "semanas"} para a chegada. As janelas abaixo já estão nas suas datas.`
-                  : "A chegada é agora! Priorize o que ainda estiver aberto."}
-              </p>
-            ) : (
-              <p>Conte quando o bebê chega e cada janela abaixo ganha a sua data certa, cruzada com as suas decisões.</p>
-            )}
-          </div>
-          <label className="g2dpp">
-            Data prevista da chegada
-            <input type="date" value={dpp} onChange={(e) => saveDpp(e.target.value)} />
-          </label>
-        </div>
-        <ol className="g2tl">
-          {CRONO.map((m) => {
-            const data = dppDate ? new Date(dppDate.getTime() - m.semanas * 7 * 24 * 3600 * 1000) : null;
-            const itens = m.slugs.map((s) => bySlug.get(s)).filter(Boolean);
-            const decididosNa = m.slugs.filter((s) => choices[s]?.status === "escolhido").length;
-            const completa = itens.length > 0 && decididosNa === itens.length;
-            const passada = data ? data < hoje && !completa : false;
-            const atual = proxima === m;
-            return (
-              <li
-                key={m.semanas}
-                className={`${completa ? "ok" : ""}${passada ? " late" : ""}${atual ? " now" : ""}`}
-              >
-                <span className="when">
-                  {data ? fmtData(data) : `${m.semanas} sem. antes`}
-                  {atual ? <i>você está aqui</i> : null}
-                </span>
-                <div className="what">
-                  <b>
-                    {m.titulo}
-                    {completa ? " ✓" : ""}
-                  </b>
-                  <p>{m.desc}</p>
-                  {itens.length ? (
-                    <span className="st">
-                      {decididosNa}/{itens.length} decididos
-                      {passada ? " · janela passada — priorize" : ""}
-                    </span>
-                  ) : null}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
-    );
-  }
-
   function renderInicio() {
     const p = visaoGeral;
     const eyebrow = p?.eyebrow?.trim() || `Bem-vinda ao seu guia · ${guide.collection ?? "Collection Nº 01"}`;
@@ -516,11 +377,31 @@ export default function GuiaApp({
         <div className="in">
           <div className="eyebrow">{eyebrow}</div>
           <h1 className="serif g2h1">Olá, {firstName}.</h1>
-          {paras.map((t, i) => (
-            <p key={i} className={i === 0 ? "lead-title serif" : "lead-sub"}>
-              {t}
-            </p>
-          ))}
+          {paras.map((t, i) => {
+            // O título principal quebra em 2 blocos no primeiro ":" (apresentação,
+            // não conteúdo): "DO CONCEITO…:" numa linha, o restante inteiro na outra.
+            if (i === 0) {
+              const ci = t.indexOf(":");
+              if (ci > 0 && ci < t.trim().length - 1) {
+                return (
+                  <p key={i} className="lead-title serif two-lines">
+                    <span className="lt-line">{t.slice(0, ci + 1)}</span>
+                    <span className="lt-line">{t.slice(ci + 1).trim()}</span>
+                  </p>
+                );
+              }
+              return (
+                <p key={i} className="lead-title serif">
+                  {t}
+                </p>
+              );
+            }
+            return (
+              <p key={i} className="lead-sub">
+                {t}
+              </p>
+            );
+          })}
         </div>
       </div>
     );
@@ -580,7 +461,6 @@ export default function GuiaApp({
           </div>
         ) : null}
         {page.closing ? <blockquote className="g2quote serif">{page.closing}</blockquote> : null}
-        {page.slug === "cronograma" ? <CronogramaVivo /> : null}
       </div>
     );
   }
