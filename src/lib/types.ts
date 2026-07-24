@@ -137,6 +137,10 @@ export interface ItemDecision {
   instalacao?: string | null;
   /** Card avulso, destacado (fundo vinho): a "Dica da Helô" do item. */
   dicaHelo?: string | null;
+  /** Imagem opcional do card "Quando usar" (mesmos 3 modos: sem/topo/fundo). */
+  quandoUsarImg?: CardImage | null;
+  /** Imagem opcional do card "Quando não usar". */
+  quandoNaoImg?: CardImage | null;
 }
 
 export interface Item {
