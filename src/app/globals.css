@@ -723,7 +723,7 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lpage-crest img{width:min(70vw,520px); opacity:.08; margin-top:40px}
 .lpage-in{position:relative; z-index:1; max-width:720px}
 .lpage-in .eyebrow{color:var(--caramel)}
-.lpage-h1{font-weight:400; font-size:clamp(32px,5.4vw,56px); line-height:1.05; margin:16px 0 22px; color:#FBF2DC}
+.lpage-h1{font-weight:400; font-size:clamp(32px,5.4vw,56px); line-height:1.05; margin:16px 0 22px; color:#FBF2DC; text-wrap:balance}
 .lpage-in .lead{color:#EAD8BC; margin-top:14px}
 /* resumo do serviço (fallback público quando a página ainda não tem texto próprio) */
 .lpage-list{list-style:none; padding:0; margin:24px 0 0; display:grid; gap:11px; max-width:640px}
