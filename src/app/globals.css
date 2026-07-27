@@ -763,7 +763,7 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 /* ---- Painel: anexador de imagem (com otimização) ---- */
 .adm-img{display:flex; flex-direction:column; gap:8px}
 .adm-img > .lbl{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--olive)}
-.adm-img-row{display:flex; gap:14px; align-items:flex-start}
+.adm-img-row{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start}
 .adm-img .prev{flex:none; width:150px; height:104px; border-radius:12px; border:1px solid var(--line); background:#F2ECDC repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(0,0,0,.02) 8px,rgba(0,0,0,.02) 16px); overflow:hidden; display:flex; align-items:center; justify-content:center}
 .adm-img .prev img{width:100%; height:100%; object-fit:cover}
 .adm-img .prev span{font-size:12px; color:var(--faint)}
