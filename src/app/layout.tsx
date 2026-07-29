@@ -30,6 +30,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           data-accent="#67232B"
           strategy="afterInteractive"
         />
+        {/* Captação da Lex vestindo a paleta da casa (vinho/creme) — pílula
+            delicada, aprovada pelo dono. Canto oposto ao suporte. */}
+        <Script
+          src="https://alex-hub-three.vercel.app/lex-cta.js"
+          data-app="quartohelo"
+          data-label="site do Quarto da Helô"
+          data-delay="12000"
+          data-bg="linear-gradient(155deg,#67232B,#4A171F)"
+          data-fg="#F3EBDB"
+          data-muted="#E4D2B4"
+          data-border="rgba(231,223,199,.32)"
+          data-accent="#BC8880"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
