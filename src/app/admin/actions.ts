@@ -52,6 +52,7 @@ function cardImageFrom(fd: FormData, prefix: string): CardImage | null {
     url,
     mode: mode as CardImageMode,
     alt: str(fd, `${prefix}_img_alt`) || null,
+    caption: str(fd, `${prefix}_img_caption`) || null,
     opacity: opacityFrom(fd, `${prefix}_img_op`),
   };
 }
@@ -136,6 +137,7 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
     paragraphs,
     cards,
     closing: str(fd, "closing") || null,
+    background_opacity: opacityFrom(fd, "background_url_op"),
     measures,
     background_url: str(fd, "background_url") || null,
     ready: fd.get("ready") === "on",
@@ -156,6 +158,16 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
     refreshAll();
     revalidatePath(`/admin/paginas/${str(fd, "slug")}`);
   }
+  return { ok: r.ok, msg: r.msg ?? "" };
+}
+
+/* --------- card "Prefere que a gente cuide de tudo?" (guia) --------- */
+
+export async function salvarCardGuia(_prev: ActionState | null, fd: FormData): Promise<ActionState> {
+  const token = adminToken();
+  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+  const r = await callAdminFn("save_guide", { token, bump_image: cardImageFrom(fd, "bump") });
+  if (r.ok) refreshAll();
   return { ok: r.ok, msg: r.msg ?? "" };
 }
 
@@ -285,6 +297,8 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     quemParagraphs: paras("quemParagraphs"),
     quemClose: str(fd, "quemClose"),
     sobrePhoto: str(fd, "sobrePhoto") || null,
+    sobrePhotoOpacity: opacityFrom(fd, "sobrePhoto_op"),
+    contatoPhotoOpacity: opacityFrom(fd, "contatoPhoto_op"),
     trabalhoEyebrow: str(fd, "trabalhoEyebrow"),
     trabalhoTitle: str(fd, "trabalhoTitle"),
     trabalhoLead: str(fd, "trabalhoLead"),

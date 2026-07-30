@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getGuiaData } from "@/lib/content";
 import type { ItemDecision } from "@/lib/types";
-import { TrocarSenhaForm } from "./_components/AdminForms";
+import { CardGuiaForm, TrocarSenhaForm } from "./_components/AdminForms";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +81,13 @@ export default async function AdminPage() {
           <p style={{ color: "var(--muted)", fontSize: 13.5, lineHeight: 1.7, margin: "10px 0 0" }}>
             Tudo o que você salvar aqui vale na hora no guia. Não precisa configurar nada.
           </p>
+        </div>
+      </div>
+
+      <div className="adm-section">
+        <h2>Card do guia</h2>
+        <div className="adm-cat">
+          <CardGuiaForm guide={guide} />
         </div>
       </div>
 

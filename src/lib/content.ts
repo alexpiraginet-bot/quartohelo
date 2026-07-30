@@ -87,6 +87,18 @@ export async function getGuide(): Promise<GuideMeta> {
   }
 }
 
+/* Título do moodboard: passa a ser automático ("Quarto do/da <nome da
+ * criança>"). Os rótulos genéricos que estão salvos no banco valem como "não
+ * preenchido", senão eles continuariam vencendo o título automático para
+ * sempre. Um título próprio, escrito pela Helô, continua prevalecendo. */
+const GENERIC_MOOD_TITLES = new Set(["moodboard", "meu quartinho", "meu moodboard"]);
+
+function normalizeProjectTexts(p: GuidePage): GuidePage {
+  const t = p.project?.moodTitle?.trim();
+  if (!t || !GENERIC_MOOD_TITLES.has(t.toLowerCase())) return p;
+  return { ...p, project: { ...p.project, moodTitle: null } };
+}
+
 /**
  * Normalização retrocompatível e conservadora (não toca o banco): quando uma
  * página tem tabela de medidas, as linhas de texto que apenas repetem a tabela
@@ -121,7 +133,7 @@ export async function getGuiaData(): Promise<{
 }> {
   const guide = await getGuide();
   if (!supabase) {
-    return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs), options: seedProductOptions };
+    return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs).map(normalizeProjectTexts), options: seedProductOptions };
   }
   try {
     const { data: pagesRows, error: pagesErr } = await supabase
@@ -130,7 +142,7 @@ export async function getGuiaData(): Promise<{
       .order("order");
     if (pagesErr || !pagesRows?.length) {
       // Banco ainda sem a estrutura v2 — o guia inteiro roda no seed.
-      return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs), options: seedProductOptions };
+      return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs).map(normalizeProjectTexts), options: seedProductOptions };
     }
     const dbPages: GuidePage[] = pagesRows.map((p) => ({
       slug: p.slug,
@@ -142,6 +154,7 @@ export async function getGuiaData(): Promise<{
       measures: p.measures && typeof p.measures === "object" && !Array.isArray(p.measures) ? (p.measures as GuidePage["measures"]) : null,
       project: p.project && typeof p.project === "object" && !Array.isArray(p.project) ? (p.project as GuidePage["project"]) : null,
       backgroundUrl: p.background_url ?? null,
+      backgroundOpacity: typeof p.background_opacity === "number" ? p.background_opacity : null,
       ready: !!p.ready,
       order: p.order ?? 0,
     }));
@@ -155,7 +168,7 @@ export async function getGuiaData(): Promise<{
     };
     let pages = ensureSeed(dbPages, "visao-geral");
     pages = ensureSeed(pages, "meu-projeto");
-    pages = [...pages].sort((a, b) => a.order - b.order).map(normalizeMeasuresParagraphs);
+    pages = [...pages].sort((a, b) => a.order - b.order).map(normalizeMeasuresParagraphs).map(normalizeProjectTexts);
     const { data: optRows } = await supabase.from("qh_product_options").select("*").order("order");
     const options: ProductOption[] = (optRows ?? []).map((o) => ({
       id: o.id,
@@ -174,7 +187,7 @@ export async function getGuiaData(): Promise<{
     const categories = await getCategories();
     return { categories, guide, pages, options };
   } catch {
-    return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs), options: seedProductOptions };
+    return { categories: seedCategories, guide, pages: seedGuidePages.map(normalizeMeasuresParagraphs).map(normalizeProjectTexts), options: seedProductOptions };
   }
 }
 

@@ -83,10 +83,22 @@ export function CardImageField({
             <small>Vale só para a foto. O texto do card continua igual.</small>
           </div>
           {isTop ? (
-            <label className="adm-cardimg-alt">
-              Texto alternativo (opcional)
-              <input name={`${prefix}_img_alt`} defaultValue={value?.alt ?? ""} placeholder="Descreva a imagem (vazio = decorativa)" />
-            </label>
+            <>
+              <label className="adm-cardimg-alt">
+                Frase sobre a foto do topo (opcional)
+                <input
+                  name={`${prefix}_img_caption`}
+                  defaultValue={value?.caption ?? ""}
+                  maxLength={120}
+                  placeholder="Ex.: O berço no lugar certo"
+                />
+                <small>Aparece escrita por cima da faixa de foto, no rodapé dela.</small>
+              </label>
+              <label className="adm-cardimg-alt">
+                Texto alternativo (opcional)
+                <input name={`${prefix}_img_alt`} defaultValue={value?.alt ?? ""} placeholder="Descreva a imagem (vazio = decorativa)" />
+              </label>
+            </>
           ) : null}
         </>
       ) : null}
