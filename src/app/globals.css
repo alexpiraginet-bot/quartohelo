@@ -647,7 +647,9 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lcard .desc{margin-top:12px; color:var(--ink); font-weight:300; font-size:14.5px; line-height:1.65}
 .lcard ul{margin:16px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px}
 .lcard ul li{position:relative; padding-left:20px; font-size:13.5px; color:var(--muted); line-height:1.5}
-.lcard ul li::before{content:"◆"; position:absolute; left:0; top:1px; font-size:9px; color:var(--caramel)}
+/* Marcador dos tópicos do card: bolinha (era losango). */
+.lcard ul li::before{content:""; position:absolute; left:1px; top:.55em; width:5px; height:5px;
+  border-radius:50%; background:var(--caramel)}
 .lcard .plus{margin-top:16px; font-size:12px; color:var(--wine-soft); font-style:italic}
 .lcard .foot{margin-top:14px; font-size:13px; color:var(--faint); font-style:italic; line-height:1.5}
 .lcard .btn.sm{margin-top:auto; align-self:flex-start; padding:11px 20px; font-size:11px}
@@ -712,15 +714,27 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lsocial .soc svg{width:20px; height:20px}
 
 /* --- footer --- */
-.lfoot{background:var(--wine-deep); color:#E5D4B4; padding:26px 0}
+/* Folga embaixo do tamanho do menu flutuante (mais a safe area do iPhone), para
+ * a pílula nunca cobrir a frase e a logo do rodapé. */
+.lfoot{background:var(--wine-deep); color:#E5D4B4; padding:26px 0;
+  padding-bottom:calc(26px + 84px + env(safe-area-inset-bottom,0px))}
 .lfoot .foot-row{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:12.5px}
-/* Logo do rodapé no mesmo bege da frase do outro canto (#E5D4B4 = cor do
- * .lfoot). Usamos máscara com o PNG (que tem transparência) para pintar o
- * desenho exatamente nessa cor, em vez de aproximar com filtro. */
-.lfoot .logo img{height:26px; display:block;
-  -webkit-mask:url(/images/logo-horizontal.png) center/contain no-repeat;
-  mask:url(/images/logo-horizontal.png) center/contain no-repeat;
-  background-color:currentColor; width:132px}
+/* A frase encosta mais na direita, saindo de cima do menu, que é centralizado. */
+.lfoot .foot-row > :last-child{margin-left:auto; text-align:right;
+  margin-right:calc(-1 * clamp(6px,2.4vw,26px))}
+@media (max-width:700px){
+  .lfoot .foot-row{justify-content:center; text-align:center}
+  .lfoot .foot-row > :last-child{margin-left:0; margin-right:0; text-align:center}
+}
+/* Logo do rodapé exatamente na cor da frase do outro canto: a máscara pinta o
+ * desenho com currentColor, então as duas herdam a mesma cor da .foot-row.
+ * O PNG tem traços finos com transparência parcial, o que deixava a logo com
+ * aparência apagada ao lado do texto. Somando a máscara com ela mesma
+ * (mask-composite: add) o traço fica cheio e o peso visual bate com a frase. */
+.lfoot .logo img{height:42px; display:block; width:76px;
+  -webkit-mask:url(/images/logo-quarto-helo.png) center/contain no-repeat;
+  mask:url(/images/logo-quarto-helo.png) center/contain no-repeat;
+  background-color:currentColor}
 @supports not ((-webkit-mask-image:url(#a)) or (mask-image:url(#a))){
   .lfoot .logo img{background:none; filter:brightness(0) invert(1) opacity(.86)}
 }
