@@ -377,6 +377,12 @@ export const seedSite: SiteContent = {
   /* ---- Landing v2 ---- */
   sobrePhoto: "/images/estudio-sobre.jpg",
   contatoPhoto: "/images/estudio-contato.jpg",
+  // Início sem foto por padrão: fica o fundo vinho atual até a cliente anexar
+  // a imagem oficial pelo painel.
+  heroPhoto: null,
+  heroPhotoOpacity: null,
+  // Portfólio começa vazio: a cliente anexa as fotos pelo painel.
+  portfolio: { eyebrow: "Portfólio", title: "Quartos que assinamos", lead: null, photos: [] },
   produtoDigital: {
     tag: "Produto digital",
     title: "O Fim da Dúvida",

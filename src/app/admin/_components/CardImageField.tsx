@@ -3,17 +3,21 @@
 import { useState } from "react";
 import { ImageField } from "./ImageField";
 import type { CardImage, CardImageMode } from "@/lib/types";
+import { BG_OPACITIES, DEFAULT_BG_OPACITY, DEFAULT_TOP_OPACITY, TOP_OPACITIES } from "@/lib/types";
 
 /* Configuração de imagem por card (uso leigo): escolhe "Sem imagem", "Foto no
- * topo" ou "Foto de fundo (50%)". Reutiliza o anexador/otimizador existente
- * (ImageField). Os valores vão em campos nomeados por prefixo:
- *   {prefix}_img_mode · {prefix}_img_url · {prefix}_img_alt  */
+ * topo" ou "Foto de fundo", e a opacidade da FOTO (o texto do card nunca muda
+ * de opacidade). Reutiliza o anexador/otimizador existente (ImageField).
+ * Os valores vão em campos nomeados por prefixo:
+ *   {prefix}_img_mode · {prefix}_img_url · {prefix}_img_alt · {prefix}_img_op  */
 
 const MODES: [CardImageMode, string][] = [
   ["none", "Sem imagem"],
   ["top", "Foto no topo"],
-  ["background", "Foto de fundo (50%)"],
+  ["background", "Foto de fundo"],
 ];
+
+const opLabel = (v: number) => (v >= 1 ? "Sem opacidade" : `${Math.round(v * 100)}%`);
 
 export function CardImageField({
   prefix,
@@ -25,6 +29,21 @@ export function CardImageField({
   folder: string;
 }) {
   const [mode, setMode] = useState<CardImageMode>(value?.mode ?? "none");
+  // Opacidade já salva (quando é uma das oferecidas) ou o padrão do modo, para
+  // um card que já estava configurado continuar exatamente como está.
+  const saved = typeof value?.opacity === "number" ? value.opacity : null;
+  const [topOp, setTopOp] = useState<number>(
+    saved !== null && (TOP_OPACITIES as readonly number[]).includes(saved) ? saved : DEFAULT_TOP_OPACITY,
+  );
+  const [bgOp, setBgOp] = useState<number>(
+    saved !== null && (BG_OPACITIES as readonly number[]).includes(saved) ? saved : DEFAULT_BG_OPACITY,
+  );
+
+  const isTop = mode === "top";
+  const opacities: readonly number[] = isTop ? TOP_OPACITIES : BG_OPACITIES;
+  const current = isTop ? topOp : bgOp;
+  const setCurrent = isTop ? setTopOp : setBgOp;
+
   return (
     <div className="adm-cardimg">
       <span className="lbl">Imagem do card</span>
@@ -45,7 +64,25 @@ export function CardImageField({
             folder={folder}
             hint="Anexe a foto — ela é otimizada automaticamente."
           />
-          {mode === "top" ? (
+          <div className="adm-cardimg-op">
+            <span className="lbl">Opacidade da foto</span>
+            <div className="adm-cardimg-modes" role="radiogroup" aria-label="Opacidade da foto">
+              {opacities.map((v) => (
+                <label key={v} className={`adm-radio${current === v ? " sel" : ""}`}>
+                  <input
+                    type="radio"
+                    name={`${prefix}_img_op`}
+                    value={v}
+                    checked={current === v}
+                    onChange={() => setCurrent(v)}
+                  />
+                  <span>{opLabel(v)}</span>
+                </label>
+              ))}
+            </div>
+            <small>Vale só para a foto. O texto do card continua igual.</small>
+          </div>
+          {isTop ? (
             <label className="adm-cardimg-alt">
               Texto alternativo (opcional)
               <input name={`${prefix}_img_alt`} defaultValue={value?.alt ?? ""} placeholder="Descreva a imagem (vazio = decorativa)" />

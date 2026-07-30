@@ -10,5 +10,5 @@ const FALLBACK: SitePage = { eyebrow: "Como trabalhamos", title: "Curadoria Assi
 export default async function Page() {
   const s = await getSiteContent();
   const card = s.services?.find((c) => c.ctaHref === "/curadoria-assinada") ?? null;
-  return <PageShell page={s.curadoriaPage ?? FALLBACK} card={card} whatsapp={s.whatsapp} waMessage={WA_MSG.curadoria} footerTagline={s.footerTagline} />;
+  return <PageShell page={s.curadoriaPage ?? FALLBACK} card={card} whatsapp={s.whatsapp} waMessage={WA_MSG.curadoria} footerTagline={s.footerTagline} waCta />;
 }
