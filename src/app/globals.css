@@ -653,6 +653,12 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lcard .plus{margin-top:16px; font-size:12px; color:var(--wine-soft); font-style:italic}
 .lcard .foot{margin-top:14px; font-size:13px; color:var(--faint); font-style:italic; line-height:1.5}
 .lcard .btn.sm{margin-top:auto; align-self:flex-start; padding:11px 20px; font-size:11px}
+/* Folga mínima entre o conteúdo e o botão. O botão continua com margin-top:auto,
+ * então os três seguem alinhados na mesma linha; isto só levanta o piso da
+ * distância, que no card mais alto era zero — não sobra espaço vertical para a
+ * margem automática ocupar, e o botão encostava no texto. Nos cards mais curtos
+ * a folga continua maior, como manda o alinhamento. */
+.lcard > :has(+ .btn.sm){margin-bottom:24px}
 /* CTA dos cards ("Conheça …"): sempre vinho escuro, sólido. Não herda cor nem
  * deixa a foto/fundo do card aparecer atrás, então o botão fica igual em todos
  * os cards, com ou sem imagem. Vale também quando o card tem foto de fundo. */
@@ -726,14 +732,24 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
   .lfoot .foot-row{justify-content:center; text-align:center}
   .lfoot .foot-row > :last-child{margin-left:0; margin-right:0; text-align:center}
 }
-/* Logo do rodapé exatamente na cor da frase do outro canto: a máscara pinta o
- * desenho com currentColor, então as duas herdam a mesma cor da .foot-row.
- * O PNG tem traços finos com transparência parcial, o que deixava a logo com
- * aparência apagada ao lado do texto. Somando a máscara com ela mesma
- * (mask-composite: add) o traço fica cheio e o peso visual bate com a frase. */
-.lfoot .logo img{height:42px; display:block; width:76px;
-  -webkit-mask:url(/images/logo-quarto-helo.png) center/contain no-repeat;
-  mask:url(/images/logo-quarto-helo.png) center/contain no-repeat;
+/* Logo do rodapé: a marca horizontal, a mesma de antes — o que muda é só o tom,
+ * que agora é o bege da frase do outro canto.
+ * A máscara pinta o desenho com currentColor, herdado da .foot-row. Medido no
+ * PNG já no tamanho de tela (132x26): o traço tem alpha mediano de 0,44, ou seja,
+ * quase metade do vinho do fundo atravessava o bege e a logo saía amarronzada.
+ * Repetindo a máscara quatro vezes e somando (mask-composite: add) o alpha
+ * mediano vai a 0,90 e o desenho fica no bege cheio, do mesmo peso da frase. */
+.lfoot .logo img{height:26px; display:block; width:132px;
+  -webkit-mask:url(/images/logo-horizontal.png) center/contain no-repeat,
+    url(/images/logo-horizontal.png) center/contain no-repeat,
+    url(/images/logo-horizontal.png) center/contain no-repeat,
+    url(/images/logo-horizontal.png) center/contain no-repeat;
+  mask:url(/images/logo-horizontal.png) center/contain no-repeat,
+    url(/images/logo-horizontal.png) center/contain no-repeat,
+    url(/images/logo-horizontal.png) center/contain no-repeat,
+    url(/images/logo-horizontal.png) center/contain no-repeat;
+  -webkit-mask-composite:source-over;
+  mask-composite:add;
   background-color:currentColor}
 @supports not ((-webkit-mask-image:url(#a)) or (mask-image:url(#a))){
   .lfoot .logo img{background:none; filter:brightness(0) invert(1) opacity(.86)}
