@@ -734,25 +734,20 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 }
 /* Logo do rodapé: a marca horizontal, a mesma de antes — o que muda é só o tom,
  * que agora é o bege da frase do outro canto.
- * A máscara pinta o desenho com currentColor, herdado da .foot-row. Medido no
- * PNG já no tamanho de tela (132x26): o traço tem alpha mediano de 0,44, ou seja,
- * quase metade do vinho do fundo atravessava o bege e a logo saía amarronzada.
- * Repetindo a máscara quatro vezes e somando (mask-composite: add) o alpha
- * mediano vai a 0,90 e o desenho fica no bege cheio, do mesmo peso da frase. */
-.lfoot .logo img{height:26px; display:block; width:132px;
-  -webkit-mask:url(/images/logo-horizontal.png) center/contain no-repeat,
-    url(/images/logo-horizontal.png) center/contain no-repeat,
-    url(/images/logo-horizontal.png) center/contain no-repeat,
-    url(/images/logo-horizontal.png) center/contain no-repeat;
-  mask:url(/images/logo-horizontal.png) center/contain no-repeat,
-    url(/images/logo-horizontal.png) center/contain no-repeat,
-    url(/images/logo-horizontal.png) center/contain no-repeat,
-    url(/images/logo-horizontal.png) center/contain no-repeat;
-  -webkit-mask-composite:source-over;
-  mask-composite:add;
+ * A máscara vai no <span>, não no <img>: o desenho do PNG é vinho (#602020), e
+ * quando a máscara ficava no próprio <img> esse desenho era pintado POR CIMA do
+ * bege do background, misturando os dois. Era daí que vinha o tom amarronzado —
+ * medido no render, a tinta parava em rgb(128,90,79). Com a máscara no span e o
+ * bitmap fora do caminho, o traço bate exatamente a cor da frase ao lado,
+ * rgb(154,143,115). O <img> continua no HTML pelo alt e pelo fallback abaixo. */
+.lfoot .logo{display:block; width:132px; height:26px;
+  -webkit-mask:url(/images/logo-horizontal.png) center/contain no-repeat;
+  mask:url(/images/logo-horizontal.png) center/contain no-repeat;
   background-color:currentColor}
+.lfoot .logo img{display:block; width:100%; height:100%; opacity:0}
 @supports not ((-webkit-mask-image:url(#a)) or (mask-image:url(#a))){
-  .lfoot .logo img{background:none; filter:brightness(0) invert(1) opacity(.86)}
+  .lfoot .logo{background:none}
+  .lfoot .logo img{opacity:1; filter:brightness(0) invert(1) opacity(.86)}
 }
 
 /* --- botão flutuante WhatsApp --- */
