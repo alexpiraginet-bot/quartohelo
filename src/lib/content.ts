@@ -32,12 +32,27 @@ const DEPRECATED_CARD_LINES = new Set(
   ].map(normText),
 );
 const LEGACY_HORARIO = "9h30 às 17h30";
+/* Rótulos de botão que foram reescritos: o valor antigo vive no blob e o painel
+ * ainda mostra o texto salvo, então trocamos na leitura até um "Salvar"
+ * consolidar. Chave normalizada -> texto novo. */
+const RENAMED_CTA_LABELS = new Map<string, string>([
+  [normText("Conhecer o produto digital"), "Conheça o produto digital"],
+]);
 
 function stripDeprecated(v?: string | null): string | null {
   return v && DEPRECATED_CARD_LINES.has(normText(v)) ? null : (v ?? null);
 }
+function renameCta(v?: string | null): string | null {
+  if (!v) return v ?? null;
+  return RENAMED_CTA_LABELS.get(normText(v)) ?? v;
+}
 function normalizeCard(c: ServiceCard): ServiceCard {
-  return { ...c, featuredLabel: stripDeprecated(c.featuredLabel), foot: stripDeprecated(c.foot) };
+  return {
+    ...c,
+    featuredLabel: stripDeprecated(c.featuredLabel),
+    foot: stripDeprecated(c.foot),
+    ctaLabel: renameCta(c.ctaLabel),
+  };
 }
 function normalizeSite(s: SiteContent): SiteContent {
   return {

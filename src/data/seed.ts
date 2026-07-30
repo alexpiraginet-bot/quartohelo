@@ -393,7 +393,7 @@ export const seedSite: SiteContent = {
       "Curadoria por faixa de investimento, com preço e link",
       "Cronograma de montagem mês a mês e Meu Projeto",
     ],
-    ctaLabel: "Conhecer o produto digital",
+    ctaLabel: "Conheça o produto digital",
     ctaHref: "/produto-digital",
   },
   whatsapp: "(27) 99854-2106",
