@@ -7,6 +7,7 @@ import { Track } from "./_components/Track";
 import { CardMediaBg, CardMediaTop, cardHasBg } from "./_components/CardMedia";
 import { Portfolio } from "./_components/Portfolio";
 import type { ServiceCard } from "@/lib/types";
+import { DEFAULT_PAGE_OPACITY } from "@/lib/types";
 
 export const dynamic = "force-dynamic"; // reflete o CMS assim que o Supabase entra
 
@@ -22,6 +23,11 @@ function igHref(v?: string | null): string | null {
   if (t.includes("instagram.com")) return `https://${t.replace(/^\/+/, "")}`;
   const handle = t.replace(/^@+/, "").replace(/^\/+/, "").trim();
   return handle ? `https://instagram.com/${handle}` : null;
+}
+
+/** Opacidade de foto de fundo escolhida no painel; sem escolha, o padrão. */
+function photoOpacity(v?: number | null): number {
+  return typeof v === "number" && v > 0 && v <= 1 ? v : DEFAULT_PAGE_OPACITY;
 }
 
 function Social({ d, href, label }: { d: string; href?: string | null; label: string }) {
@@ -83,7 +89,7 @@ export default async function Home() {
       </header>
 
       <section className="lsobre" id="sobre">
-        <div className="lsobre-photo" style={{ backgroundImage: `url(${s.sobrePhoto ?? ""})` }} aria-hidden="true" />
+        <div className="lsobre-photo" style={{ backgroundImage: `url(${s.sobrePhoto ?? ""})`, opacity: photoOpacity(s.sobrePhotoOpacity) }} aria-hidden="true" />
         <div className="lwrap lsobre-in rv">
           <div className="eyebrow">{s.quemEyebrow}</div>
           {s.quemTitleHtml ? <h2 className="h2 serif" dangerouslySetInnerHTML={{ __html: s.quemTitleHtml }} /> : null}
@@ -123,7 +129,7 @@ export default async function Home() {
       </section>
 
       <section className="lcontato" id="contato">
-        <div className="lcontato-photo" style={{ backgroundImage: `url(${s.contatoPhoto ?? ""})` }} aria-hidden="true" />
+        <div className="lcontato-photo" style={{ backgroundImage: `url(${s.contatoPhoto ?? ""})`, opacity: photoOpacity(s.contatoPhotoOpacity) }} aria-hidden="true" />
         <div className="lwrap lcontato-in rv">
           <div className="eyebrow">{s.contatoEyebrow}</div>
           <h2 className="h2 serif" dangerouslySetInnerHTML={{ __html: s.contatoTitleHtml }} />

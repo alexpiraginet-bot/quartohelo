@@ -172,7 +172,7 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2user .who b{font-weight:400; font-size:13.5px; color:#FAF3E1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .g2user .who span{font-size:11px; color:rgba(239,227,203,.55)}
 
-.g2main{margin-left:268px; min-height:100svh; display:flex; flex-direction:column}
+.g2main{margin-left:268px; min-height:100svh; display:flex; flex-direction:column; position:relative}
 .g2top{position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:14px; padding:13px clamp(18px,3vw,34px);
   background:color-mix(in srgb,var(--bone) 86%,transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
 .g2top .baby{font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--wine)}
@@ -201,18 +201,38 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2welcome .lead-sub{margin-top:16px; color:var(--muted); font-weight:300; font-size:clamp(15px,1.9vw,17.5px); line-height:1.8; max-width:54ch}
 /* Callout único "Dica da Helô" — discreto e complementar: nunca compete com o
  * título nem com o texto principal. Fundo claro sutil + acento delicado. */
-.g2dica{display:flex; gap:10px; align-items:flex-start; margin:14px 0; max-width:64ch;
-  background:color-mix(in srgb,var(--caramel) 12%,#FFFDF8);
-  border:1px solid color-mix(in srgb,var(--caramel) 34%,var(--line));
-  border-left:3px solid var(--caramel); border-radius:10px; padding:11px 15px}
-.g2dica .ic{flex:none; margin-top:1px; color:var(--caramel); font-size:12px; line-height:1.5}
-.g2dica .bd b{display:block; font-weight:600; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--olive)}
-.g2dica .bd p{margin-top:3px; font-size:13.5px; line-height:1.6; color:var(--muted); white-space:pre-line}
+/* Dica da Helô — card em destaque: fundo vinho e letra clara, onde quer que
+ * apareça (páginas, decisão do item, abaixo da tabela de medidas). */
+.g2dica{display:flex; gap:11px; align-items:flex-start; margin:16px 0; max-width:64ch;
+  background:linear-gradient(150deg,var(--wine),var(--wine-deep));
+  border:1px solid var(--wine-deep); border-radius:12px; padding:14px 17px; box-shadow:var(--shadow-sm)}
+/* Marcador em ponto negritado, no lugar do losango. */
+.g2dica .ic{flex:none; margin-top:7px; width:7px; height:7px; border-radius:50%; background:var(--caramel)}
+.g2dica .bd b{display:block; font-weight:600; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--caramel)}
+.g2dica .bd p{margin-top:5px; font-size:14px; line-height:1.65; color:#F3E6CC; white-space:pre-line}
+
+/* Marcador padrão dos cards de decisão: ponto negritado no lugar dos ícones
+ * avulsos (losango, x, !, engrenagem) que cada card usava. */
+.mk{flex:none; width:7px; height:7px; border-radius:50%; background:var(--caramel); display:inline-block}
 
 /* Cabeçalho de mês/etapa — 1º nível de leitura no Cronograma (fácil de localizar). */
 .g2ph{margin:40px 0 6px; padding-top:18px; border-top:1px solid var(--line);
   font-family:"Fraunces",Georgia,serif; font-weight:500; font-size:clamp(23px,3vw,31px); color:var(--wine); line-height:1.14; letter-spacing:.005em}
 .g2ph:first-child{margin-top:6px; padding-top:0; border-top:0}
+
+/* Cronograma: cada mês é um bloco fechado — mês em destaque no alto e o que
+ * acontece nele em tópicos, para a leitura não virar um texto corrido só. */
+.g2month{margin-top:26px; background:var(--bone-2); border:1px solid var(--line);
+  border-left:3px solid var(--caramel); border-radius:14px; padding:18px 20px 20px}
+.g2month:first-child{margin-top:10px}
+.g2month-h{font-family:"Fraunces",Georgia,serif; font-weight:500; font-size:clamp(20px,2.6vw,26px);
+  color:var(--wine); line-height:1.18; text-transform:none}
+.g2month-list{margin:12px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px}
+.g2month-list li{position:relative; padding-left:20px; color:var(--ink); font-weight:300;
+  font-size:14.5px; line-height:1.65}
+.g2month-list li::before{content:""; position:absolute; left:1px; top:.62em; width:6px; height:6px;
+  border-radius:50%; background:var(--caramel)}
+.g2month .g2dica{margin:16px 0 0; max-width:none}
 
 /* Tabela de medidas — <table> acessível no desktop/tablet. */
 .g2measures{margin:22px 0; max-width:100%; overflow-x:auto}
@@ -238,9 +258,15 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 
 /* Imagem de fundo opcional por página (padrão: sem imagem). Véu claro preserva a leitura. */
 .g2view.hasbg{position:relative}
-.g2bg{position:absolute; inset:0; z-index:0; background-size:cover; background-position:center; pointer-events:none}
-.g2bg::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(239,234,217,.8),rgba(239,234,217,.9))}
-.g2view.hasbg:not(.g2welcome) > *:not(.g2bg){position:relative; z-index:1}
+/* Fundo da página: mora na .g2main (não na .g2view, que tem largura de leitura),
+ * então cobre a página inteira em vez de virar um retângulo no meio da tela.
+ * A foto tem a opacidade escolhida no painel; o véu creme por cima é que
+ * garante a legibilidade do texto, e vem em camada separada para a opacidade
+ * nunca atingir o conteúdo. */
+.g2bg{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.g2bg .ph{position:absolute; inset:0; background-size:cover; background-position:center}
+.g2bg .veil{position:absolute; inset:0; background:#EFEAD9}
+.g2main > *:not(.g2bg){position:relative; z-index:1}
 .g2chip{display:inline-block; margin-top:14px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--olive); background:color-mix(in srgb,var(--olive) 10%,transparent); border:1px solid color-mix(in srgb,var(--olive) 24%,transparent); border-radius:999px; padding:6px 12px}
 .g2chip.ok{color:#4A5B2A; background:#EEF4E4; border-color:#CBDCA9}
 .g2note{margin-top:26px; color:var(--faint); font-size:13px; font-style:italic; line-height:1.6}
@@ -272,7 +298,8 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2dec .lbl, .g2gen .lbl, .g2tier .tl{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--olive)}
 .g2dec .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
 @media (max-width:620px){ .g2dec .grid{grid-template-columns:1fr} }
-.g2dec .d{background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px}
+/* Cards da página do item em bege da casa (eram brancos). */
+.g2dec .d{background:var(--bone-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px}
 .g2dec .d b{font-size:12px; letter-spacing:.06em; color:var(--wine); text-transform:uppercase; display:flex; align-items:center; gap:7px}
 .g2dec .d span{display:block; color:var(--muted); font-size:14px; margin-top:5px; line-height:1.55}
 .g2dec .empty{color:var(--faint); font-style:italic; font-size:13.5px; margin-top:8px}
@@ -288,7 +315,9 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2tier .row{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:9px}
 @media (max-width:820px){ .g2tier .row{grid-template-columns:1fr 1fr} }
 @media (max-width:540px){ .g2tier .row{grid-template-columns:1fr} }
-.g2card{background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-sm); transition:border-color .2s, transform .2s; display:flex; flex-direction:column}
+/* Card de opção do catálogo em bege da casa (era branco), do papel de parede
+ * à bolsa de passeio. */
+.g2card{background:var(--bone-2); border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:var(--shadow-sm); transition:border-color .2s, transform .2s; display:flex; flex-direction:column}
 .g2card:hover{transform:translateY(-2px)}
 .g2card.sel{border-color:var(--wine); box-shadow:0 0 0 1px var(--wine), var(--shadow-sm)}
 .g2card .ph{position:relative; aspect-ratio:4/3; background:linear-gradient(160deg,#F3EEDF,#E7DFC7); display:flex; align-items:center; justify-content:center; padding:14px; text-align:center; overflow:hidden}
@@ -301,7 +330,7 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2card .pr{color:var(--wine); font-size:17px}
 .g2card .sp{color:var(--muted); font-size:12px}
 .g2card .lk{color:var(--olive); font-size:12px; letter-spacing:.04em}
-.g2card .bd .pick{margin-top:auto; align-self:flex-start; border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 14px; font-size:12.5px; color:var(--ink); cursor:pointer; font-family:inherit; transition:.2s}
+.g2card .bd .pick{margin-top:auto; align-self:flex-start; border:1px solid var(--line); background:var(--bone); border-radius:999px; padding:7px 14px; font-size:12.5px; color:var(--ink); cursor:pointer; font-family:inherit; transition:.2s}
 .g2card .bd>*+.pick{margin-top:10px}
 .g2card .pick:hover{border-color:var(--wine)}
 .g2card .pick.on{background:var(--wine); border-color:var(--wine); color:var(--bone-2)}
@@ -516,7 +545,9 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 
 /* ---- Guia: order bump da marcenaria ---- */
 .g2bump{margin-top:34px; background:linear-gradient(150deg,#F6F0DE,#EDE3C8); border:1px solid color-mix(in srgb,var(--caramel) 55%,var(--line)); border-radius:18px; padding:24px; position:relative; overflow:hidden}
-.g2bump::before{content:""; position:absolute; inset:0 0 auto 0; height:8px; background:url("/images/estampa-listras.svg") center top/220px 220px}
+/* A listra estampada do topo saiu a pedido da Helô: o card agora se destaca
+ * pela foto (quando houver) e pelo próprio fundo. */
+.g2bump .card-media-top{margin:-24px -24px 16px; border-radius:17px 17px 0 0}
 .g2bump .in{position:relative; max-width:56ch}
 .g2bump .k{font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--olive)}
 .g2bump b.serif{display:block; font-weight:500; font-size:clamp(19px,2.4vw,24px); color:var(--wine); margin-top:6px}
@@ -672,8 +703,16 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 /* Imagem do card — genérico (landing e guia). Modo "topo": faixa que sangra
  * até as bordas; a margem negativa é por contexto (varia com o padding).
  * A faixa tem metade da altura de antes (era 16/10). */
-.card-media-top{overflow:hidden; aspect-ratio:32/10; background:var(--bone)}
+/* Faixa de imagem no topo do card, com metade da altura de antes (era 32/10):
+ * a foto continua presente sem roubar espaço do texto. */
+.card-media-top{overflow:hidden; aspect-ratio:64/10; background:var(--bone); position:relative}
 .card-media-top img{display:block; width:100%; height:100%; object-fit:cover}
+/* Frase opcional escrita sobre a faixa. Fica legível com qualquer foto: sombra
+ * suave por baixo do texto, nunca opacidade no texto em si. */
+.card-media-top .cap{position:absolute; inset:auto 0 0 0; padding:6px 12px 7px; color:#FBF2DC;
+  font-size:12px; letter-spacing:.02em; line-height:1.3;
+  background:linear-gradient(180deg,rgba(74,23,31,0),rgba(74,23,31,.72))}
+.card-media-top.has-cap img{transform:none}
 .lcard .card-media-top{margin:-30px -28px 14px; border-radius:19px 19px 0 0}
 /* Imagem do card — modo "fundo": camada atrás do conteúdo a 50% (o texto e os
  * botões seguem 100% opacos; nunca aplicamos opacity no card inteiro) */

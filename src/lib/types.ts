@@ -115,6 +115,8 @@ export interface GuidePage {
   /** Textos editoriais da tela especial "Meu projeto" (só nessa página). */
   project?: ProjectTexts | null;
   backgroundUrl?: string | null;
+  /** Opacidade da foto de fundo (0 a 1). Ausente = padrão. */
+  backgroundOpacity?: number | null;
   ready: boolean;
   order: number;
 }
@@ -182,6 +184,9 @@ export interface GuideMeta {
   coverSub?: string | null;
   /** Data-base dos preços do catálogo, exibida no Meu Projeto. */
   precoDataBase?: string | null;
+  /** Imagem do card "Prefere que a gente cuide de tudo?" (topo ou fundo),
+   *  com as mesmas opacidades dos demais cards. */
+  bumpImage?: CardImage | null;
 }
 
 /* ------------------------------------------------------------------ *
@@ -196,17 +201,24 @@ export interface CardImage {
   mode?: CardImageMode;
   /** Texto alternativo (usado no modo "top"; vazio = decorativa). */
   alt?: string | null;
+  /** Frase escrita sobre a faixa do topo (opcional). */
+  caption?: string | null;
   /** Opacidade da IMAGEM (nunca do texto), de 0 a 1. Ausente = padrão do modo:
    *  topo = 1 (sem opacidade) · fundo = 0,5. Mantém cards antigos como estão. */
   opacity?: number | null;
 }
 
-/** Opacidades oferecidas no painel, por modo (o que a cliente escolhe). */
-export const TOP_OPACITIES = [1, 0.8, 0.5] as const;
-export const BG_OPACITIES = [0.8, 0.5] as const;
+/** Opacidades oferecidas no painel, por modo (o que a cliente escolhe).
+ *  Mesmo trio em toda parte — 90%, 80% e 50% —; no topo cabe também a foto
+ *  cheia, que é o padrão de quem só quer a faixa de imagem. */
+export const TOP_OPACITIES = [1, 0.9, 0.8, 0.5] as const;
+export const BG_OPACITIES = [0.9, 0.8, 0.5] as const;
+/** Fundo de página inteira (guia e páginas próprias da landing). */
+export const PAGE_OPACITIES = [0.9, 0.8, 0.5] as const;
 /** Padrão de cada modo quando o card não tem opacidade salva. */
 export const DEFAULT_TOP_OPACITY = 1;
 export const DEFAULT_BG_OPACITY = 0.5;
+export const DEFAULT_PAGE_OPACITY = 0.5;
 
 /** Uma foto do Portfólio (carrossel da landing). */
 export interface PortfolioPhoto {
@@ -273,7 +285,9 @@ export interface SiteContent {
   /* ---- Landing v2 (doc "Alterações Landing Page") ---- */
   // Fundos (fotos do estúdio)
   sobrePhoto?: string | null;
+  sobrePhotoOpacity?: number | null;
   contatoPhoto?: string | null;
+  contatoPhotoOpacity?: number | null;
   // Fundo do Início (hero): foto opcional + opacidade da foto (nunca do texto).
   heroPhoto?: string | null;
   heroPhotoOpacity?: number | null;

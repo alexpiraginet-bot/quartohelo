@@ -13,7 +13,7 @@ import type {
   PriceTier,
   ProductOption,
 } from "@/lib/types";
-import { GENERO_LABEL, TIER_LABEL } from "@/lib/types";
+import { DEFAULT_PAGE_OPACITY, GENERO_LABEL, TIER_LABEL } from "@/lib/types";
 import { CardMediaBg, CardMediaTop, cardHasBg } from "@/app/_components/CardMedia";
 import { openSupport } from "@/app/_components/Interactive";
 import { track } from "@/app/_components/Track";
@@ -46,7 +46,8 @@ const GEN_KEY = "qh_guia_v2_genero";
 
 /** Ordem do documento: primeira linha os mais altos, última os acessíveis. */
 const TIER_ORDER: PriceTier[] = ["alto", "medio", "acessivel"];
-const GENEROS: Genero[] = ["menina", "neutro", "menino"];
+/** Ordem pedida pela Helô para as variações do quarto. */
+const GENEROS: Genero[] = ["menina", "menino", "neutro"];
 
 type View =
   | { kind: "inicio" }
@@ -93,13 +94,81 @@ function DicaHelo({ body, label }: { body: string; label?: string | null }) {
   if (!body || !body.trim()) return null;
   return (
     <aside className="g2dica">
-      <span className="ic" aria-hidden="true">✦</span>
+      <span className="ic" aria-hidden="true" />
       <div className="bd">
         <b>{label?.trim() || "Dica da Helô"}</b>
         <p>{body}</p>
       </div>
     </aside>
   );
+}
+
+/** Cabeçalho de mês do cronograma: "4° MÊS", "4º mês —", "Do 4º ao 6º mês". */
+const MONTH_RE = /^(?:d[oa]\s+)?\d+\s*[°ºo]?\s*(?:ao?\s*\d+\s*[°ºo]?\s*)?m[êe]s\b/i;
+/** Linha de dica dentro do texto da página. */
+const isDica = (t: string) => t.startsWith("✦");
+
+function dicaFrom(t: string, key: number) {
+  const raw = t.replace(/^✦\s*/, "");
+  // Separa o rótulo ("Dica da Helô" / "Guia da Helô") do corpo.
+  const m = raw.match(/^((?:Dica|Guia) da Hel[ôo])\s*[—:-]\s*(.+)$/is);
+  return <DicaHelo key={key} label={m ? m[1] : undefined} body={m ? m[2] : raw} />;
+}
+
+/**
+ * Texto corrido de uma página do guia. Parágrafo comum sai como <p>; linha de
+ * dica vira o callout. O cronograma é o caso especial: quando aparece um
+ * cabeçalho de mês, ele e tudo que vem até o próximo mês formam um bloco — mês
+ * em destaque, conteúdo em tópicos. Nenhuma informação é reescrita: cada
+ * parágrafo (e cada linha dentro dele) vira um tópico, na ordem em que estava.
+ */
+function renderProse(paragraphs: string[]) {
+  const out: React.ReactNode[] = [];
+  let bloco: { titulo: string; topicos: string[]; dicas: { t: string; i: number }[] } | null = null;
+
+  const fecha = (key: number) => {
+    if (!bloco) return;
+    const { titulo, topicos, dicas } = bloco;
+    out.push(
+      <section className="g2month" key={`m${key}`}>
+        <h3 className="g2month-h">{titulo}</h3>
+        {topicos.length ? (
+          <ul className="g2month-list">
+            {topicos.map((t, j) => (
+              <li key={j}>{t}</li>
+            ))}
+          </ul>
+        ) : null}
+        {dicas.map((d) => dicaFrom(d.t, d.i))}
+      </section>,
+    );
+    bloco = null;
+  };
+
+  paragraphs.forEach((p, i) => {
+    const t = (p ?? "").trim();
+    if (!t) return;
+    if (MONTH_RE.test(t)) {
+      fecha(i);
+      bloco = { titulo: t, topicos: [], dicas: [] };
+      return;
+    }
+    if (isDica(t)) {
+      if (bloco) bloco.dicas.push({ t, i });
+      else out.push(dicaFrom(t, i));
+      return;
+    }
+    if (bloco) {
+      // Linhas soltas dentro do parágrafo já são itens de lista no original.
+      for (const linha of t.split(/\n+/).map((l) => l.trim()).filter(Boolean)) {
+        bloco.topicos.push(linha.replace(/^[-–—•*·◆♦]\s*/, ""));
+      }
+      return;
+    }
+    out.push(<p key={i}>{t}</p>);
+  });
+  fecha(paragraphs.length);
+  return out;
 }
 
 /**
@@ -305,6 +374,10 @@ export default function GuiaApp({
   }
 
   const firstName = profile.motherName.split(" ")[0];
+  // "Quarto do Pedro" / "Quarto da Helena": o artigo vem da variação escolhida
+  // no guia, que é o único sinal que temos do gênero da criança. Sem escolha
+  // (neutro), fica "da", como já aparecia no topo e no menu.
+  const quartoDaCrianca = `Quarto d${genero === "menino" ? "o" : "a"} ${profile.babyName}`;
   // "Visão geral" e "Meu projeto" são páginas editáveis como as outras, mas no
   // guia têm telas próprias (entrada e projeto). Separamos para não duplicá-las
   // no menu "O guia".
@@ -319,6 +392,24 @@ export default function GuiaApp({
     return null;
   };
 
+  // Foto de fundo da página aberta, com a opacidade escolhida no painel. O véu
+  // creme sobe junto com a foto, devagar, para o texto seguir legível.
+  const bgPage =
+    view.kind === "inicio"
+      ? visaoGeral
+      : view.kind === "pagina"
+        ? pages.find((p) => p.slug === view.slug)
+        : view.kind === "projeto"
+          ? meuProjeto
+          : null;
+  const activeBg = bgPage?.backgroundUrl?.trim()
+    ? (() => {
+        const o = bgPage.backgroundOpacity;
+        const opacity = typeof o === "number" && o > 0 && o <= 1 ? o : DEFAULT_PAGE_OPACITY;
+        return { url: bgPage.backgroundUrl!, opacity, veil: Math.min(0.62, 0.28 + 0.14 * opacity) };
+      })()
+    : null;
+
   const navTo = (v: View) => () => setView(v);
 
   const isActive = (v: View) =>
@@ -330,8 +421,11 @@ export default function GuiaApp({
   /* ------------------------------ visões ------------------------------ */
 
   function OrderBump({ compact = false }: { compact?: boolean }) {
+    const img = guide.bumpImage ?? null;
     return (
-      <aside className={`g2bump${compact ? " mini" : ""}`}>
+      <aside className={`g2bump${compact ? " mini" : ""}${cardHasBg(img) ? " has-bg" : ""}`}>
+        <CardMediaBg image={img} />
+        <CardMediaTop image={img} />
         <div className="in">
           <span className="k">Curadoria Assinada · Projeto Conceito</span>
           <b className="serif">Prefere que a gente cuide de tudo?</b>
@@ -371,9 +465,6 @@ export default function GuiaApp({
         ];
     return (
       <div className={`g2view g2welcome${p?.backgroundUrl ? " hasbg" : ""}`}>
-        {p?.backgroundUrl ? (
-          <div className="g2bg" style={{ backgroundImage: `url(${p.backgroundUrl})` }} aria-hidden="true" />
-        ) : null}
         <div className="brasao-bg" aria-hidden="true" />
         <div className="in">
           <div className="eyebrow">{eyebrow}</div>
@@ -413,35 +504,12 @@ export default function GuiaApp({
     if (!page) return null;
     return (
       <div className={`g2view${page.backgroundUrl ? " hasbg" : ""}`}>
-        {page.backgroundUrl ? (
-          <div className="g2bg" style={{ backgroundImage: `url(${page.backgroundUrl})` }} aria-hidden="true" />
-        ) : null}
         {page.eyebrow ? <div className="eyebrow">{page.eyebrow}</div> : null}
         <h1 className="serif g2h1">{page.title}</h1>
         {!page.ready ? (
           <span className="g2chip">Texto provisório — o conteúdo oficial da Helô entra pelo painel</span>
         ) : null}
-        <div className="g2prose">
-          {page.paragraphs.map((p, i) => {
-            const t = p.trim();
-            // Linha de dica (começa com ✦) → callout discreto "Dica da Helô".
-            if (t.startsWith("✦")) {
-              const raw = t.replace(/^✦\s*/, "");
-              // Separa o rótulo ("Dica da Helô" / "Guia da Helô") do corpo.
-              const m = raw.match(/^((?:Dica|Guia) da Hel[ôo])\s*[—:-]\s*(.+)$/is);
-              return <DicaHelo key={i} label={m ? m[1] : undefined} body={m ? m[2] : raw} />;
-            }
-            // Cabeçalho de mês (ex.: "4° MÊS — ...") → título de seção.
-            if (/^\d+\s*°?\s*m[êe]s\b/i.test(t)) {
-              return (
-                <h3 className="g2ph" key={i}>
-                  {t}
-                </h3>
-              );
-            }
-            return <p key={i}>{t}</p>;
-          })}
-        </div>
+        <div className="g2prose">{renderProse(page.paragraphs)}</div>
         {page.measures?.rows?.length ? (
           <>
             <MeasuresTable data={page.measures} />
@@ -506,7 +574,7 @@ export default function GuiaApp({
                 <div className={`d${cardHasBg(d.quandoUsarImg) ? " has-bg" : ""}`}>
                   <CardMediaBg image={d.quandoUsarImg} />
                   <CardMediaTop image={d.quandoUsarImg} />
-                  <b>◆ Quando usar</b>
+                  <b><span className="mk" aria-hidden="true" /> Quando usar</b>
                   <span>{d.quandoUsar}</span>
                 </div>
               ) : null}
@@ -514,25 +582,25 @@ export default function GuiaApp({
                 <div className={`d${cardHasBg(d.quandoNaoImg) ? " has-bg" : ""}`}>
                   <CardMediaBg image={d.quandoNaoImg} />
                   <CardMediaTop image={d.quandoNaoImg} />
-                  <b>✕ Quando não usar</b>
+                  <b><span className="mk" aria-hidden="true" /> Quando não usar</b>
                   <span>{d.quandoNao}</span>
                 </div>
               ) : null}
               {d.erroComum ? (
                 <div className="d">
-                  <b>! Erro mais comum</b>
+                  <b><span className="mk" aria-hidden="true" /> Erro mais comum</b>
                   <span>{d.erroComum}</span>
                 </div>
               ) : null}
               {d.efeito ? (
                 <div className="d">
-                  <b>♦ O efeito no quarto</b>
+                  <b><span className="mk" aria-hidden="true" /> O efeito no quarto</b>
                   <span>{d.efeito}</span>
                 </div>
               ) : null}
               {d.instalacao ? (
                 <div className="d">
-                  <b>⚙ Instalação</b>
+                  <b><span className="mk" aria-hidden="true" /> Instalação</b>
                   <span>{d.instalacao}</span>
                 </div>
               ) : null}
@@ -731,9 +799,6 @@ export default function GuiaApp({
     ).replace(/\{data\}/g, dataBase);
     return (
       <div className={`g2view${meuProjeto?.backgroundUrl ? " hasbg" : ""}`}>
-        {meuProjeto?.backgroundUrl ? (
-          <div className="g2bg" style={{ backgroundImage: `url(${meuProjeto.backgroundUrl})` }} aria-hidden="true" />
-        ) : null}
         <div className="eyebrow">{meuProjeto?.eyebrow?.trim() || "O seu quarto, escolha a escolha"}</div>
         <h1 className="serif g2h1">{meuProjeto?.title?.trim() || "Meu projeto"}</h1>
 
@@ -746,7 +811,7 @@ export default function GuiaApp({
         </div>
 
         <section className="g2sec-b">
-          <h2 className="serif">{pj.moodTitle?.trim() || "Moodboard"}</h2>
+          <h2 className="serif">{pj.moodTitle?.trim() || quartoDaCrianca}</h2>
           {decididos.length ? (
             <div className="g2mb">
               {decididos.map(({ item, cat }) => {
@@ -887,7 +952,7 @@ export default function GuiaApp({
             </span>
             <span className="who">
               <b>{profile.motherName}</b>
-              <span>Quarto da {profile.babyName}</span>
+              <span>{quartoDaCrianca}</span>
             </span>
           </div>
         </div>
@@ -896,6 +961,15 @@ export default function GuiaApp({
       {menuOpen ? <div className="g2scrim" onClick={() => setMenuOpen(false)} /> : null}
 
       <div className="g2main" ref={mainRef}>
+        {/* Fundo da página aberta. Fica aqui, e não dentro da .g2view, porque a
+            view tem largura de leitura (900px): lá dentro a foto virava um
+            retângulo no meio da tela em vez de fundo da página. */}
+        {activeBg?.url ? (
+          <div className="g2bg" aria-hidden="true">
+            <span className="ph" style={{ backgroundImage: `url(${activeBg.url})`, opacity: activeBg.opacity }} />
+            <span className="veil" style={{ opacity: activeBg.veil }} />
+          </div>
+        ) : null}
         <header className="g2top">
           <button type="button" className="g2burger" onClick={() => setMenuOpen(true)} aria-label="Abrir menu">
             <span />
@@ -903,7 +977,7 @@ export default function GuiaApp({
             <span />
           </button>
           <span className="baby">
-            Quarto da {profile.babyName} <i>· {guide.collection ?? "Collection Nº 01"}</i>
+            {quartoDaCrianca} <i>· {guide.collection ?? "Collection Nº 01"}</i>
           </span>
           <Link className="out" href="/">
             Quarto da Helô →

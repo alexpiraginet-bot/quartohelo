@@ -124,14 +124,21 @@ function sanitizeProject(p: unknown): unknown {
 // Normaliza a imagem opcional de um card (landing/guia/decisão). Só aceita
 // modo "top"/"background" e URL http(s) (as fotos sobem otimizadas para o
 // bucket). Devolve null para "sem imagem" ou dado inválido.
-function sanitizeCardImage(v: unknown): { url: string; mode: string; alt: string | null } | null {
+function sanitizeCardImage(
+  v: unknown,
+): { url: string; mode: string; alt: string | null; caption: string | null; opacity: number | null } | null {
   if (!v || typeof v !== "object" || Array.isArray(v)) return null;
   const o = v as Record<string, unknown>;
   const url = typeof o.url === "string" ? o.url.trim() : "";
   const mode = o.mode === "top" || o.mode === "background" ? o.mode : "";
   if (!url || !/^https?:\/\//i.test(url) || !mode) return null;
   const alt = String(o.alt ?? "").replace(/[<>]/g, "").trim().slice(0, 300) || null;
-  return { url, mode, alt };
+  const caption = String(o.caption ?? "").replace(/[<>]/g, "").trim().slice(0, 120) || null;
+  // A opacidade escolhida no painel precisa chegar ao banco: sem esta linha o
+  // campo era descartado aqui e a cliente mexia no ajuste sem efeito nenhum.
+  const op = Number(o.opacity);
+  const opacity = Number.isFinite(op) && op > 0 && op <= 1 ? op : null;
+  return { url, mode, alt, caption, opacity };
 }
 
 Deno.serve(async (req) => {
@@ -301,6 +308,10 @@ Deno.serve(async (req) => {
         const bg = body.background_url;
         row.background_url = typeof bg === "string" && /^https?:\/\//i.test(bg) ? bg : null;
       }
+      if ("background_opacity" in body) {
+        const bo = Number(body.background_opacity);
+        row.background_opacity = Number.isFinite(bo) && bo > 0 && bo <= 1 ? bo : null;
+      }
       const { error } = await db.from("qh_guide_pages").upsert(row);
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
       return json({ ok: true, msg: "Página salva. Já está valendo no guia." });
@@ -381,6 +392,19 @@ Deno.serve(async (req) => {
     }
 
     // Conteúdo da landing (SiteContent inteiro em JSON) — a Helô edita pela aba Site.
+    // Guia como produto: hoje só a imagem do card "Prefere que a gente cuide de
+    // tudo?". Mescla no que já está salvo, para não zerar os demais campos.
+    if (action === "save_guide") {
+      const { data: cur } = await db.from("qh_guide_meta").select("data").eq("id", "guia").maybeSingle();
+      const base = cur?.data && typeof cur.data === "object" && !Array.isArray(cur.data)
+        ? (cur.data as Record<string, unknown>)
+        : {};
+      const data = { ...base, bumpImage: sanitizeCardImage(body.bump_image) };
+      const { error } = await db.from("qh_guide_meta").upsert({ id: "guia", data });
+      if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
+      return json({ ok: true, msg: "Card salvo. Já está valendo no guia." });
+    }
+
     if (action === "save_site") {
       const data = body.data;
       if (!data || typeof data !== "object" || Array.isArray(data)) return json({ ok: false, msg: "Conteúdo inválido." });

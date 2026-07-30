@@ -2,19 +2,21 @@
 
 import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import type { CardImage, GuideDica, GuidePage, Genero, Item, MeasureRow, PriceTier, ProductOption, ProjectTexts } from "@/lib/types";
+import type { CardImage, GuideDica, GuideMeta, GuidePage, Genero, Item, MeasureRow, PriceTier, ProductOption, ProjectTexts } from "@/lib/types";
 import { GENERO_LABEL, TIER_LABEL } from "@/lib/types";
 import { CardImageField } from "./CardImageField";
 import {
   type ActionState,
   entrarNoPainel,
   excluirOpcao,
+  salvarCardGuia,
   salvarOpcao,
   salvarPagina,
   salvarTextosItem,
   trocarSenha,
 } from "../actions";
 import { ImageField } from "./ImageField";
+import { PhotoOpacityField } from "./PhotoOpacityField";
 
 /* Formulários do painel — pensados para uso leigo: campos com os nomes que a
  * Helô usa, resposta em português claro e nada de jargão técnico. */
@@ -192,12 +194,13 @@ export function PaginaForm({ page }: { page: GuidePage }) {
         Linha pequena acima do título (opcional)
         <input name="eyebrow" defaultValue={page.eyebrow ?? ""} />
       </label>
-      <ImageField
+      <PhotoOpacityField
         name="background_url"
         label="Imagem de fundo (opcional)"
         value={page.backgroundUrl}
+        opacity={page.backgroundOpacity}
         folder={`paginas/${page.slug}`}
-        hint="Aparece atrás do conteúdo, com um véu claro por cima. Deixe vazia para o fundo padrão."
+        hint="Cobre a página inteira, com um véu claro por cima. Deixe vazia para o fundo padrão."
       />
       {isProjeto ? <ProjetoTextos project={project} setProject={setProject} /> : null}
       {!isProjeto ? (
@@ -319,6 +322,26 @@ export function PaginaForm({ page }: { page: GuidePage }) {
       ) : null}
       <div className="adm-actions">
         <SubmitBtn>Salvar página</SubmitBtn>
+        <Feedback state={state} />
+      </div>
+    </form>
+  );
+}
+
+/* ------------- card "Prefere que a gente cuide de tudo?" ------------- */
+
+/** Só a foto do card do guia — os textos dele seguem fixos, como sempre foram. */
+export function CardGuiaForm({ guide }: { guide: GuideMeta }) {
+  const [state, action] = useFormState(salvarCardGuia, null);
+  return (
+    <form action={action} className="adm-form">
+      <div className="adm-cards-head">
+        <span>Card &quot;Prefere que a gente cuide de tudo?&quot;</span>
+        <small>Aparece no Meu projeto e nas páginas de Armário e Cômoda. A foto entra no topo ou como fundo, igual aos demais cards.</small>
+      </div>
+      <CardImageField prefix="bump" value={guide.bumpImage} folder="guia/card" />
+      <div className="adm-actions">
+        <SubmitBtn>Salvar card</SubmitBtn>
         <Feedback state={state} />
       </div>
     </form>
