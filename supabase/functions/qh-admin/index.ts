@@ -391,7 +391,6 @@ Deno.serve(async (req) => {
       return json({ ok: true, rows: data ?? [] });
     }
 
-    // Conteúdo da landing (SiteContent inteiro em JSON) — a Helô edita pela aba Site.
     // Guia como produto: hoje só a imagem do card "Prefere que a gente cuide de
     // tudo?". Mescla no que já está salvo, para não zerar os demais campos.
     if (action === "save_guide") {
@@ -405,6 +404,7 @@ Deno.serve(async (req) => {
       return json({ ok: true, msg: "Card salvo. Já está valendo no guia." });
     }
 
+    // Conteúdo da landing (SiteContent inteiro em JSON) — a Helô edita pela aba Site.
     if (action === "save_site") {
       const data = body.data;
       if (!data || typeof data !== "object" || Array.isArray(data)) return json({ ok: false, msg: "Conteúdo inválido." });

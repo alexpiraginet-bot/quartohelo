@@ -124,22 +124,39 @@ function dicaFrom(t: string, key: number) {
  */
 function renderProse(paragraphs: string[]) {
   const out: React.ReactNode[] = [];
-  let bloco: { titulo: string; topicos: string[]; dicas: { t: string; i: number }[] } | null = null;
+  type Entrada = { tipo: "topico" | "dica"; texto: string; i: number };
+  let bloco: { titulo: string; entradas: Entrada[] } | null = null;
 
   const fecha = (key: number) => {
     if (!bloco) return;
-    const { titulo, topicos, dicas } = bloco;
+    const { titulo, entradas } = bloco;
+    // A ordem original é preservada: tópicos seguidos viram uma lista só, e cada
+    // dica entra exatamente onde estava, entre os tópicos a que ela se refere.
+    const corpo: React.ReactNode[] = [];
+    let lote: Entrada[] = [];
+    const despeja = () => {
+      if (!lote.length) return;
+      corpo.push(
+        <ul className="g2month-list" key={`l${lote[0].i}`}>
+          {lote.map((e, j) => (
+            <li key={`${e.i}-${j}`}>{e.texto}</li>
+          ))}
+        </ul>,
+      );
+      lote = [];
+    };
+    for (const e of entradas) {
+      if (e.tipo === "topico") lote.push(e);
+      else {
+        despeja();
+        corpo.push(dicaFrom(e.texto, e.i));
+      }
+    }
+    despeja();
     out.push(
       <section className="g2month" key={`m${key}`}>
         <h3 className="g2month-h">{titulo}</h3>
-        {topicos.length ? (
-          <ul className="g2month-list">
-            {topicos.map((t, j) => (
-              <li key={j}>{t}</li>
-            ))}
-          </ul>
-        ) : null}
-        {dicas.map((d) => dicaFrom(d.t, d.i))}
+        {corpo}
       </section>,
     );
     bloco = null;
@@ -150,18 +167,18 @@ function renderProse(paragraphs: string[]) {
     if (!t) return;
     if (MONTH_RE.test(t)) {
       fecha(i);
-      bloco = { titulo: t, topicos: [], dicas: [] };
+      bloco = { titulo: t, entradas: [] };
       return;
     }
     if (isDica(t)) {
-      if (bloco) bloco.dicas.push({ t, i });
+      if (bloco) bloco.entradas.push({ tipo: "dica", texto: t, i });
       else out.push(dicaFrom(t, i));
       return;
     }
     if (bloco) {
       // Linhas soltas dentro do parágrafo já são itens de lista no original.
       for (const linha of t.split(/\n+/).map((l) => l.trim()).filter(Boolean)) {
-        bloco.topicos.push(linha.replace(/^[-–—•*·◆♦]\s*/, ""));
+        bloco.entradas.push({ tipo: "topico", texto: linha.replace(/^[-–—•*·◆♦]\s*/, ""), i });
       }
       return;
     }
