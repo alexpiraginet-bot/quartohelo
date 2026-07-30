@@ -591,37 +591,24 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
  * + brilho de vidro no topo), desfoque equilibrado e reflexo sutil. Nunca opacity
  * no contêiner — só o fundo é translúcido; ícones e rótulos ficam 100% opacos e
  * bem legíveis (creme claro + leve sombra bordô). */
-.lbottom{position:fixed; z-index:60; left:50%; bottom:14px; transform:translateX(-50%);
+/* Menu inferior: uma cor sólida só, a mesma da barra do topo (.ltop.solid),
+ * sem degradê e sem vidro. Respeita a safe area do iPhone. */
+.lbottom{position:fixed; z-index:60; left:50%; bottom:calc(14px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%);
   display:flex; gap:0;
-  background:
-    linear-gradient(180deg, rgba(255,244,222,.16), rgba(255,244,222,0) 40%),
-    linear-gradient(180deg, rgba(88,30,38,.86), rgba(56,15,22,.93));
-  backdrop-filter:blur(16px) saturate(1.5); -webkit-backdrop-filter:blur(16px) saturate(1.5);
+  background:var(--wine);
   border:1px solid rgba(242,226,198,.30); border-radius:999px; padding:7px 6px;
-  box-shadow:0 14px 36px rgba(40,12,17,.42), 0 2px 8px rgba(40,12,17,.30),
-    inset 0 1px 0 rgba(255,246,224,.30), inset 0 -8px 16px rgba(28,7,11,.22);
+  box-shadow:0 14px 36px rgba(40,12,17,.42), 0 2px 8px rgba(40,12,17,.30);
   max-width:calc(100vw - 16px); overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch}
-/* Reflexo/brilho de vidro no topo — decorativo, não intercepta cliques. */
-.lbottom::after{content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  background:
-    radial-gradient(120% 78% at 50% -18%, rgba(255,248,230,.22), rgba(255,248,230,0) 60%),
-    linear-gradient(180deg, rgba(255,245,224,.10), rgba(255,245,224,0) 30%)}
-/* Sem suporte a backdrop-filter (ou transparência reduzida): fundo bordô sólido. */
-@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
-  .lbottom{background:linear-gradient(180deg, rgba(92,32,40,.96), rgba(64,19,26,.98))}
-}
-@media (prefers-reduced-transparency: reduce){
-  .lbottom{background:linear-gradient(180deg, rgba(92,32,40,.97), rgba(64,19,26,.99)); backdrop-filter:none; -webkit-backdrop-filter:none}
-  .lbottom::after{opacity:.5}
-}
 .lbottom::-webkit-scrollbar{display:none}
 .lbottom a{position:relative; z-index:1; flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:3px; text-decoration:none;
   color:#FBF1D8; padding:6px 7px; border-radius:999px; min-width:48px; transition:background .2s, color .2s}
 .lbottom a:hover{background:rgba(255,242,218,.20); color:#FFF7E6}
 .lbottom a:active{background:rgba(255,242,218,.26)}
 .lbottom a:focus-visible{outline:2px solid rgba(255,246,224,.9); outline-offset:2px; color:#FFF7E6}
-.lbottom svg{width:18px; height:18px; filter:drop-shadow(0 1px 1px rgba(34,9,14,.55))}
-.lbottom span{font-size:9.5px; letter-spacing:.02em; white-space:nowrap; text-shadow:0 1px 2px rgba(34,9,14,.5)}
+/* No lugar do ícone, um ponto negritado acima do rótulo. */
+.lbottom .dot{width:7px; height:7px; border-radius:50%; background:currentColor; display:block; flex:0 0 auto}
+.lbottom a:hover .dot,.lbottom a:focus-visible .dot{transform:scale(1.15)}
+.lbottom span{font-size:9.5px; letter-spacing:.02em; white-space:nowrap}
 
 /* --- hero vinho --- */
 .lhero{position:relative; overflow:hidden; min-height:88vh; display:flex; align-items:center;
@@ -664,18 +651,33 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lcard .plus{margin-top:16px; font-size:12px; color:var(--wine-soft); font-style:italic}
 .lcard .foot{margin-top:14px; font-size:13px; color:var(--faint); font-style:italic; line-height:1.5}
 .lcard .btn.sm{margin-top:auto; align-self:flex-start; padding:11px 20px; font-size:11px}
-.lcard .btn.ghost.sm{color:var(--wine); border-color:color-mix(in srgb,var(--wine) 34%,transparent)}
-.lcard .btn.ghost.sm:hover{border-color:var(--wine); background:color-mix(in srgb,var(--wine) 6%,transparent)}
+/* CTA dos cards ("Conheça …"): sempre vinho escuro, sólido. Não herda cor nem
+ * deixa a foto/fundo do card aparecer atrás, então o botão fica igual em todos
+ * os cards, com ou sem imagem. Vale também quando o card tem foto de fundo. */
+.lcard .btn.ghost.sm,
+.lcard.has-bg .btn.ghost.sm,
+.lcard.feat .btn.ghost.sm{background:var(--wine-deep); color:#FBF2DC; border-color:var(--wine-deep)}
+.lcard .btn.ghost.sm:hover,
+.lcard.has-bg .btn.ghost.sm:hover,
+.lcard.feat .btn.ghost.sm:hover{background:var(--wine); border-color:var(--wine); color:#FFF7E6}
+.lcard .btn.ghost.sm:focus-visible{outline:2px solid var(--wine-deep); outline-offset:3px}
 /* Imagem do card — genérico (landing e guia). Modo "topo": faixa que sangra
- * até as bordas; a margem negativa é por contexto (varia com o padding). */
-.card-media-top{overflow:hidden; aspect-ratio:16/10; background:var(--bone)}
+ * até as bordas; a margem negativa é por contexto (varia com o padding).
+ * A faixa tem metade da altura de antes (era 16/10). */
+.card-media-top{overflow:hidden; aspect-ratio:32/10; background:var(--bone)}
 .card-media-top img{display:block; width:100%; height:100%; object-fit:cover}
 .lcard .card-media-top{margin:-30px -28px 14px; border-radius:19px 19px 0 0}
 /* Imagem do card — modo "fundo": camada atrás do conteúdo a 50% (o texto e os
  * botões seguem 100% opacos; nunca aplicamos opacity no card inteiro) */
 .card-media-bg{position:absolute; inset:0; z-index:0; pointer-events:none}
 .card-media-bg .ph{position:absolute; inset:0; background-size:cover; background-position:center; opacity:.5}
-.card-media-bg .veil{position:absolute; inset:0; background:linear-gradient(180deg, rgba(250,247,236,.15), rgba(250,247,236,.5))}
+/* Véu creme sobre a foto de fundo: a opacidade vem do componente e acompanha a
+ * opacidade escolhida para a foto, para o texto nunca perder contraste. */
+.card-media-bg .veil{position:absolute; inset:0; background:#FAF7EC}
+/* Card com foto de fundo: texto em tom mais escuro, para o contraste ficar
+ * confortável mesmo sobre a foto mais visível (80%). */
+.lcard.has-bg .desc,.lcard.has-bg ul li,.lcard.has-bg .foot{color:var(--ink)}
+.lcard.has-bg .tag{color:#4C4718}
 .has-bg{position:relative; overflow:hidden; isolation:isolate}
 .has-bg > *:not(.card-media-bg){position:relative; z-index:1}
 /* Sangria da foto no topo por contexto do guia (padding menor que o da landing) */
@@ -686,18 +688,22 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lcontato{position:relative; overflow:hidden; padding:clamp(70px,10vw,130px) 0; color:#F5EAD2}
 .lcontato-photo{position:absolute; inset:0; background-size:cover; background-position:center}
 .lcontato::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(74,23,31,.6),rgba(74,23,31,.75))}
-.lcontato-in{position:relative; z-index:1; max-width:640px}
+/* Contato: tudo centralizado na página (desktop e celular), com as redes
+ * empurradas para o fim do bloco. */
+.lcontato-in{position:relative; z-index:1; max-width:640px; margin-inline:auto;
+  display:flex; flex-direction:column; align-items:center; text-align:center}
 .lcontato-in .eyebrow{color:var(--caramel)}
 .lcontato-in .h2{color:#FBF2DC}
 .lcontato-in .h2 i{font-style:italic; color:var(--caramel)}
 .lcontato-in .lead{color:#EAD8BC; margin-top:12px}
 .lcontato-in .btn{margin-top:24px}
-.lcontato-cards{margin-top:34px; display:flex; gap:16px; flex-wrap:wrap}
+.lcontato-cards{margin-top:34px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center}
 .lcontato-cards .lc{background:rgba(255,255,255,.06); border:1px solid rgba(210,181,142,.28); border-radius:16px; padding:18px 22px; min-width:220px; display:flex; flex-direction:column; gap:4px}
 .lcontato-cards .lc b{font-size:14px; color:#FBF2DC; font-weight:500}
 .lcontato-cards .lc span{font-size:14px; color:#E3D2B6}
-/* "Siga nossas redes" + ícones centralizados como um conjunto (desktop e mobile) */
-.lsocial{margin-top:30px; display:flex; flex-direction:column; align-items:center; text-align:center}
+/* "Siga nossas redes" + ícones centralizados como um conjunto (desktop e
+ * mobile), bem separados do bloco do horário e no fim da seção. */
+.lsocial{margin-top:clamp(56px,9vw,96px); display:flex; flex-direction:column; align-items:center; text-align:center}
 .lsocial .k{font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(231,223,199,.7)}
 .lsocial .icons{margin-top:12px; display:flex; gap:12px; justify-content:center}
 .lsocial .soc,.lsocial .soc.off{display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; border:1px solid rgba(210,181,142,.4); color:#F3E8CE; transition:background .2s, transform .2s}
@@ -708,12 +714,26 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 /* --- footer --- */
 .lfoot{background:var(--wine-deep); color:#E5D4B4; padding:26px 0}
 .lfoot .foot-row{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:12.5px}
-.lfoot .logo img{height:26px; filter:brightness(0) invert(1) opacity(.8)}
+/* Logo do rodapé no mesmo bege da frase do outro canto (#E5D4B4 = cor do
+ * .lfoot). Usamos máscara com o PNG (que tem transparência) para pintar o
+ * desenho exatamente nessa cor, em vez de aproximar com filtro. */
+.lfoot .logo img{height:26px; display:block;
+  -webkit-mask:url(/images/logo-horizontal.png) center/contain no-repeat;
+  mask:url(/images/logo-horizontal.png) center/contain no-repeat;
+  background-color:currentColor; width:132px}
+@supports not ((-webkit-mask-image:url(#a)) or (mask-image:url(#a))){
+  .lfoot .logo img{background:none; filter:brightness(0) invert(1) opacity(.86)}
+}
 
 /* --- botão flutuante WhatsApp --- */
+/* Botão flutuante do WhatsApp: mesma posição, destino e comportamento; só a
+ * cor deixa de ser verde e passa a ser bege da casa, com o ícone em vinho
+ * (contraste alto sobre o bege). */
 .wa-fab{position:fixed; z-index:59; right:18px; bottom:92px; width:54px; height:54px; border-radius:50%;
-  background:#25543a; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 12px 30px rgba(0,0,0,.3); transition:transform .2s}
-.wa-fab:hover{transform:scale(1.06)}
+  background:var(--bone-2); color:var(--wine-deep); border:1px solid rgba(74,23,31,.16);
+  display:flex; align-items:center; justify-content:center; box-shadow:0 12px 30px rgba(0,0,0,.3); transition:transform .2s}
+.wa-fab:hover{transform:scale(1.06); background:#F2EBD8}
+.wa-fab:focus-visible{outline:2px solid var(--wine-deep); outline-offset:3px}
 .wa-fab svg{width:30px; height:30px}
 
 /* --- páginas próprias --- */
@@ -728,7 +748,14 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 /* resumo do serviço (fallback público quando a página ainda não tem texto próprio) */
 .lpage-list{list-style:none; padding:0; margin:24px 0 0; display:grid; gap:11px; max-width:640px}
 .lpage-list li{position:relative; padding-left:22px; color:#EAD8BC; font-weight:300; font-size:clamp(14px,1.9vw,16px); line-height:1.55}
-.lpage-list li::before{content:"◆"; position:absolute; left:0; top:2px; font-size:10px; color:var(--caramel)}
+/* Marcador em bolinha (no lugar do tracinho que vinha digitado no texto). */
+.lpage-list li::before{content:""; position:absolute; left:2px; top:.62em; width:6px; height:6px;
+  border-radius:50%; background:var(--caramel)}
+/* Espaçamento entre blocos do corpo: um bloco atrás do outro fica com o mesmo
+ * respiro, venha o texto do painel ou dos itens do card. */
+.lpage-in .lead + .lpage-list{margin-top:18px}
+.lpage-in .lpage-list + .lead{margin-top:18px}
+.lpage-in .lpage-list + .lpage-list{margin-top:11px}
 .lpage-note{margin-top:20px; color:var(--caramel); font-style:italic; font-family:"Fraunces",Georgia,serif; font-size:clamp(15px,2vw,18px); line-height:1.4}
 .lpage-cta{margin-top:30px}
 .lback{display:inline-block; margin-top:34px; color:var(--caramel); text-decoration:none; font-size:13px; letter-spacing:.1em}
@@ -776,3 +803,67 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .adm-img .ops small{font-size:12px; color:var(--faint); line-height:1.4; max-width:34ch}
 /* dentro do card de opção do catálogo, a foto ocupa a largura */
 .adm-opt .foto .adm-img{width:100%}
+
+/* ---- Foto de fundo do Início (hero) e das páginas próprias ----
+ * A opacidade sai do painel e vale só para a foto: título, texto e botões
+ * ficam por cima, 100% opacos. */
+/* Véu vinho por cima da foto, como já é feito no Contato: mantém a base escura
+ * da casa, então o título e o texto em creme continuam legíveis com qualquer
+ * foto. A opacidade escolhida controla o quanto a foto aparece sob esse véu. */
+.lhero-photo,.lpage-photo{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.lhero-photo .ph,.lpage-photo .ph{position:absolute; inset:0; background-size:cover; background-position:center}
+.lhero-photo::after,.lpage-photo::after{content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(74,23,31,.58),rgba(74,23,31,.74))}
+.lhero.has-photo > *:not(.lhero-photo){position:relative; z-index:1}
+.lhero.has-photo .lhero-crest img{opacity:.06}
+.lpage.has-photo > *:not(.lpage-photo){position:relative; z-index:1}
+
+/* ---- Portfólio (carrossel antes do Contato) ---- */
+.lport{padding:clamp(64px,9vw,110px) 0; background:var(--bone-2)}
+.lport-head{max-width:680px}
+.lport-head .lead{margin-top:14px}
+.lport-empty{margin-top:26px; color:var(--muted); font-style:italic; font-size:15px}
+.lport-carousel{margin-top:34px; position:relative}
+.lport-carousel .frame{position:relative; border-radius:20px; overflow:hidden; background:var(--bone);
+  border:1px solid var(--line); box-shadow:var(--shadow-sm); aspect-ratio:16/9}
+.lport-carousel .slide{position:absolute; inset:0; margin:0; opacity:0; transition:opacity .6s ease; pointer-events:none}
+.lport-carousel .slide.on{opacity:1; pointer-events:auto}
+.lport-carousel .slide img{width:100%; height:100%; object-fit:cover; display:block}
+.lport-carousel .pnav{position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%;
+  border:1px solid rgba(74,23,31,.18); background:rgba(250,247,236,.86); color:var(--wine-deep);
+  font-size:26px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .2s, transform .2s}
+.lport-carousel .pnav:hover{background:#fff; transform:translateY(-50%) scale(1.05)}
+.lport-carousel .pnav:focus-visible{outline:2px solid var(--wine-deep); outline-offset:2px}
+.lport-carousel .pnav.prev{left:12px}
+.lport-carousel .pnav.next{right:12px}
+.lport-carousel .dots{display:flex; gap:9px; justify-content:center; margin-top:16px}
+.lport-carousel .dots .d{width:9px; height:9px; border-radius:50%; border:1px solid var(--wine);
+  background:transparent; cursor:pointer; padding:0; transition:background .2s, transform .2s}
+.lport-carousel .dots .d.on{background:var(--wine); transform:scale(1.2)}
+.lport-carousel .dots .d:focus-visible{outline:2px solid var(--wine-deep); outline-offset:2px}
+@media (prefers-reduced-motion:reduce){ .lport-carousel .slide{transition:none} }
+@media (max-width:700px){
+  .lport-carousel .frame{aspect-ratio:4/3}
+  .lport-carousel .pnav{width:38px; height:38px; font-size:22px}
+}
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+/* ---- Painel: opacidade da foto e fotos do Portfólio ---- */
+.adm-cardimg-op{display:flex; flex-direction:column; gap:8px}
+.adm-cardimg-op > .lbl{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--olive)}
+.adm-cardimg-op small{font-size:12px; color:var(--faint); line-height:1.4}
+.adm-photoop{display:flex; flex-direction:column; gap:12px}
+.adm-portfolio{display:flex; flex-direction:column; gap:14px}
+.adm-portfolio .adm-empty{font-size:13.5px; color:var(--muted); font-style:italic; margin:0}
+.adm-portrow{display:flex; gap:12px; align-items:flex-start; border:1px dashed var(--line);
+  border-radius:12px; padding:12px; background:#fff}
+.adm-portrow .bd{flex:1; display:flex; flex-direction:column; gap:10px; min-width:0}
+.adm-portrow .ord{display:flex; flex-direction:column; gap:4px}
+.adm-portrow .ord button{width:26px; height:24px; border:1px solid var(--line); background:#FDFBF4;
+  border-radius:7px; cursor:pointer; color:var(--wine); font-size:12px; line-height:1}
+.adm-portrow .ord button:disabled{opacity:.35; cursor:default}
+.adm-portrow .rm{width:28px; height:28px; border:1px solid var(--line); background:#fff; border-radius:8px;
+  cursor:pointer; color:var(--wine-soft); font-size:16px; line-height:1; flex:0 0 auto}
+.adm-portrow .rm:hover{border-color:var(--wine); color:var(--wine)}

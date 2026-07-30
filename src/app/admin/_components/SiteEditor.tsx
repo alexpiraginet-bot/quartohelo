@@ -5,6 +5,8 @@ import type { ServiceCard, SiteContent } from "@/lib/types";
 import { salvarSite, type ActionState } from "../actions";
 import { ImageField } from "./ImageField";
 import { CardImageField } from "./CardImageField";
+import { PhotoOpacityField } from "./PhotoOpacityField";
+import { PortfolioField } from "./PortfolioField";
 
 /* Editor da landing (aba "Site"). Um único formulário com todas as seções;
  * salva o SiteContent inteiro de uma vez (a ação mescla com o atual). */
@@ -81,6 +83,14 @@ export function SiteEditor({ content }: { content: SiteContent }) {
         <T name="heroEyebrow" label="Linha de cima" def={s.heroEyebrow} />
         <T name="heroTitleHtml" label="Título (use <i>…</i> para itálico)" def={s.heroTitleHtml} />
         <T name="heroSub" label="Frase abaixo" def={s.heroSub} />
+        <PhotoOpacityField
+          name="heroPhoto"
+          label="Foto de fundo do Início"
+          value={s.heroPhoto}
+          opacity={s.heroPhotoOpacity}
+          folder="site"
+          hint="Aparece atrás do título, sobre o fundo vinho. Deixe vazia para manter só o vinho."
+        />
       </fieldset>
 
       <fieldset className="adm-sec">
@@ -102,6 +112,16 @@ export function SiteEditor({ content }: { content: SiteContent }) {
       </fieldset>
 
       <fieldset className="adm-sec">
+        <legend>Portfólio (carrossel antes do Contato)</legend>
+        <div className="adm-2col">
+          <T name="portfolio_eyebrow" label="Rótulo" def={s.portfolio?.eyebrow} ph="Portfólio" />
+          <T name="portfolio_title" label="Título" def={s.portfolio?.title} ph="Quartos que assinamos" />
+        </div>
+        <A name="portfolio_lead" label="Frase de apoio (opcional)" def={s.portfolio?.lead} rows={2} />
+        <PortfolioField photos={s.portfolio?.photos ?? []} />
+      </fieldset>
+
+      <fieldset className="adm-sec">
         <legend>Páginas próprias (abertas pelos botões)</legend>
         {[
           { p: "cur", t: "Curadoria Assinada", d: s.curadoriaPage },
@@ -115,6 +135,15 @@ export function SiteEditor({ content }: { content: SiteContent }) {
               <T name={`${pg.p}_title`} label="Título" def={pg.d?.title ?? pg.t} />
             </div>
             <A name={`${pg.p}_paras`} label="Texto (linha em branco entre parágrafos)" def={(pg.d?.paragraphs ?? []).join("\n\n")} rows={6} />
+            <p className="adm-hint">Comece a linha com um tracinho para virar item de lista com bolinha.</p>
+            <PhotoOpacityField
+              name={`${pg.p}_photo`}
+              label="Foto de fundo da página"
+              value={pg.d?.photo}
+              opacity={pg.d?.photoOpacity}
+              folder="site"
+              hint="Aparece atrás do texto desta página. Deixe vazia para manter o fundo atual."
+            />
           </div>
         ))}
       </fieldset>

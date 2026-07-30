@@ -189,13 +189,37 @@ export interface GuideMeta {
  * ------------------------------------------------------------------ */
 
 /** Imagem opcional de um card, configurável por card no painel.
- *  mode: "none" (padrão) · "top" (foto no topo) · "background" (fundo a 50%). */
+ *  mode: "none" (padrão) · "top" (foto no topo) · "background" (fundo). */
 export type CardImageMode = "none" | "top" | "background";
 export interface CardImage {
   url?: string | null;
   mode?: CardImageMode;
   /** Texto alternativo (usado no modo "top"; vazio = decorativa). */
   alt?: string | null;
+  /** Opacidade da IMAGEM (nunca do texto), de 0 a 1. Ausente = padrão do modo:
+   *  topo = 1 (sem opacidade) · fundo = 0,5. Mantém cards antigos como estão. */
+  opacity?: number | null;
+}
+
+/** Opacidades oferecidas no painel, por modo (o que a cliente escolhe). */
+export const TOP_OPACITIES = [1, 0.8, 0.5] as const;
+export const BG_OPACITIES = [0.8, 0.5] as const;
+/** Padrão de cada modo quando o card não tem opacidade salva. */
+export const DEFAULT_TOP_OPACITY = 1;
+export const DEFAULT_BG_OPACITY = 0.5;
+
+/** Uma foto do Portfólio (carrossel da landing). */
+export interface PortfolioPhoto {
+  url: string;
+  alt?: string | null;
+}
+
+/** Seção "Portfólio" da landing: textos + as fotos do carrossel. */
+export interface PortfolioContent {
+  eyebrow?: string | null;
+  title?: string | null;
+  lead?: string | null;
+  photos: PortfolioPhoto[];
 }
 
 export interface ServiceCard {
@@ -218,7 +242,10 @@ export interface SitePage {
   eyebrow?: string | null;
   title: string;
   paragraphs: string[];
+  /** Foto de fundo da página (opcional). */
   photo?: string | null;
+  /** Opacidade da foto de fundo (0 a 1). Ausente = padrão. */
+  photoOpacity?: number | null;
 }
 
 export interface SiteContent {
@@ -247,6 +274,11 @@ export interface SiteContent {
   // Fundos (fotos do estúdio)
   sobrePhoto?: string | null;
   contatoPhoto?: string | null;
+  // Fundo do Início (hero): foto opcional + opacidade da foto (nunca do texto).
+  heroPhoto?: string | null;
+  heroPhotoOpacity?: number | null;
+  // Seção "Portfólio" (carrossel), logo antes do Contato.
+  portfolio?: PortfolioContent | null;
   // Card do produto digital, dentro de "Como trabalhamos"
   produtoDigital?: ServiceCard | null;
   // Contato — dados de atendimento (todos editáveis no painel)

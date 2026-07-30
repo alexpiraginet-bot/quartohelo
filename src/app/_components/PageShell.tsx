@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteNav } from "./SiteNav";
+import { PageBody } from "./PageBody";
 import { waHref, WA_MSG } from "@/lib/whatsapp";
 import type { ServiceCard, SitePage } from "@/lib/types";
 
@@ -19,6 +20,7 @@ export function PageShell({
   whatsapp,
   waMessage,
   footerTagline,
+  waCta = false,
   children,
 }: {
   page: SitePage;
@@ -26,15 +28,29 @@ export function PageShell({
   whatsapp?: string | null;
   waMessage?: string | null;
   footerTagline?: string | null;
+  /** Mostra o botão "Falar no WhatsApp" abaixo do conteúdo (mesmo componente,
+   *  formato e destino nas páginas que o usam). */
+  waCta?: boolean;
   children?: React.ReactNode;
 }) {
   const realParas = (page.paragraphs ?? []).filter((p) => p.trim() && !PLACEHOLDER.test(p));
   const useFallback = realParas.length === 0 && !!card;
   const wa = waHref(whatsapp, waMessage ?? WA_MSG.geral);
+  // Foto de fundo da página (editável no painel). A opacidade vale só para a
+  // foto: o conteúdo continua 100% opaco e legível.
+  const bg = page.photo?.trim() ? page.photo : null;
+  const bgOpacity = typeof page.photoOpacity === "number" && page.photoOpacity > 0 && page.photoOpacity <= 1
+    ? page.photoOpacity
+    : 0.5;
   return (
     <div className="land2 lpage-wrap">
       <SiteNav />
-      <main className="lpage" id="top">
+      <main className={`lpage${bg ? " has-photo" : ""}`} id="top">
+        {bg ? (
+          <div className="lpage-photo" aria-hidden="true">
+            <span className="ph" style={{ backgroundImage: `url(${bg})`, opacity: bgOpacity }} />
+          </div>
+        ) : null}
         <div className="lpage-crest" aria-hidden="true"><img src="/images/brasao-creme.png" alt="" /></div>
         <div className="lwrap lpage-in">
           {page.eyebrow ? <div className="eyebrow">{page.eyebrow}</div> : null}
@@ -46,15 +62,15 @@ export function PageShell({
                 <ul className="lpage-list">{card.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>
               ) : null}
               {card?.foot ? <p className="lpage-note">{card.foot}</p> : null}
-              {wa ? (
-                <div className="lpage-cta">
-                  <a className="btn primary" href={wa} target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
-                </div>
-              ) : null}
             </>
           ) : (
-            realParas.map((p, i) => <p className="lead" key={i}>{p}</p>)
+            <PageBody paragraphs={realParas} />
           )}
+          {waCta && wa ? (
+            <div className="lpage-cta">
+              <a className="btn primary" href={wa} target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+            </div>
+          ) : null}
           {children}
           <Link className="lback" href="/#servicos">← Voltar</Link>
         </div>

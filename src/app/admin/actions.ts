@@ -5,7 +5,15 @@ import { callAdminFn } from "@/lib/db/adminFn";
 import { adminToken, clearAdminSession, setAdminSession } from "@/lib/admin/auth";
 import { getSiteContent } from "@/lib/content";
 import { waHref } from "@/lib/whatsapp";
-import type { CardImage, CardImageMode, ServiceCard, SiteContent, SitePage } from "@/lib/types";
+import type {
+  CardImage,
+  CardImageMode,
+  PortfolioContent,
+  PortfolioPhoto,
+  ServiceCard,
+  SiteContent,
+  SitePage,
+} from "@/lib/types";
 
 /**
  * Ações do painel da Helô. Todas encaminham para a Edge Function qh-admin
@@ -40,7 +48,18 @@ function cardImageFrom(fd: FormData, prefix: string): CardImage | null {
   const mode = str(fd, `${prefix}_img_mode`);
   const url = str(fd, `${prefix}_img_url`);
   if (!url || (mode !== "top" && mode !== "background")) return null;
-  return { url, mode: mode as CardImageMode, alt: str(fd, `${prefix}_img_alt`) || null };
+  return {
+    url,
+    mode: mode as CardImageMode,
+    alt: str(fd, `${prefix}_img_alt`) || null,
+    opacity: opacityFrom(fd, `${prefix}_img_op`),
+  };
+}
+
+/** Opacidade vinda do painel: só aceita de 0 a 1; fora disso, null (= padrão). */
+function opacityFrom(fd: FormData, key: string): number | null {
+  const n = Number(str(fd, key));
+  return Number.isFinite(n) && n > 0 && n <= 1 ? n : null;
 }
 
 function refreshAll() {
@@ -223,7 +242,24 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     title: str(fd, `${prefix}_title`) || fallbackTitle,
     paragraphs: paras(`${prefix}_paras`),
     photo: str(fd, `${prefix}_photo`) || null,
+    photoOpacity: opacityFrom(fd, `${prefix}_photo_op`),
   });
+
+  // Portfólio: campos indexados (portfolio_url_0, portfolio_alt_0, …). Só entra
+  // no site a linha que tem foto anexada; a ordem é a da tela.
+  const portfolioPhotos: PortfolioPhoto[] = [];
+  const portfolioCount = Number(str(fd, "portfolio_count")) || 0;
+  for (let i = 0; i < portfolioCount; i++) {
+    const url = str(fd, `portfolio_url_${i}`);
+    if (!url) continue;
+    portfolioPhotos.push({ url, alt: str(fd, `portfolio_alt_${i}`) || null });
+  }
+  const portfolio: PortfolioContent = {
+    eyebrow: str(fd, "portfolio_eyebrow") || null,
+    title: str(fd, "portfolio_title") || null,
+    lead: str(fd, "portfolio_lead") || null,
+    photos: portfolioPhotos,
+  };
   const card = (prefix: string, base?: ServiceCard | null): ServiceCard => ({
     ...(base ?? { tag: "", title: "", desc: "", bullets: [] }),
     tag: str(fd, `${prefix}_tag`),
@@ -242,6 +278,9 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     heroEyebrow: str(fd, "heroEyebrow"),
     heroTitleHtml: str(fd, "heroTitleHtml"),
     heroSub: str(fd, "heroSub"),
+    heroPhoto: str(fd, "heroPhoto") || null,
+    heroPhotoOpacity: opacityFrom(fd, "heroPhoto_op"),
+    portfolio,
     quemEyebrow: str(fd, "quemEyebrow"),
     quemParagraphs: paras("quemParagraphs"),
     quemClose: str(fd, "quemClose"),

@@ -5,6 +5,7 @@ import { LandingFx } from "./_components/Interactive";
 import { SiteNav } from "./_components/SiteNav";
 import { Track } from "./_components/Track";
 import { CardMediaBg, CardMediaTop, cardHasBg } from "./_components/CardMedia";
+import { Portfolio } from "./_components/Portfolio";
 import type { ServiceCard } from "@/lib/types";
 
 export const dynamic = "force-dynamic"; // reflete o CMS assim que o Supabase entra
@@ -53,13 +54,26 @@ export default async function Home() {
   // WhatsApp: todos os links vêm do MESMO campo (s.whatsapp).
   const waMain = waHref(s.whatsapp, WA_MSG.geral);
   const waPlain = waHref(s.whatsapp);
+  // Fundo do Início: foto opcional com opacidade própria (o texto segue opaco).
+  const heroPhoto = s.heroPhoto?.trim() ? s.heroPhoto : null;
+  const heroOpacity =
+    typeof s.heroPhotoOpacity === "number" && s.heroPhotoOpacity > 0 && s.heroPhotoOpacity <= 1
+      ? s.heroPhotoOpacity
+      : 0.5;
+  const portfolio = s.portfolio ?? null;
+  const portfolioPhotos = portfolio?.photos?.filter((p) => p?.url?.trim()) ?? [];
   return (
     <div className="land2">
       <LandingFx />
       <Track kind="visita_site" />
       <SiteNav />
 
-      <header className="lhero" id="top">
+      <header className={`lhero${heroPhoto ? " has-photo" : ""}`} id="top">
+        {heroPhoto ? (
+          <div className="lhero-photo" aria-hidden="true">
+            <span className="ph" style={{ backgroundImage: `url(${heroPhoto})`, opacity: heroOpacity }} />
+          </div>
+        ) : null}
         <div className="lhero-crest" aria-hidden="true"><img src="/images/brasao-creme.png" alt="" /></div>
         <div className="lwrap lhero-in">
           <div className="eyebrow">{s.heroEyebrow}</div>
@@ -87,6 +101,23 @@ export default async function Home() {
           </div>
           <div className="lserv-grid">
             {cards.map((c, i) => <Card c={c} key={i} />)}
+          </div>
+        </div>
+      </section>
+
+      <section className="lport" id="portfolio">
+        <div className="lwrap">
+          <div className="rv lport-head">
+            {portfolio?.eyebrow?.trim() ? <div className="eyebrow">{portfolio.eyebrow}</div> : null}
+            <h2 className="h2 serif">{portfolio?.title?.trim() || "Portfólio"}</h2>
+            {portfolio?.lead?.trim() ? <p className="lead">{portfolio.lead}</p> : null}
+          </div>
+          <div className="rv">
+            {portfolioPhotos.length ? (
+              <Portfolio photos={portfolioPhotos} />
+            ) : (
+              <p className="lport-empty">Em breve, os quartos que assinamos.</p>
+            )}
           </div>
         </div>
       </section>
