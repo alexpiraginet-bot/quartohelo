@@ -47,7 +47,11 @@ export function PageShell({
       <SiteNav />
       <main className={`lpage${bg ? " has-photo" : ""}`} id="top">
         {bg ? (
-          <div className="lpage-photo" aria-hidden="true">
+          <div
+            className="lpage-photo"
+            aria-hidden="true"
+            style={{ "--photo-op": bgOpacity } as React.CSSProperties}
+          >
             <span className="ph" style={{ backgroundImage: `url(${bg})`, opacity: bgOpacity }} />
           </div>
         ) : null}

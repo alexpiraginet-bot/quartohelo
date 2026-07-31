@@ -423,7 +423,10 @@ export default function GuiaApp({
     ? (() => {
         const o = bgPage.backgroundOpacity;
         const opacity = typeof o === "number" && o > 0 && o <= 1 ? o : DEFAULT_PAGE_OPACITY;
-        return { url: bgPage.backgroundUrl!, opacity, veil: Math.min(0.62, 0.28 + 0.14 * opacity) };
+        // Véu fixo e leve: quem manda no quanto a foto aparece é a opacidade
+        // escolhida no painel. Antes o véu subia junto e achatava a escala,
+        // deixando 80% e 90% praticamente iguais na tela.
+        return { url: bgPage.backgroundUrl!, opacity, veil: 0.22 };
       })()
     : null;
 
@@ -439,22 +442,27 @@ export default function GuiaApp({
 
   function OrderBump({ compact = false }: { compact?: boolean }) {
     const img = guide.bumpImage ?? null;
+    // Textos editáveis no painel; o que estiver em branco cai no padrão.
+    const b = guide.bump ?? null;
+    const kicker = b?.kicker?.trim() || "Curadoria Assinada · Projeto Conceito";
+    const title = b?.title?.trim() || "Prefere que a gente cuide de tudo?";
+    const body = b?.body?.length
+      ? b.body
+      : [
+          "Este guia foi feito para você montar o quarto com autonomia e segurança. Mas se em algum momento você sentir que prefere entregar tudo em nossas mãos, nós estamos aqui.",
+          "Na Curadoria Assinada e no Projeto Conceito, cuidamos de cada detalhe por você: do conceito ao último bordado, com a intermediação direta junto aos fornecedores. Você não decide nada sozinha, cada escolha chega pronta e em harmonia com o todo.",
+        ];
+    const cta = b?.cta?.trim() || "Para conhecer, é só falar com a gente";
     return (
       <aside className={`g2bump${compact ? " mini" : ""}${cardHasBg(img) ? " has-bg" : ""}`}>
         <CardMediaBg image={img} />
         <CardMediaTop image={img} />
         <div className="in">
-          <span className="k">Curadoria Assinada · Projeto Conceito</span>
-          <b className="serif">Prefere que a gente cuide de tudo?</b>
-          <p>
-            Este guia foi feito para você montar o quarto com autonomia e segurança. Mas se em algum momento você
-            sentir que prefere entregar tudo em nossas mãos, nós estamos aqui.
-          </p>
-          <p>
-            Na Curadoria Assinada e no Projeto Conceito, cuidamos de cada detalhe por você: do conceito ao último
-            bordado, com a intermediação direta junto aos fornecedores. Você não decide nada sozinha, cada escolha
-            chega pronta e em harmonia com o todo.
-          </p>
+          <span className="k">{kicker}</span>
+          <b className="serif">{title}</b>
+          {body.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
           <button
             type="button"
             className="btn wine"
@@ -463,7 +471,7 @@ export default function GuiaApp({
               openSupport();
             }}
           >
-            Para conhecer, é só falar com a gente
+            {cta}
           </button>
         </div>
       </aside>

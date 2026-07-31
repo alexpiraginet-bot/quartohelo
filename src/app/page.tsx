@@ -76,7 +76,11 @@ export default async function Home() {
 
       <header className={`lhero${heroPhoto ? " has-photo" : ""}`} id="top">
         {heroPhoto ? (
-          <div className="lhero-photo" aria-hidden="true">
+          <div
+            className="lhero-photo"
+            aria-hidden="true"
+            style={{ "--photo-op": heroOpacity } as React.CSSProperties}
+          >
             <span className="ph" style={{ backgroundImage: `url(${heroPhoto})`, opacity: heroOpacity }} />
           </div>
         ) : null}

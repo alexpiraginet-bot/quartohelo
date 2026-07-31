@@ -330,15 +330,33 @@ export function PaginaForm({ page }: { page: GuidePage }) {
 
 /* ------------- card "Prefere que a gente cuide de tudo?" ------------- */
 
-/** Só a foto do card do guia — os textos dele seguem fixos, como sempre foram. */
+/** Card do guia: textos e foto, tudo editável. Campo em branco volta ao texto
+ *  padrão, então dá para limpar sem quebrar o card. */
 export function CardGuiaForm({ guide }: { guide: GuideMeta }) {
   const [state, action] = useFormState(salvarCardGuia, null);
+  const b = guide.bump ?? null;
   return (
     <form action={action} className="adm-form">
       <div className="adm-cards-head">
         <span>Card &quot;Prefere que a gente cuide de tudo?&quot;</span>
-        <small>Aparece no Meu projeto e nas páginas de Armário e Cômoda. A foto entra no topo ou como fundo, igual aos demais cards.</small>
+        <small>Aparece no Meu projeto e nas páginas de Armário e Cômoda. Deixe um campo em branco para voltar ao texto padrão.</small>
       </div>
+      <label>
+        Linha de cima
+        <input name="bump_kicker" defaultValue={b?.kicker ?? ""} placeholder="Curadoria Assinada · Projeto Conceito" />
+      </label>
+      <label>
+        Título
+        <input name="bump_title" defaultValue={b?.title ?? ""} placeholder="Prefere que a gente cuide de tudo?" />
+      </label>
+      <label>
+        Texto (deixe uma linha em branco entre parágrafos)
+        <textarea name="bump_body" rows={7} defaultValue={(b?.body ?? []).join("\n\n")} />
+      </label>
+      <label>
+        Texto do botão
+        <input name="bump_cta" defaultValue={b?.cta ?? ""} placeholder="Para conhecer, é só falar com a gente" />
+      </label>
       <CardImageField prefix="bump" value={guide.bumpImage} folder="guia/card" />
       <div className="adm-actions">
         <SubmitBtn>Salvar card</SubmitBtn>

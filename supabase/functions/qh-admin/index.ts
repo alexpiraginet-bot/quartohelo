@@ -391,14 +391,31 @@ Deno.serve(async (req) => {
       return json({ ok: true, rows: data ?? [] });
     }
 
-    // Guia como produto: hoje só a imagem do card "Prefere que a gente cuide de
-    // tudo?". Mescla no que já está salvo, para não zerar os demais campos.
+    // Guia como produto: a imagem e os textos do card "Prefere que a gente
+    // cuide de tudo?". Mescla no que já está salvo, para não zerar o resto.
     if (action === "save_guide") {
       const { data: cur } = await db.from("qh_guide_meta").select("data").eq("id", "guia").maybeSingle();
       const base = cur?.data && typeof cur.data === "object" && !Array.isArray(cur.data)
         ? (cur.data as Record<string, unknown>)
         : {};
-      const data = { ...base, bumpImage: sanitizeCardImage(body.bump_image) };
+      const data: Record<string, unknown> = { ...base, bumpImage: sanitizeCardImage(body.bump_image) };
+      // Textos do card (opcionais): só gravamos quando a tela envia a chave, e
+      // campo vazio vira null para o guia voltar ao texto padrão.
+      if ("bump" in body) {
+        const bp = (body.bump ?? {}) as Record<string, unknown>;
+        const clean = (v: unknown) => {
+          const s = String(v ?? "").replace(/[<>]/g, "").trim();
+          return s ? s.slice(0, 1200) : null;
+        };
+        const arr = Array.isArray(bp.body) ? bp.body.map(clean).filter(Boolean) : [];
+        const bump = {
+          kicker: clean(bp.kicker),
+          title: clean(bp.title),
+          body: arr.length ? arr : null,
+          cta: clean(bp.cta),
+        };
+        data.bump = bump.kicker || bump.title || bump.body || bump.cta ? bump : null;
+      }
       const { error } = await db.from("qh_guide_meta").upsert({ id: "guia", data });
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
       return json({ ok: true, msg: "Card salvo. Já está valendo no guia." });

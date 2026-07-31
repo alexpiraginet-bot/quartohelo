@@ -166,7 +166,20 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
 export async function salvarCardGuia(_prev: ActionState | null, fd: FormData): Promise<ActionState> {
   const token = adminToken();
   if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
-  const r = await callAdminFn("save_guide", { token, bump_image: cardImageFrom(fd, "bump") });
+  const body = str(fd, "bump_body")
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const r = await callAdminFn("save_guide", {
+    token,
+    bump_image: cardImageFrom(fd, "bump"),
+    bump: {
+      kicker: str(fd, "bump_kicker") || null,
+      title: str(fd, "bump_title") || null,
+      body,
+      cta: str(fd, "bump_cta") || null,
+    },
+  });
   if (r.ok) refreshAll();
   return { ok: r.ok, msg: r.msg ?? "" };
 }
