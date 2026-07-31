@@ -877,7 +877,9 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lhero-photo,.lpage-photo{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
 .lhero-photo .ph,.lpage-photo .ph{position:absolute; inset:0; background-size:cover; background-position:center}
 .lhero-photo::after,.lpage-photo::after{content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg,rgba(74,23,31,.58),rgba(74,23,31,.74))}
+  background:linear-gradient(180deg,
+    rgba(74,23,31,calc(0.80 - 0.30 * var(--photo-op,.5))),
+    rgba(74,23,31,calc(0.92 - 0.30 * var(--photo-op,.5))))}
 .lhero.has-photo > *:not(.lhero-photo){position:relative; z-index:1}
 .lhero.has-photo .lhero-crest img{opacity:.06}
 .lpage.has-photo > *:not(.lpage-photo){position:relative; z-index:1}

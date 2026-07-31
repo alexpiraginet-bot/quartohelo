@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGuiaData } from "@/lib/content";
-import { PaginaForm } from "../../_components/AdminForms";
+import { CardGuiaForm, PaginaForm } from "../../_components/AdminForms";
 
 export const dynamic = "force-dynamic";
 
 export default async function PaginaAdmin({ params }: { params: { slug: string } }) {
-  const { pages } = await getGuiaData();
+  const { pages, guide } = await getGuiaData();
   const page = pages.find((p) => p.slug === params.slug);
   if (!page) notFound();
   return (
@@ -21,6 +21,13 @@ export default async function PaginaAdmin({ params }: { params: { slug: string }
       <div className="adm-cat">
         <PaginaForm page={page} />
       </div>
+      {/* O card "Prefere que a gente cuide de tudo?" aparece nesta tela do guia,
+          então ele fica aqui também, e não só na home do painel. */}
+      {page.slug === "meu-projeto" ? (
+        <div className="adm-cat">
+          <CardGuiaForm guide={guide} />
+        </div>
+      ) : null}
     </div>
   );
 }

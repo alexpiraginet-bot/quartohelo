@@ -187,6 +187,18 @@ export interface GuideMeta {
   /** Imagem do card "Prefere que a gente cuide de tudo?" (topo ou fundo),
    *  com as mesmas opacidades dos demais cards. */
   bumpImage?: CardImage | null;
+  /** Textos do mesmo card, editáveis no painel. Vazio = usa o texto padrão. */
+  bump?: BumpTexts | null;
+}
+
+/** Textos do card "Prefere que a gente cuide de tudo?" (Meu projeto e itens).
+ *  Todos opcionais: o que ficar em branco cai no texto padrão do guia. */
+export interface BumpTexts {
+  kicker?: string | null;
+  title?: string | null;
+  /** Corpo do card: um parágrafo por linha em branco. */
+  body?: string[] | null;
+  cta?: string | null;
 }
 
 /* ------------------------------------------------------------------ *

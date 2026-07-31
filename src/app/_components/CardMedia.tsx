@@ -37,12 +37,13 @@ export function CardMediaTop({ image }: { image?: CardImage | null }) {
 export function CardMediaBg({ image }: { image?: CardImage | null }) {
   if (!cardHasBg(image)) return null;
   const op = opacityOf(image!, DEFAULT_BG_OPACITY);
-  // O véu creme sobe junto com a foto, para o texto seguir legível (contraste
-  // AA), mas devagar: com o coeficiente antigo (0,34 + 0,45·op) ele engolia o
-  // ajuste — 50% e 80% chegavam à tela com 0,22 e 0,24 de foto visível, e a
-  // cliente mexia na opacidade sem ver diferença. Aqui a foto visível sai de
-  // 0,33 em 50% para 0,53 em 90%, e o véu nunca cai abaixo de 0,35.
-  const veil = Math.min(0.62, 0.28 + 0.14 * op);
+  // O véu creme é FIXO e leve: o que a cliente escolhe no painel é que manda no
+  // quanto a foto aparece. Antes o véu subia junto com a opacidade e anulava o
+  // ajuste — 80% e 90% chegavam à tela com 0,49 e 0,53 de foto visível, quase
+  // idênticos, e ela mexia no controle sem ver diferença. Agora 50% · 80% · 90%
+  // viram 0,41 · 0,66 · 0,74 de foto visível, cada passo bem distinto. Quem
+  // protege o texto é a cor escura dele em .lcard.has-bg, medida em AA.
+  const veil = 0.18;
   return (
     <div className="card-media-bg" aria-hidden="true">
       <span className="ph" style={{ backgroundImage: `url(${image!.url})`, opacity: op }} />
