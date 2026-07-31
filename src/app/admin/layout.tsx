@@ -30,6 +30,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/paginas">Páginas do guia</Link>
           <Link href="/admin/catalogo">Catálogo</Link>
           <Link href="/admin/analytics">Acessos</Link>
+          <Link href="/admin/tutorial">Como faço</Link>
         </div>
         <div className="adm-right">
           <Link href="/" target="_blank" rel="noopener noreferrer">Ver a Landing Page →</Link>
