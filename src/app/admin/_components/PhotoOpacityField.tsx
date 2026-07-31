@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ImageField } from "./ImageField";
 import { PAGE_OPACITIES } from "@/lib/types";
+import { Ajuda } from "./Ajuda";
 
 /* Foto de fundo + opacidade (Início e páginas próprias). Mesmo padrão de
  * anexo/otimização dos demais campos; a opacidade vale só para a FOTO, o texto
@@ -17,6 +18,7 @@ export function PhotoOpacityField({
   opacity,
   folder,
   hint,
+  ajuda,
   defaultOpacity = 0.5,
 }: {
   name: string;
@@ -25,6 +27,8 @@ export function PhotoOpacityField({
   opacity?: number | null;
   folder: string;
   hint?: string;
+  /** id da tarefa em _content/tutorial.ts: mostra o "?" com o passo a passo. */
+  ajuda?: string;
   defaultOpacity?: number;
 }) {
   const saved = typeof opacity === "number" && opacity > 0 && opacity <= 1 ? opacity : null;
@@ -38,6 +42,7 @@ export function PhotoOpacityField({
   return (
     <div className="adm-photoop">
       <ImageField name={name} label={label} value={value} folder={folder} hint={hint} />
+      {ajuda ? <span className="adm-ajuda-solta"><Ajuda tarefa={ajuda} /></span> : null}
       <div className="adm-cardimg-op">
         <span className="lbl">Opacidade da foto</span>
         <div className="adm-cardimg-modes" role="radiogroup" aria-label={`Opacidade — ${label}`}>

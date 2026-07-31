@@ -27,6 +27,23 @@ export interface ActionState {
   msg: string;
 }
 
+/** Resultado de uma pré-visualização: onde abrir o ensaio, se deu certo. */
+export interface PreviewState {
+  ok: boolean;
+  msg: string;
+  url?: string;
+}
+
+/* A pré-visualização depende de uma ação nova na Edge Function. Se a função
+ * ainda estiver na versão anterior, ela responde "Ação desconhecida" — que não
+ * diz nada para quem está editando. Trocamos por uma frase honesta. */
+const PREVIEW_INDISPONIVEL =
+  "A pré-visualização ainda não está ligada neste servidor. Fale com a gente. Salvar continua funcionando normalmente.";
+function previewMsg(msg: string | undefined): string {
+  const m = (msg ?? "").trim();
+  return /ação desconhecida/i.test(m) ? PREVIEW_INDISPONIVEL : m || "Não consegui montar a pré-visualização.";
+}
+
 function parseBRL(v: FormDataEntryValue | null): number | null {
   const raw = typeof v === "string" ? v : "";
   const t = raw.replace(/[^\d.,]/g, "");
@@ -97,9 +114,10 @@ export async function trocarSenha(_prev: ActionState | null, fd: FormData): Prom
 
 /* --------------------------- páginas do guia --------------------------- */
 
-export async function salvarPagina(_prev: ActionState | null, fd: FormData): Promise<ActionState> {
-  const token = adminToken();
-  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+/** Monta o payload de uma página do guia a partir do formulário. Serve para
+ *  salvar e para pré-visualizar — as duas telas leem exatamente os mesmos
+ *  campos, então o ensaio nunca diverge do que vai ser salvo. */
+function pageFrom(fd: FormData, token: string): Record<string, unknown> {
   const paragraphs = str(fd, "texto")
     .split(/\n\s*\n/)
     .map((p) => p.trim())
@@ -153,12 +171,43 @@ export async function salvarPagina(_prev: ActionState | null, fd: FormData): Pro
     }
   }
 
-  const r = await callAdminFn("save_page", payload);
+  return payload;
+}
+
+export async function salvarPagina(_prev: ActionState | null, fd: FormData): Promise<ActionState> {
+  const token = adminToken();
+  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+  const r = await callAdminFn("save_page", pageFrom(fd, token));
   if (r.ok) {
     refreshAll();
     revalidatePath(`/admin/paginas/${str(fd, "slug")}`);
   }
   return { ok: r.ok, msg: r.msg ?? "" };
+}
+
+/** Guarda a página em edição na linha de pré-visualização e devolve o endereço
+ *  do ensaio. Nada do que está publicado é tocado. */
+export async function previsualizarPagina(fd: FormData): Promise<PreviewState> {
+  const token = adminToken();
+  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+  const p = pageFrom(fd, token);
+  // A tela do guia lê o formato do app (camelCase); o banco guarda snake_case.
+  const data = {
+    slug: p.slug,
+    title: p.title,
+    eyebrow: p.eyebrow,
+    paragraphs: p.paragraphs,
+    cards: p.cards,
+    closing: p.closing,
+    measures: p.measures,
+    project: p.project ?? null,
+    backgroundUrl: p.background_url,
+    backgroundOpacity: p.background_opacity,
+    ready: p.ready,
+    order: p.order,
+  };
+  const r = await callAdminFn("save_preview", { token, kind: "page", data });
+  return { ok: r.ok, msg: r.ok ? (r.msg ?? "") : previewMsg(r.msg), url: r.ok ? "/pre-visualizar/guia" : undefined };
 }
 
 /* --------- card "Prefere que a gente cuide de tudo?" (guia) --------- */
@@ -253,9 +302,9 @@ export async function excluirOpcao(_prev: ActionState | null, fd: FormData): Pro
 
 /* --------------------------- site / landing --------------------------- */
 
-export async function salvarSite(_prev: ActionState | null, fd: FormData): Promise<ActionState> {
-  const token = adminToken();
-  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+/** Monta o SiteContent inteiro a partir do formulário da aba "Site". Usado por
+ *  salvar e por pré-visualizar, para o ensaio ser idêntico ao que será salvo. */
+async function siteFrom(fd: FormData): Promise<SiteContent> {
   const cur = await getSiteContent();
 
   const paras = (k: string) =>
@@ -334,6 +383,13 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     digitalPage: page("dig", "O Fim da Dúvida"),
   };
 
+  return data;
+}
+
+export async function salvarSite(_prev: ActionState | null, fd: FormData): Promise<ActionState> {
+  const token = adminToken();
+  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+  const data = await siteFrom(fd);
   const r = await callAdminFn("save_site", { token, data });
   if (r.ok) {
     revalidatePath("/");
@@ -343,6 +399,16 @@ export async function salvarSite(_prev: ActionState | null, fd: FormData): Promi
     revalidatePath("/admin/site");
   }
   return { ok: r.ok, msg: r.msg ?? "" };
+}
+
+/** Ensaio da landing: grava o que está no formulário na linha de
+ *  pré-visualização e devolve o endereço da tela. O site publicado não muda. */
+export async function previsualizarSite(fd: FormData): Promise<PreviewState> {
+  const token = adminToken();
+  if (!token) return { ok: false, msg: "Sua sessão expirou. Entre de novo." };
+  const data = await siteFrom(fd);
+  const r = await callAdminFn("save_preview", { token, kind: "landing", data });
+  return { ok: r.ok, msg: r.ok ? (r.msg ?? "") : previewMsg(r.msg), url: r.ok ? "/pre-visualizar" : undefined };
 }
 
 /* --------------------------- upload de imagem --------------------------- */

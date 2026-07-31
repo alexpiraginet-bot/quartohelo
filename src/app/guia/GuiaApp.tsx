@@ -227,18 +227,31 @@ export default function GuiaApp({
   pages,
   options,
   profile,
+  previewSlug = null,
 }: {
   categories: Category[];
   guide: GuideMeta;
   pages: GuidePage[];
   options: ProductOption[];
   profile: GuestProfile;
+  /** Ensaio do painel: abre direto na página editada e não conta acesso. */
+  previewSlug?: string | null;
 }) {
+  const preview = !!previewSlug;
+  // Em pré-visualização, nada é registrado em Acessos: quem está ali é a Helô
+  // conferindo o que acabou de escrever, não uma cliente visitando o guia.
+  const evento = preview ? () => {} : track;
+  const viewInicial = (): View =>
+    !previewSlug || previewSlug === "visao-geral"
+      ? { kind: "inicio" }
+      : previewSlug === "meu-projeto"
+        ? { kind: "projeto" }
+        : { kind: "pagina", slug: previewSlug };
   const [choices, setChoices] = useState<Choices>({});
   const [genero, setGenero] = useState<Genero>("neutro");
-  const [entered, setEntered] = useState(false);
+  const [entered, setEntered] = useState(preview);
   const [hydrated, setHydrated] = useState(false);
-  const [view, setView] = useState<View>({ kind: "inicio" });
+  const [view, setView] = useState<View>(viewInicial);
   const [menuOpen, setMenuOpen] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -252,7 +265,7 @@ export default function GuiaApp({
       /* segue sem persistência */
     }
     setHydrated(true);
-    track("visita_guia");
+    evento("visita_guia");
   }, []);
 
   useEffect(() => {
@@ -268,7 +281,7 @@ export default function GuiaApp({
     setMenuOpen(false);
     mainRef.current?.scrollTo?.({ top: 0 });
     window.scrollTo({ top: 0 });
-    if (view.kind === "projeto") track("projeto_visto");
+    if (view.kind === "projeto") evento("projeto_visto");
   }, [view]);
 
   const allEntries = useMemo(
@@ -312,7 +325,7 @@ export default function GuiaApp({
 
   function chooseOption(slug: string, opt: ProductOption) {
     if (choices[slug]?.optionId !== opt.id) {
-      track("escolha_item", { item: slug, tier: opt.tier, genero: opt.genero });
+      evento("escolha_item", { item: slug, tier: opt.tier, genero: opt.genero });
     }
     setChoices((prev) => {
       const cur = prev[slug];
@@ -364,7 +377,7 @@ export default function GuiaApp({
 
   function enter() {
     setEntered(true);
-    track("entrou_guia");
+    evento("entrou_guia");
     try {
       window.localStorage.setItem(ENTER_KEY, "1");
     } catch {}
@@ -467,7 +480,7 @@ export default function GuiaApp({
             type="button"
             className="btn wine"
             onClick={() => {
-              track("interesse_marcenaria");
+              evento("interesse_marcenaria");
               openSupport();
             }}
           >
@@ -689,7 +702,7 @@ export default function GuiaApp({
                               href={o.url}
                               target="_blank"
                               rel="noreferrer"
-                              onClick={() => track("clique_fornecedor", { item: slug, url: o.url })}
+                              onClick={() => evento("clique_fornecedor", { item: slug, url: o.url })}
                             >
                               Ver no fornecedor ↗
                             </a>

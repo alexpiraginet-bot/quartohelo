@@ -430,6 +430,19 @@ Deno.serve(async (req) => {
       return json({ ok: true, msg: "Site salvo. Já está valendo na landing." });
     }
 
+    // Pré-visualização: grava em uma linha separada, que só a tela de
+    // pré-visualização (dentro do painel) lê. O site publicado não muda.
+    if (action === "save_preview") {
+      const kind = S("kind");
+      const id = kind === "landing" ? "landing_preview" : kind === "page" ? "page_preview" : "";
+      if (!id) return json({ ok: false, msg: "Pré-visualização inválida." });
+      const data = body.data;
+      if (!data || typeof data !== "object" || Array.isArray(data)) return json({ ok: false, msg: "Conteúdo inválido." });
+      const { error } = await db.from("qh_site_content").upsert({ id, data });
+      if (error) return json({ ok: false, msg: "Não consegui preparar a pré-visualização: " + error.message });
+      return json({ ok: true, msg: "Pré-visualização pronta." });
+    }
+
     // Anexar imagem (fundos do site, fotos do guia). Já chega otimizada do navegador.
     if (action === "upload_image") {
       if (typeof body.data !== "string" || !body.data.startsWith("data:")) return json({ ok: false, msg: "Imagem inválida." });
