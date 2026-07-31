@@ -5,6 +5,8 @@ import { useFormState, useFormStatus } from "react-dom";
 import type { CardImage, GuideDica, GuideMeta, GuidePage, Genero, Item, MeasureRow, PriceTier, ProductOption, ProjectTexts } from "@/lib/types";
 import { GENERO_LABEL, TIER_LABEL } from "@/lib/types";
 import { CardImageField } from "./CardImageField";
+import { PreviewButton } from "./PreviewButton";
+import { Ajuda } from "./Ajuda";
 import {
   type ActionState,
   entrarNoPainel,
@@ -197,6 +199,7 @@ export function PaginaForm({ page }: { page: GuidePage }) {
       <PhotoOpacityField
         name="background_url"
         label="Imagem de fundo (opcional)"
+        ajuda="fundo-pagina-guia"
         value={page.backgroundUrl}
         opacity={page.backgroundOpacity}
         folder={`paginas/${page.slug}`}
@@ -206,7 +209,7 @@ export function PaginaForm({ page }: { page: GuidePage }) {
       {!isProjeto ? (
         <>
       <label>
-        Texto da página
+        Texto da página <Ajuda tarefa="texto-guia" />
         <textarea
           name="texto"
           rows={14}
@@ -321,6 +324,7 @@ export function PaginaForm({ page }: { page: GuidePage }) {
         </label>
       ) : null}
       <div className="adm-actions">
+        <PreviewButton kind="pagina" />
         <SubmitBtn>Salvar página</SubmitBtn>
         <Feedback state={state} />
       </div>
@@ -338,7 +342,7 @@ export function CardGuiaForm({ guide }: { guide: GuideMeta }) {
   return (
     <form action={action} className="adm-form">
       <div className="adm-cards-head">
-        <span>Card &quot;Prefere que a gente cuide de tudo?&quot;</span>
+        <span>Card &quot;Prefere que a gente cuide de tudo?&quot; <Ajuda tarefa="card-cuide" /></span>
         <small>Aparece no Meu projeto e nas páginas de Armário e Cômoda. Deixe um campo em branco para voltar ao texto padrão.</small>
       </div>
       <label>
@@ -375,7 +379,7 @@ export function ItemTextosForm({ item }: { item: Item }) {
     <form action={action} className="adm-form">
       <input type="hidden" name="slug" value={item.slug} />
       <label>
-        Frase de abertura (o que é / por que importa)
+        Frase de abertura (o que é / por que importa) <Ajuda tarefa="textos-item" />
         <input name="summary" defaultValue={item.summary ?? ""} />
       </label>
       <div className="adm-2col">
@@ -455,7 +459,7 @@ function OpcaoForm({
         </div>
         <div className="campos">
           <label>
-            Nome
+            Nome <Ajuda tarefa="opcoes" />
             <input name="name" defaultValue={option?.name ?? ""} placeholder="Ex.: Berço Lume" />
           </label>
           <div className="linha">

@@ -972,3 +972,68 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .adm-tut-trouble dt{font-size:14.5px; color:var(--wine); font-weight:500}
 .adm-tut-trouble dd{margin:3px 0 0; font-size:14px; color:var(--muted); line-height:1.6}
 .adm-tut-foot{margin-top:18px; font-size:13.5px; color:var(--faint); font-style:italic}
+
+/* ---- Pré-visualização (ensaio do painel, só para quem está logado) ---- */
+.prev-page{--prev-h:52px; padding-top:var(--prev-h)}
+.prev-bar{position:fixed; top:0; left:0; right:0; z-index:200; min-height:var(--prev-h);
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:8px clamp(12px,3vw,24px); background:var(--wine); color:var(--bone);
+  box-shadow:0 2px 14px rgba(0,0,0,.18)}
+.prev-bar .prev-tag{font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  border:1px solid rgba(243,235,219,.5); border-radius:999px; padding:4px 10px; flex:0 0 auto}
+.prev-bar .prev-txt{font-size:13.5px; line-height:1.45; opacity:.94}
+.prev-bar .prev-back{margin-left:auto; flex:0 0 auto; font-size:12px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--wine); background:var(--bone); border-radius:999px;
+  padding:8px 14px; text-decoration:none}
+.prev-bar .prev-back:hover{background:#fff}
+.prev-empty{max-width:620px; margin:0 auto; padding:clamp(40px,8vw,90px) 24px; text-align:center}
+.prev-empty h1{font-family:"Fraunces",Georgia,serif; color:var(--wine); font-size:clamp(24px,4vw,32px); font-weight:500}
+.prev-empty p{margin:12px 0 22px; color:var(--muted); line-height:1.6}
+.prev-bar .prev-txt-curta{display:none; font-size:13px}
+/* Tudo que é fixo ou grudado no topo do site desce a altura da faixa, senão
+   fica escondido atrás dela: o menu da landing, a coluna do guia e a barra
+   interna do guia. */
+.prev-page .ltop{top:var(--prev-h)}
+.prev-page .g2side{top:var(--prev-h)}
+.prev-page .g2top{top:var(--prev-h)}
+.prev-page .g2,.prev-page .g2main{min-height:calc(100svh - var(--prev-h))}
+/* Telas estreitas: frase curta, sem o selo, para a faixa caber em uma linha
+   e não roubar metade da tela do celular. */
+@media (max-width:900px){
+  .prev-page{--prev-h:56px}
+  .prev-bar{gap:10px}
+  .prev-bar .prev-txt{display:none}
+  .prev-bar .prev-txt-curta{display:inline}
+  .prev-bar .prev-back{padding:7px 12px}
+}
+@media (max-width:560px){
+  .prev-bar .prev-tag{display:none}
+  .prev-bar .prev-txt-curta{font-size:12.5px}
+}
+
+/* ---- Ajuda dentro da tela de edição (o "?" ao lado do bloco) ---- */
+.adm-ajuda{position:relative; display:inline-block; vertical-align:middle; margin-left:6px}
+.adm-ajuda-solta{display:block; margin-top:-4px}
+.adm-ajuda-btn{width:20px; height:20px; border-radius:50%; border:1px solid var(--line);
+  background:#FDFBF4; color:var(--wine); font-family:inherit; font-size:12px; line-height:1;
+  cursor:pointer; padding:0; text-transform:none; letter-spacing:0}
+.adm-ajuda-btn:hover{border-color:var(--wine); background:#fff}
+.adm-ajuda-btn:focus-visible{outline:2px solid var(--wine-deep); outline-offset:2px}
+.adm-ajuda-box{position:absolute; z-index:60; top:calc(100% + 8px); left:0; width:min(340px,78vw);
+  display:block; background:#fff; border:1px solid var(--line); border-radius:14px;
+  padding:14px 16px; box-shadow:0 14px 34px rgba(74,23,31,.16); text-align:left;
+  font-size:13.5px; color:var(--ink); text-transform:none; letter-spacing:0; font-weight:400}
+.adm-ajuda-box b{display:block; font-family:"Fraunces",Georgia,serif; font-weight:400;
+  font-size:16px; color:var(--wine)}
+.adm-ajuda-box em{display:block; margin-top:2px; font-size:12.5px; color:var(--muted)}
+.adm-ajuda-box .passos{display:block; counter-reset:passo; margin-top:10px}
+.adm-ajuda-box .passo{display:block; position:relative; padding-left:24px; margin-top:8px; line-height:1.55}
+.adm-ajuda-box .passo::before{counter-increment:passo; content:counter(passo) "."; position:absolute;
+  left:0; top:0; color:var(--caramel); font-weight:600}
+.adm-ajuda-box .passo small{display:block; margin-top:2px; font-size:12px; color:var(--faint); line-height:1.45}
+.adm-ajuda-mais{display:inline-block; margin-top:12px; font-size:12.5px; color:var(--wine)}
+@media (max-width:560px){ .adm-ajuda-box{left:auto; right:0} }
+
+/* Barra de ações: "ver antes" e "salvar" lado a lado */
+.adm-savebar,.adm-actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.adm-msg.inline{margin:0; font-size:13px}

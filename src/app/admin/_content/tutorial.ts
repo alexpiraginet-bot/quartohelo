@@ -42,8 +42,16 @@ export const TUTORIAL_BASICS: TutorialStep[] = [
     note: "Cada bloco tem o próprio botão. Salvar o Site não salva as Páginas do guia, e vice-versa.",
   },
   {
+    text: "Antes de salvar, clique em “Ver como vai ficar” para conferir sem mexer no site.",
+    note: "Abre outra aba com o resultado. Só você enxerga essa tela; quem visitar o site continua vendo o que está no ar.",
+  },
+  {
     text: "Depois de salvar, abra “Ver a Landing Page” ou “Ver o guia” no menu de cima para conferir.",
     note: "Abre em outra aba, então você não perde o que estava editando.",
+  },
+  {
+    text: "O “?” ao lado de um bloco abre o passo a passo daquela tarefa ali mesmo.",
+    note: "É o mesmo texto desta aba, sem precisar sair da tela em que você está.",
   },
   {
     text: "Campo em branco costuma significar “usar o padrão” ou “não mostrar”.",
@@ -60,6 +68,26 @@ export const TUTORIAL: TutorialSection[] = [
     title: "Landing page",
     intro: "A página que abre em quartodahelo.com.",
     tasks: [
+      {
+        id: "ver-antes",
+        title: "Ver como vai ficar antes de salvar",
+        result: "Abre o site do jeito que ele vai ficar, sem mudar nada para quem visita.",
+        href: "/admin/site",
+        hrefLabel: "Abrir Site (landing)",
+        steps: [
+          { text: "Faça as mudanças normalmente, sem salvar." },
+          { text: "Desça até o fim e clique em “Ver como vai ficar”." },
+          {
+            text: "Confira na aba que abriu.",
+            note: "A faixa no topo lembra que é um ensaio. O site publicado continua igual.",
+          },
+          { text: "Se gostou, volte para a aba da edição e clique em salvar." },
+          {
+            text: "Se não gostou, feche a aba e continue editando.",
+            note: "Nada foi para o ar: dá para desistir sem consequência.",
+          },
+        ],
+      },
       {
         id: "texto-landing",
         title: "Trocar um texto da landing",
@@ -152,6 +180,10 @@ export const TUTORIAL: TutorialSection[] = [
             text: "Deixe uma linha em branco entre um parágrafo e outro.",
             note: "Se começar a linha com um tracinho, ela vira item de lista com bolinha.",
           },
+          {
+            text: "Clique em “Ver como vai ficar” para conferir antes.",
+            note: "Abre o guia já na página que você está editando, sem mudar o que a cliente vê.",
+          },
           { text: "Clique em “Salvar página”." },
         ],
       },
@@ -235,7 +267,11 @@ export const TUTORIAL_TROUBLE: { q: string; a: string }[] = [
   },
   {
     q: "Apaguei um texto sem querer.",
-    a: "Escreva de novo e salve. Não existe desfazer por enquanto, então na dúvida copie o texto antes de apagar.",
+    a: "Se ainda não salvou, atualize a página com F5 que o texto salvo volta. Se já salvou, escreva de novo: não existe desfazer por enquanto, então na dúvida copie o texto antes de apagar.",
+  },
+  {
+    q: "Cliquei em “Ver como vai ficar” e não abriu nada.",
+    a: "O navegador pode ter bloqueado a aba nova. Procure o aviso de pop-up na barra de endereço e libere para o painel, ou clique no botão de novo.",
   },
   {
     q: "A foto ficou torta ou cortada.",

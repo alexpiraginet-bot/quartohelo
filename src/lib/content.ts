@@ -77,6 +77,30 @@ export async function getSiteContent(): Promise<SiteContent> {
   }
 }
 
+/* Pré-visualização: linhas separadas da mesma tabela, gravadas pelo painel e
+ * lidas só pelas telas de pré-visualização (que exigem sessão de admin). O que
+ * está publicado (id "landing") não é tocado. Sem linha, devolve null e a tela
+ * avisa que é preciso clicar em "Ver como vai ficar" primeiro. */
+async function readPreview<T>(id: string): Promise<T | null> {
+  if (!supabase) return null;
+  try {
+    const { data } = await supabase.from("qh_site_content").select("data").eq("id", id).maybeSingle();
+    return (data?.data as T) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getSitePreview(): Promise<SiteContent | null> {
+  const d = await readPreview<Partial<SiteContent>>("landing_preview");
+  return d ? normalizeSite({ ...seedSite, ...d }) : null;
+}
+
+export async function getPagePreview(): Promise<GuidePage | null> {
+  const d = await readPreview<GuidePage>("page_preview");
+  return d?.slug ? normalizeProjectTexts(normalizeMeasuresParagraphs(d)) : null;
+}
+
 export async function getGuide(): Promise<GuideMeta> {
   if (!supabase) return seedGuide;
   try {

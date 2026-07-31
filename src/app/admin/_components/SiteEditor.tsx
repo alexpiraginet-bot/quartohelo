@@ -7,6 +7,8 @@ import { ImageField } from "./ImageField";
 import { CardImageField } from "./CardImageField";
 import { PhotoOpacityField } from "./PhotoOpacityField";
 import { PortfolioField } from "./PortfolioField";
+import { PreviewButton } from "./PreviewButton";
+import { Ajuda } from "./Ajuda";
 
 /* Editor da landing (aba "Site"). Um único formulário com todas as seções;
  * salva o SiteContent inteiro de uma vez (a ação mescla com o atual). */
@@ -19,6 +21,7 @@ function SaveBar() {
   const { pending } = useFormStatus();
   return (
     <div className="adm-savebar">
+      <PreviewButton kind="site" />
       <button type="submit" className="adm-btn wine" disabled={pending}>
         {pending ? "Salvando…" : "Salvar o site"}
       </button>
@@ -62,10 +65,10 @@ export function SiteEditor({ content }: { content: SiteContent }) {
   const [svc0, svc1] = s.services;
   return (
     <form action={action} className="adm-form adm-site">
-      <p className="adm-hint">Tudo que você editar aqui reflete na hora no site. Deixe um campo em branco para escondê-lo (ex.: e-mail ou uma rede social).</p>
+      <p className="adm-hint">Nada muda no site enquanto você não clicar em “Salvar o site”. Para conferir antes, use “Ver como vai ficar”: abre outra aba com o site do jeitinho que vai ficar. Deixe um campo em branco para escondê-lo (ex.: e-mail ou uma rede social).</p>
 
       <fieldset className="adm-sec">
-        <legend>Contato</legend>
+        <legend>Contato <Ajuda tarefa="whatsapp" /></legend>
         <T name="email" label="E-mail" def={s.email} ph="contato@quartodahelo.com" />
         <div className="adm-2col">
           <T name="whatsapp" label="WhatsApp (número — o link é gerado automaticamente)" def={s.whatsapp} ph="(27) 99854-2106" />
@@ -79,7 +82,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
       </fieldset>
 
       <fieldset className="adm-sec">
-        <legend>Início (hero)</legend>
+        <legend>Início (hero) <Ajuda tarefa="fundo-inicio" /></legend>
         <T name="heroEyebrow" label="Linha de cima" def={s.heroEyebrow} />
         <T name="heroTitleHtml" label="Título (use <i>…</i> para itálico)" def={s.heroTitleHtml} />
         <T name="heroSub" label="Frase abaixo" def={s.heroSub} />
@@ -94,7 +97,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
       </fieldset>
 
       <fieldset className="adm-sec">
-        <legend>Sobre nós</legend>
+        <legend>Sobre nós <Ajuda tarefa="texto-landing" /></legend>
         <T name="quemEyebrow" label="Rótulo" def={s.quemEyebrow} />
         <A name="quemParagraphs" label="Texto (deixe uma linha em branco entre parágrafos)" def={s.quemParagraphs.join("\n\n")} rows={12} />
         <T name="quemClose" label="Frase de fechamento (destaque)" def={s.quemClose} />
@@ -102,7 +105,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
       </fieldset>
 
       <fieldset className="adm-sec">
-        <legend>Como trabalhamos</legend>
+        <legend>Como trabalhamos <Ajuda tarefa="foto-card" /></legend>
         <T name="trabalhoEyebrow" label="Rótulo" def={s.trabalhoEyebrow} />
         <T name="trabalhoTitle" label="Título" def={s.trabalhoTitle} />
         <A name="trabalhoLead" label="Frase de apoio" def={s.trabalhoLead} rows={2} />
@@ -112,7 +115,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
       </fieldset>
 
       <fieldset className="adm-sec">
-        <legend>Portfólio (carrossel antes do Contato)</legend>
+        <legend>Portfólio (carrossel antes do Contato) <Ajuda tarefa="portfolio" /></legend>
         <div className="adm-2col">
           <T name="portfolio_eyebrow" label="Rótulo" def={s.portfolio?.eyebrow} ph="Portfólio" />
           <T name="portfolio_title" label="Título" def={s.portfolio?.title} ph="Quartos que assinamos" />
