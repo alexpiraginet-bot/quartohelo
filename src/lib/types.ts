@@ -226,7 +226,7 @@ export interface CardImage {
 export const TOP_OPACITIES = [1, 0.9, 0.8, 0.5] as const;
 export const BG_OPACITIES = [0.9, 0.8, 0.5] as const;
 /** Fundo de página inteira (guia e páginas próprias da landing). */
-export const PAGE_OPACITIES = [0.9, 0.8, 0.5] as const;
+export const PAGE_OPACITIES = [1, 0.9, 0.8, 0.5] as const;
 /** Padrão de cada modo quando o card não tem opacidade salva. */
 export const DEFAULT_TOP_OPACITY = 1;
 export const DEFAULT_BG_OPACITY = 0.5;

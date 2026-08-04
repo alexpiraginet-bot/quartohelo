@@ -9,7 +9,7 @@ import { Ajuda } from "./Ajuda";
  * anexo/otimização dos demais campos; a opacidade vale só para a FOTO, o texto
  * por cima continua 100% opaco. Campos: {name} (URL) e {name}_op (opacidade). */
 
-const opLabel = (v: number) => (v >= 1 ? "Sem opacidade" : `${Math.round(v * 100)}%`);
+const opLabel = (v: number) => (v >= 1 ? "100% (foto cheia)" : `${Math.round(v * 100)}%`);
 
 export function PhotoOpacityField({
   name,

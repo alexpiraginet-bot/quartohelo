@@ -203,7 +203,7 @@ export function PaginaForm({ page }: { page: GuidePage }) {
         value={page.backgroundUrl}
         opacity={page.backgroundOpacity}
         folder={`paginas/${page.slug}`}
-        hint="Cobre a página inteira, com um véu claro por cima. Deixe vazia para o fundo padrão."
+        hint="Cobre a página inteira. Em 100% a foto aparece limpa, sem véu. Na Visão geral, a foto também tira o brasão. Deixe vazia para o fundo padrão."
       />
       {isProjeto ? <ProjetoTextos project={project} setProject={setProject} /> : null}
       {!isProjeto ? (

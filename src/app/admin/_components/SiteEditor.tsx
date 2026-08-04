@@ -92,7 +92,7 @@ export function SiteEditor({ content }: { content: SiteContent }) {
           value={s.heroPhoto}
           opacity={s.heroPhotoOpacity}
           folder="site"
-          hint="Aparece atrás do título, sobre o fundo vinho. Deixe vazia para manter só o vinho."
+          hint="Vira o fundo do Início e tira o brasão. Em 100% a foto aparece inteira, sem véu vinho por cima. Deixe vazia para manter o brasão."
         />
       </fieldset>
 
