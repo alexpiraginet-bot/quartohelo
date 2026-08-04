@@ -85,7 +85,11 @@ export function LandingView({ s, preview = false }: { s: SiteContent; preview?: 
             <span className="ph" style={{ backgroundImage: `url(${heroPhoto})`, opacity: heroOpacity }} />
           </div>
         ) : null}
-        <div className="lhero-crest" aria-hidden="true"><img src="/images/brasao-creme.png" alt="" /></div>
+        {/* O brasão é o fundo padrão do Início. Quando ela anexa uma foto, ele
+            sai: a foto é que vira o fundo, sem marca d'água por cima. */}
+        {heroPhoto ? null : (
+          <div className="lhero-crest" aria-hidden="true"><img src="/images/brasao-creme.png" alt="" /></div>
+        )}
         <div className="lwrap lhero-in">
           <div className="eyebrow">{s.heroEyebrow}</div>
           <h1 className="serif lhero-h1" dangerouslySetInnerHTML={{ __html: s.heroTitleHtml }} />

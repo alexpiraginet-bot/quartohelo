@@ -17,7 +17,7 @@ const MODES: [CardImageMode, string][] = [
   ["background", "Foto de fundo"],
 ];
 
-const opLabel = (v: number) => (v >= 1 ? "Sem opacidade" : `${Math.round(v * 100)}%`);
+const opLabel = (v: number) => (v >= 1 ? "100% (foto cheia)" : `${Math.round(v * 100)}%`);
 
 export function CardImageField({
   prefix,

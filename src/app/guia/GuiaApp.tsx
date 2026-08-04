@@ -436,10 +436,10 @@ export default function GuiaApp({
     ? (() => {
         const o = bgPage.backgroundOpacity;
         const opacity = typeof o === "number" && o > 0 && o <= 1 ? o : DEFAULT_PAGE_OPACITY;
-        // Véu fixo e leve: quem manda no quanto a foto aparece é a opacidade
-        // escolhida no painel. Antes o véu subia junto e achatava a escala,
-        // deixando 80% e 90% praticamente iguais na tela.
-        return { url: bgPage.backgroundUrl!, opacity, veil: 0.22 };
+        // O véu acompanha a opacidade escolhida: em 50% ele fica como sempre
+        // esteve (0,22) e em 100% desaparece, deixando a foto limpa. Antes ele
+        // era fixo, então "100%" nunca chegava a ser foto cheia de verdade.
+        return { url: bgPage.backgroundUrl!, opacity, veil: (1 - opacity) * 0.44 };
       })()
     : null;
 
@@ -503,7 +503,9 @@ export default function GuiaApp({
         ];
     return (
       <div className={`g2view g2welcome${p?.backgroundUrl ? " hasbg" : ""}`}>
-        <div className="brasao-bg" aria-hidden="true" />
+        {/* O brasão é o fundo padrão desta página. Com foto anexada ele sai,
+            para a foto ser o fundo e não ficar marca d'água por cima. */}
+        {p?.backgroundUrl ? null : <div className="brasao-bg" aria-hidden="true" />}
         <div className="in">
           <div className="eyebrow">{eyebrow}</div>
           <h1 className="serif g2h1">Olá, {firstName}.</h1>

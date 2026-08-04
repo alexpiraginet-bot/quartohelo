@@ -141,8 +141,11 @@ export const TUTORIAL: TutorialSection[] = [
         hrefLabel: "Abrir Site (landing)",
         steps: [
           { text: "Em “Site (landing)”, vá em “Início (hero)”." },
-          { text: "Em “Foto de fundo do Início”, clique em “Anexar imagem”." },
-          { text: "Escolha a opacidade.", note: "Quanto maior, mais a foto aparece. O título continua legível de qualquer jeito." },
+          { text: "Em “Foto de fundo do Início”, clique em “Anexar imagem”.", note: "Anexar a foto já tira o brasão do fundo." },
+          {
+            text: "Escolha a opacidade.",
+            note: "Quanto maior, mais a foto aparece. Em 100% ela aparece inteira, sem véu vinho por cima. O título continua legível de qualquer jeito.",
+          },
           { text: "Clique em “Salvar o site”." },
           { text: "Para voltar ao fundo vinho, clique em “Remover” na foto e salve." },
         ],
@@ -195,8 +198,8 @@ export const TUTORIAL: TutorialSection[] = [
         hrefLabel: "Abrir Páginas do guia",
         steps: [
           { text: "Abra a página em “Páginas do guia”." },
-          { text: "Em “Imagem de fundo”, clique em “Anexar imagem”." },
-          { text: "Escolha a opacidade da foto." },
+          { text: "Em “Imagem de fundo”, clique em “Anexar imagem”.", note: "Na Visão geral, a foto também tira o brasão do fundo." },
+          { text: "Escolha a opacidade da foto.", note: "Em 100% a foto aparece limpa, sem véu por cima." },
           { text: "Clique em “Salvar página”." },
         ],
       },
