@@ -654,16 +654,20 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lbottom span{font-size:9.5px; letter-spacing:.02em; white-space:nowrap}
 
 /* --- hero vinho --- */
+/* Fundo vinho chapado (era degradê radial) e brasão encostado à direita: só o
+   fim da frase centralizada passa por cima dele. */
 .lhero{position:relative; overflow:hidden; min-height:88vh; display:flex; align-items:center;
-  background:radial-gradient(120% 90% at 70% 10%,var(--wine-soft),var(--wine) 45%,var(--wine-deep));
-  color:#F5EAD2; padding:110px 0 70px}
-.lhero-crest{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none}
-.lhero-crest img{width:min(78vw,620px); opacity:.09}
+  background:var(--wine); color:#F5EAD2; padding:110px 0 70px}
+.lhero-crest{position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-end;
+  padding-right:clamp(0px,1.5vw,26px); pointer-events:none}
+.lhero-crest img{width:min(46vw,430px); opacity:.09}
 .lhero-in{position:relative; text-align:center; max-width:820px}
 .lhero .eyebrow{color:var(--caramel); letter-spacing:.34em}
 .lhero-h1{font-weight:400; font-size:clamp(34px,6.4vw,68px); line-height:1.05; margin:20px 0 0; color:#FBF2DC}
 .lhero-h1 i{font-style:italic; color:var(--caramel)}
-.lhero-sub{margin:22px auto 0; font-size:clamp(15px,2vw,19px); font-weight:300; line-height:1.6; color:#EAD8BC; max-width:44ch}
+/* Mesma família, tamanho, cor e espaçamento do rótulo do topo (.eyebrow). */
+.lhero-sub{margin:26px auto 0; font-size:11.5px; letter-spacing:.34em; text-transform:uppercase;
+  font-weight:400; line-height:1.7; color:var(--caramel); max-width:52ch}
 .lhero-cta{margin-top:34px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
 
 /* --- Sobre nós --- */
@@ -673,7 +677,6 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lsobre-in{position:relative; z-index:1; max-width:720px}
 .lsobre-in .eyebrow{color:var(--wine-soft)}
 .lsobre-in .lead{margin-top:16px}
-.lsobre-in .lead:first-of-type{font-size:clamp(18px,2.4vw,23px); color:var(--wine); font-weight:400; line-height:1.5}
 .lsobre-in .close{margin-top:26px; font-size:clamp(19px,2.6vw,26px); color:var(--wine); font-style:italic}
 
 /* --- Como trabalhamos --- */
@@ -687,14 +690,16 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lcard:hover{background:#FBF7EC; border-color:var(--caramel); box-shadow:var(--shadow); transform:translateY(-4px)}
 .lcard .tag{font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--olive)}
 .lcard h3{font-size:26px; font-weight:400; color:var(--wine); margin:8px 0 0}
-.lcard .desc{margin-top:12px; color:var(--ink); font-weight:300; font-size:14.5px; line-height:1.65}
+.lcard .desc{margin-top:12px; color:var(--ink); font-weight:500; font-size:14.5px; line-height:1.65}
 .lcard ul{margin:16px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px}
-.lcard ul li{position:relative; padding-left:20px; font-size:13.5px; color:var(--muted); line-height:1.5}
-/* Marcador dos tópicos do card: bolinha (era losango). */
+.lcard ul li{position:relative; padding-left:20px; font-size:13.5px; color:var(--ink);
+  font-weight:500; line-height:1.5}
+/* Marcador dos tópicos: bolinha na cor do próprio texto (currentColor), então
+   ela acompanha o item em qualquer card, com ou sem foto de fundo. */
 .lcard ul li::before{content:""; position:absolute; left:1px; top:.55em; width:5px; height:5px;
-  border-radius:50%; background:var(--caramel)}
+  border-radius:50%; background:currentColor}
 .lcard .plus{margin-top:16px; font-size:12px; color:var(--wine-soft); font-style:italic}
-.lcard .foot{margin-top:14px; font-size:13px; color:var(--faint); font-style:italic; line-height:1.5}
+.lcard .foot{margin-top:14px; font-size:13px; color:var(--ink); font-weight:400; font-style:italic; line-height:1.5}
 .lcard .btn.sm{margin-top:auto; align-self:flex-start; padding:11px 20px; font-size:11px}
 /* Folga mínima entre o conteúdo e o botão. O botão continua com margin-top:auto,
  * então os três seguem alinhados na mesma linha; isto só levanta o piso da
@@ -814,9 +819,10 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 
 /* --- páginas próprias --- */
 .lpage{position:relative; overflow:hidden; min-height:78vh; padding:120px 0 70px;
-  background:radial-gradient(120% 90% at 72% 8%,var(--wine-soft),var(--wine) 48%,var(--wine-deep)); color:#F5EAD2}
-.lpage-crest{position:absolute; inset:0; display:flex; align-items:flex-start; justify-content:center; pointer-events:none}
-.lpage-crest img{width:min(70vw,520px); opacity:.08; margin-top:40px}
+  background:var(--wine); color:#F5EAD2}
+.lpage-crest{position:absolute; inset:0; display:flex; align-items:flex-start; justify-content:flex-end;
+  padding-right:clamp(0px,1.5vw,26px); pointer-events:none}
+.lpage-crest img{width:min(46vw,430px); opacity:.08; margin-top:40px}
 .lpage-in{position:relative; z-index:1; max-width:720px}
 .lpage-in .eyebrow{color:var(--caramel)}
 .lpage-h1{font-weight:400; font-size:clamp(32px,5.4vw,56px); line-height:1.05; margin:16px 0 22px; color:#FBF2DC; text-wrap:balance}
