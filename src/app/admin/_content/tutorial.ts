@@ -112,8 +112,8 @@ export const TUTORIAL: TutorialSection[] = [
           { text: "Em “Imagem do card”, escolha “Foto no topo” ou “Foto de fundo”." },
           { text: "Clique em “Anexar imagem” e escolha a foto." },
           {
-            text: "Em “Opacidade da foto”, escolha 100%, 90%, 80% ou 50%.",
-            note: "100% mostra a foto cheia, sem véu por cima. 50% deixa mais suave. O texto do card não muda de cor.",
+            text: "Em “Opacidade da foto”, escolha 90%, 80% ou 50%.",
+            note: "90% mostra a foto o mais forte possível sem apagar o texto do card. 50% deixa mais suave. O texto do card não muda de cor.",
           },
           { text: "Clique em “Salvar o site”." },
         ],

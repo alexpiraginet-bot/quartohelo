@@ -1000,7 +1000,9 @@ export default function GuiaApp({
 
       {menuOpen ? <div className="g2scrim" onClick={() => setMenuOpen(false)} /> : null}
 
-      <div className="g2main" ref={mainRef}>
+      {/* A Visão geral é uma tela vinho, como o Início da landing: a coluna
+          inteira muda de cor, não só o bloco de texto. */}
+      <div className={`g2main${view.kind === "inicio" ? " vinho" : ""}`} ref={mainRef}>
         {/* Fundo da página aberta. Fica aqui, e não dentro da .g2view, porque a
             view tem largura de leitura (900px): lá dentro a foto virava um
             retângulo no meio da tela em vez de fundo da página. */}
