@@ -188,12 +188,14 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2lead{color:var(--muted); font-size:clamp(15px,1.8vw,17px); line-height:1.7; margin-top:12px; max-width:60ch}
 /* Visão geral — boas-vindas com brasão vinho grande ao fundo */
 .g2welcome{position:relative; min-height:72vh; display:flex; align-items:center; padding-block:20px}
-.g2welcome .brasao-bg{position:absolute; inset:0; background:url("/images/brasao-vinho.png") right center/auto 96% no-repeat; opacity:.05; pointer-events:none}
-@media (max-width:760px){ .g2welcome .brasao-bg{background-position:center; opacity:.045} }
+/* Mesmo brasão, mesmo lugar e mesmo tamanho. Muda só a versão do arquivo:
+   sobre o vinho, o desenho vinho ficaria invisível. */
+.g2welcome .brasao-bg{position:absolute; inset:0; background:url("/images/brasao-creme.png") right center/auto 96% no-repeat; opacity:.07; pointer-events:none}
+@media (max-width:760px){ .g2welcome .brasao-bg{background-position:center; opacity:.06} }
 .g2welcome .in{position:relative; z-index:1; max-width:62ch}
-/* Com foto de fundo e sem véu, o texto escuro ganha um halo claro para não
+/* Com foto de fundo e sem véu, o texto claro ganha sombra escura para não
    sumir na imagem. Não altera a foto, só o contorno das letras. */
-.g2welcome.hasbg .in{text-shadow:0 0 2px rgba(250,247,236,.95), 0 1px 3px rgba(250,247,236,.9), 0 1px 18px rgba(250,247,236,.9)}
+.g2welcome.hasbg .in{text-shadow:0 0 2px rgba(28,8,12,.55), 0 1px 4px rgba(28,8,12,.65), 0 2px 28px rgba(28,8,12,.55)}
 .g2welcome .lead-title{margin-top:22px; color:var(--wine); font-weight:400; font-style:italic; font-size:clamp(21px,3vw,32px); line-height:1.28; max-width:22ch}
 /* Título principal em 2 blocos (parte antes do ":" e o restante). Largura
  * folgada para, no desktop, o rótulo caber numa linha; no celular quebra pela
@@ -202,6 +204,23 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2welcome .lead-title.two-lines .lt-line{display:block; text-wrap:balance}
 .g2welcome .lead-title.two-lines .lt-line + .lt-line{margin-top:2px}
 .g2welcome .lead-sub{margin-top:16px; color:var(--muted); font-weight:300; font-size:clamp(15px,1.9vw,17.5px); line-height:1.8; max-width:54ch}
+
+/* ---- Visão geral: tela vinho chapada, no espírito do Início da landing ---- */
+.g2main.vinho{background:var(--wine)}
+.g2main.vinho .g2top{background:color-mix(in srgb,var(--wine) 86%,transparent);
+  border-bottom-color:rgba(239,227,203,.14)}
+.g2main.vinho .g2top .baby{color:#EFE3CB}
+.g2main.vinho .g2top .baby i{color:rgba(239,227,203,.6)}
+.g2main.vinho .g2top .out{color:rgba(239,227,203,.72)}
+.g2main.vinho .g2top .out:hover{color:#FBF2DC}
+.g2main.vinho .g2burger span{background:#EFE3CB}
+.g2main.vinho .g2welcome .eyebrow{color:var(--caramel)}
+.g2main.vinho .g2welcome .g2h1{color:#FBF2DC}
+.g2main.vinho .g2welcome .lead-title{color:var(--caramel)}
+.g2main.vinho .g2welcome .lead-sub{color:#EAD8BC}
+/* Foto de fundo nesta tela escurece para o vinho, não para o creme. */
+.g2main.vinho .g2bg .veil{background:var(--wine-deep)}
+
 /* Callout único "Dica da Helô" — discreto e complementar: nunca compete com o
  * título nem com o texto principal. Fundo claro sutil + acento delicado. */
 /* Dica da Helô — card em destaque: fundo vinho e letra clara, onde quer que

@@ -37,10 +37,12 @@ export function CardMediaTop({ image }: { image?: CardImage | null }) {
 export function CardMediaBg({ image }: { image?: CardImage | null }) {
   if (!cardHasBg(image)) return null;
   const op = opacityOf(image!, DEFAULT_BG_OPACITY);
-  // O véu creme acompanha a opacidade escolhida: em 50% ele fica em 0,18 (como
-  // sempre esteve) e em 100% chega a zero, deixando a foto cheia. Quem protege
-  // o texto é a cor escura dele em .lcard.has-bg, não o véu.
-  const veil = (1 - op) * 0.36;
+  // O véu creme acompanha a opacidade escolhida (0,18 em 50%, como sempre
+  // esteve), mas nunca some de todo: o card tem texto escuro por cima da foto,
+  // e sem um mínimo de véu uma foto escura torna a leitura impossível. Por isso
+  // a foto de fundo do card vai até 90%, e não até 100% como o fundo das
+  // páginas, onde não há texto escuro por cima.
+  const veil = Math.max(0.12, (1 - op) * 0.36);
   return (
     <div className="card-media-bg" aria-hidden="true">
       <span className="ph" style={{ backgroundImage: `url(${image!.url})`, opacity: op }} />
