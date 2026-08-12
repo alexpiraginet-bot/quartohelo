@@ -70,6 +70,24 @@ então o Atendente registra o pedido em vez de ensinar autosserviço. O fluxo é
 - **Não cite identificadores de modelo de IA** em commits, PRs, código ou docs.
 - Antes de concluir: `npm run build` verde e conferência no deploy quando for visual.
 
+## ⚠️ A máquina da sessão volta no tempo
+
+A sessão roda numa máquina efêmera. Quando ela é reciclada, o disco volta para um instantâneo
+antigo: o `HEAD` retrocede vários merges e os arquivos das entregas recentes somem. Isso não passa
+pelo git, então **não aparece no reflog**.
+
+O sintoma engana: o hook de parada acusa "alterações não commitadas" e pede um commit. Commitar
+esse estado **reverteria em produção tudo que já foi mergeado**.
+
+- **A verdade é o GitHub**, nunca o disco. Publique cedo, não acumule trabalho local.
+- Antes de editar qualquer coisa, confira onde você está: `git log --oneline -1`.
+- Diante de um aviso de "alterações não commitadas", compare o disco inteiro com o `origin/main`
+  antes de commitar (índice temporário + `git read-tree` + `git add -A` + `git diff --cached`).
+  Se o resultado for só remoção, o disco está velho.
+- Conserto: `git fetch origin main && git checkout -f -B <ramo> origin/main`.
+- `.claude/hooks/ressincroniza-checkout.sh` faz isso sozinho no início da sessão, e só quando não
+  há commit local fora do `origin/main`.
+
 ## Pendências conhecidas
 
 - Admin **gravável** (CRUD de categorias, itens, decisões, fornecedores e conteúdo da landing).

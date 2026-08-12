@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/ressincroniza-checkout.sh",
+            "timeout": 30,
+            "statusMessage": "Conferindo se o checkout está no main…"
+          }
+        ]
+      }
+    ]
+  }
+}
