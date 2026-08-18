@@ -395,8 +395,11 @@ export default function GuiaApp({
           <button type="button" className="btn primary" onClick={enter}>
             Entrar no guia
           </button>
+          {/* Levava a etiqueta "quartodahelo.com", endereço que ainda não
+              existe: quem lesse e digitasse não chegava a lugar nenhum. O
+              destino sempre foi a landing, então a etiqueta passa a dizer isso. */}
           <Link className="site" href="/">
-            quartodahelo.com
+            Conheça o estúdio
           </Link>
         </div>
       </div>

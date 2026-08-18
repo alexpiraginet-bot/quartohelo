@@ -66,7 +66,7 @@ export const TUTORIAL: TutorialSection[] = [
   {
     id: "site",
     title: "Landing page",
-    intro: "A página que abre em quartodahelo.com.",
+    intro: "A primeira página do site, a que abre quando alguém entra no endereço.",
     tasks: [
       {
         id: "ver-antes",
