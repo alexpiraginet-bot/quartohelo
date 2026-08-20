@@ -27,14 +27,16 @@ export function ScriptsLex() {
   }
 
   // data-safe-bottom: acima do dock (nav.lbottom) do site, para a pílula não
-  // nascer em cima da navegação.
+  // nascer em cima da navegação. O valor é 92 dividido pelo zoom de 0,7 que o
+  // globals.css aplica em [data-lex-cta]: o zoom encolhe também essa folga, e
+  // 131 devolve na tela o mesmo respiro de antes.
   return (
     <Script
       src="https://alex-hub-three.vercel.app/lex-cta.js"
       data-app="quartohelo"
       data-label="site do Quarto da Helô"
       data-delay="12000"
-      data-safe-bottom="92"
+      data-safe-bottom="131"
       data-bg="linear-gradient(155deg,#67232B,#4A171F)"
       data-fg="#F3EBDB"
       data-muted="#E4D2B4"

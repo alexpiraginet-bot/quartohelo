@@ -861,6 +861,15 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lpage-in .lpage-list + .lead{margin-top:18px}
 .lpage-in .lpage-list + .lpage-list{margin-top:11px}
 .lpage-note{margin-top:20px; color:var(--caramel); font-style:italic; font-family:"Fraunces",Georgia,serif; font-size:clamp(15px,2vw,18px); line-height:1.4}
+/* A pílula da Lex vem do LEX HUB e não aceita tamanho por atributo (só cor,
+   lado, atraso e safe-bottom), e o conteúdo dela mora em shadow DOM. O que
+   alcançamos daqui é a âncora dela: um div 0x0 no canto inferior esquerdo.
+   É zoom, e não transform, de propósito: a pílula é position:fixed dentro do
+   shadow, e um transform no ancestral a faz medir contra esse div de largura
+   zero, quebrando o texto em três linhas para fora da cápsula. O zoom preserva
+   o layout e encolhe 30% a pílula e o painel que ela abre. */
+[data-lex-cta]{zoom:.7}
+
 .lpage-cta{margin-top:30px}
 /* O guia ainda não abriu, então no lugar do botão fica o aviso. Não é botão nem
    card: é a mesma voz da frase de fecho do "Sobre nós" (Fraunces itálica, mesmo
