@@ -862,10 +862,12 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lpage-in .lpage-list + .lpage-list{margin-top:11px}
 .lpage-note{margin-top:20px; color:var(--caramel); font-style:italic; font-family:"Fraunces",Georgia,serif; font-size:clamp(15px,2vw,18px); line-height:1.4}
 .lpage-cta{margin-top:30px}
-/* O guia ainda não abriu, então no lugar do botão fica o aviso. Mesma forma e
-   posição do botão, sem cara de clicável: contorno em vez de preenchimento. */
-.lpage-soon{display:inline-block; font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
-  padding:13px 22px; border-radius:999px; border:1px solid rgba(210,181,142,.5); color:var(--caramel)}
+/* O guia ainda não abriu, então no lugar do botão fica o aviso. Não é botão nem
+   card: é a mesma voz da frase de fecho do "Sobre nós" (Fraunces itálica, mesmo
+   corpo), centralizada na coluna. Em caramelo porque aqui o fundo é vinho. */
+.lpage-soon{display:block; text-align:center; margin:16px 0 4px;
+  font-family:"Fraunces",Georgia,serif; font-style:italic; font-size:clamp(19px,2.6vw,26px);
+  line-height:1.3; color:var(--caramel)}
 .lback{display:inline-block; margin-top:34px; color:var(--caramel); text-decoration:none; font-size:13px; letter-spacing:.1em}
 .lback:hover{color:#FBF2DC}
 
