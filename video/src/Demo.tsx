@@ -7,8 +7,11 @@ import { AbsoluteFill, Img, interpolate, Sequence, spring, staticFile, useCurren
  * movimento lento por cima (o olho precisa de movimento para não ler a peça
  * como slide) e uma legenda dizendo o que aquela tela resolve.
  *
- * A peça é assumidamente uma demonstração, e a capa diz isso: o guia ainda não
- * abriu, e o vídeo não pode sugerir que já está à venda.
+ * A quem a peça fala: a mãe grávida, não o comprador de software. Por isso as
+ * legendas falam do que ela sente, e não do que o sistema faz.
+ *
+ * O guia ainda não abriu, então o fecho carrega a ressalva de que isto é uma
+ * demonstração. Ela fica no fim, e não na abertura, para não gelar a entrada.
  */
 
 const VINHO = "#67232B";
@@ -16,10 +19,11 @@ const VINHO_FUNDO = "#4A171F";
 const CREME = "#F5EAD2";
 const CARAMELO = "#D2B58E";
 
-export const DURACAO_CENA = 105;
+// Peça para mãe grávida: ritmo mais lento que o de uma demonstração técnica.
+export const DURACAO_CENA = 120;
 const TRANSICAO = 14;
-const ABERTURA = 66;
-const FECHO = 84;
+const ABERTURA = 84;
+const FECHO = 108;
 
 interface Cena {
   arquivo: string;
@@ -27,15 +31,18 @@ interface Cena {
   linha: string;
 }
 
+/* As legendas falam com a mãe, não sobre o produto. Quem assiste está grávida,
+ * com um quarto para montar e pouca paciência para catálogo. Então cada tela
+ * responde ao que ela sente, não ao que o sistema faz. */
 export const CENAS: Cena[] = [
-  { arquivo: "1-capa.jpg", titulo: "Abre no navegador", linha: "Sem baixar nada, sem instalar aplicativo." },
-  { arquivo: "2-visao-geral.jpg", titulo: "Fala com ela pelo nome", linha: "O guia sabe de quem é o quarto desde a primeira tela." },
-  { arquivo: "3-conteudo.jpg", titulo: "Primeiro o critério", linha: "Medidas, circulação e cronograma antes de qualquer compra." },
-  { arquivo: "4-decisao.jpg", titulo: "A decisão de cada item", linha: "Quando usar, quando não usar e o erro mais comum." },
-  { arquivo: "5-faixas.jpg", titulo: "Três faixas de investimento", linha: "Com foto, preço e o fornecedor de cada peça." },
-  { arquivo: "6-escolha.jpg", titulo: "Ela escolhe", linha: "A escolha fica marcada e acompanha o projeto." },
-  { arquivo: "7-moodboard.jpg", titulo: "O moodboard se monta sozinho", linha: "Cada escolha entra na prancha do quarto." },
-  { arquivo: "8-investimento.jpg", titulo: "E o quarto fecha com valor", linha: "A soma se atualiza a cada decisão." },
+  { arquivo: "1-capa.jpg", titulo: "Você abre quando puder", linha: "De madrugada, na sala de espera, no fim do dia." },
+  { arquivo: "2-visao-geral.jpg", titulo: "O guia chama vocês pelo nome", linha: "O nome do seu bebê está ali desde a primeira tela." },
+  { arquivo: "3-conteudo.jpg", titulo: "Primeiro, o que ninguém conta", linha: "Medidas, circulação e a ordem certa de montar." },
+  { arquivo: "4-decisao.jpg", titulo: "A Helô decide junto com você", linha: "Quando usar, quando não usar e o erro que quase todo mundo comete." },
+  { arquivo: "5-faixas.jpg", titulo: "As opções já vêm escolhidas", linha: "Você decide quanto investir, não se está certo." },
+  { arquivo: "6-escolha.jpg", titulo: "No seu tempo", linha: "Escolhe hoje, muda de ideia amanhã. O guia acompanha." },
+  { arquivo: "7-moodboard.jpg", titulo: "E o quarto vai aparecendo", linha: "Cada escolha entra na prancha do seu bebê." },
+  { arquivo: "8-investimento.jpg", titulo: "Com a conta sempre à vista", linha: "Você sabe quanto custa antes de comprar." },
 ];
 
 export const duracaoTotal = () => ABERTURA + CENAS.length * DURACAO_CENA + FECHO;
@@ -57,7 +64,7 @@ const Rotulo: React.FC<{ texto: string; cor?: string }> = ({ texto, cor = CARAME
 );
 
 /** Abertura e fecho: vinho, brasão à direita, como a capa do site. */
-const Cartao: React.FC<{ rotulo: string; titulo: string; linha: string; frames: number }> = ({ rotulo, titulo, linha, frames }) => {
+const Cartao: React.FC<{ rotulo: string; titulo: string; linha: string; nota?: string; frames: number }> = ({ rotulo, titulo, linha, nota, frames }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const entra = spring({ frame, fps, config: { damping: 200 }, durationInFrames: 30 });
@@ -72,6 +79,13 @@ const Cartao: React.FC<{ rotulo: string; titulo: string; linha: string; frames: 
         <Rotulo texto={rotulo} />
         <div style={{ fontFamily: "Fraunces", fontSize: 76, lineHeight: 1.05, color: "#FBF2DC", marginTop: 22 }}>{titulo}</div>
         <div style={{ fontFamily: "Fraunces", fontStyle: "italic", fontSize: 30, color: CARAMELO, marginTop: 20 }}>{linha}</div>
+        {/* A ressalva de que é uma demonstração vive aqui, discreta: o acesso
+            ainda não abriu e a peça não pode sugerir o contrário. */}
+        {nota ? (
+          <div style={{ fontFamily: "Jost", fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(239,227,203,.45)", marginTop: 34 }}>
+            {nota}
+          </div>
+        ) : null}
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -116,7 +130,12 @@ export const Demo: React.FC = () => (
   <AbsoluteFill style={{ background: VINHO_FUNDO }}>
     <Fontes />
     <Sequence durationInFrames={ABERTURA}>
-      <Cartao rotulo="Quarto da Helô · Collection Nº 01" titulo="O Fim da Dúvida" linha="Uma demonstração do guia interativo." frames={ABERTURA} />
+      <Cartao
+        rotulo="Quarto da Helô · Collection Nº 01"
+        titulo="Enquanto o bebê não chega"
+        linha="o quarto vai nascendo com você."
+        frames={ABERTURA}
+      />
     </Sequence>
     {CENAS.map((cena, i) => (
       <Sequence key={cena.arquivo} from={ABERTURA + i * DURACAO_CENA} durationInFrames={DURACAO_CENA}>
@@ -124,7 +143,13 @@ export const Demo: React.FC = () => (
       </Sequence>
     ))}
     <Sequence from={ABERTURA + CENAS.length * DURACAO_CENA} durationInFrames={FECHO}>
-      <Cartao rotulo="O Fim da Dúvida" titulo="Em breve" linha="O guia completo para montar o quarto do seu bebê." frames={FECHO} />
+      <Cartao
+        rotulo="O Fim da Dúvida"
+        titulo="Nenhum quarto é igual"
+        linha="Enquanto isso, você vive a melhor parte: a espera."
+        nota="Demonstração das telas · o acesso abre em breve"
+        frames={FECHO}
+      />
     </Sequence>
   </AbsoluteFill>
 );
