@@ -33,16 +33,27 @@ interface Cena {
 
 /* As legendas falam com a mãe, não sobre o produto. Quem assiste está grávida,
  * com um quarto para montar e pouca paciência para catálogo. Então cada tela
- * responde ao que ela sente, não ao que o sistema faz. */
+ * responde ao que ela sente, não ao que o sistema faz.
+ *
+ * Duas regras que já custaram uma reescrita:
+ *
+ *  1. Nunca vender o mecanismo. "O guia chama vocês pelo nome" descrevia o
+ *     truque de imprimir um nome, que qualquer PDF automático faz. O que
+ *     importa é que a curadoria já estava pronta esperando por ela.
+ *  2. O sujeito é a mãe ou o quarto, nunca o guia. Produto que "chama",
+ *     "acompanha" e "decide" vira personagem e esfria a peça. */
 export const CENAS: Cena[] = [
   { arquivo: "1-capa.jpg", titulo: "Você abre quando puder", linha: "De madrugada, na sala de espera, no fim do dia." },
-  { arquivo: "2-visao-geral.jpg", titulo: "O guia chama vocês pelo nome", linha: "O nome do seu bebê está ali desde a primeira tela." },
+  { arquivo: "2-visao-geral.jpg", titulo: "Pensado para você", linha: "Você não começa do zero. A curadoria já foi feita para vocês." },
   { arquivo: "3-conteudo.jpg", titulo: "Primeiro, o que ninguém conta", linha: "Medidas, circulação e a ordem certa de montar." },
   { arquivo: "4-decisao.jpg", titulo: "A Helô decide junto com você", linha: "Quando usar, quando não usar e o erro que quase todo mundo comete." },
-  { arquivo: "5-faixas.jpg", titulo: "As opções já vêm escolhidas", linha: "Você decide quanto investir, não se está certo." },
-  { arquivo: "6-escolha.jpg", titulo: "No seu tempo", linha: "Escolhe hoje, muda de ideia amanhã. O guia acompanha." },
-  { arquivo: "7-moodboard.jpg", titulo: "E o quarto vai aparecendo", linha: "Cada escolha entra na prancha do seu bebê." },
-  { arquivo: "8-investimento.jpg", titulo: "Com a conta sempre à vista", linha: "Você sabe quanto custa antes de comprar." },
+  // Três faixas mesmo: Acessível, Médio e Alto padrão (TIER_LABEL).
+  { arquivo: "5-faixas.jpg", titulo: "Três faixas, o mesmo critério", linha: "Você decide quanto investir, não se está certo." },
+  { arquivo: "6-escolha.jpg", titulo: "Dá para mudar de ideia", linha: "Escolhe hoje, troca amanhã. O quarto acompanha." },
+  // Enquanto a curadoria não tiver foto em toda categoria, o moodboard é mais
+  // lista do que imagem. A legenda fala do que a tela cumpre hoje.
+  { arquivo: "7-moodboard.jpg", titulo: "Tudo junto, num lugar só", linha: "Cada escolha entra no moodboard do seu bebê." },
+  { arquivo: "8-investimento.jpg", titulo: "A conta fica à vista", linha: "Você sabe quanto custa antes de comprar." },
 ];
 
 export const duracaoTotal = () => ABERTURA + CENAS.length * DURACAO_CENA + FECHO;
@@ -143,10 +154,12 @@ export const Demo: React.FC = () => (
       </Sequence>
     ))}
     <Sequence from={ABERTURA + CENAS.length * DURACAO_CENA} durationInFrames={FECHO}>
+      {/* O fecho é onde a memória assenta, então é ele que carrega o que a peça
+          precisa provar: um guia por mãe, montado à mão, não um PDF em série. */}
       <Cartao
         rotulo="O Fim da Dúvida"
-        titulo="Nenhum quarto é igual"
-        linha="Enquanto isso, você vive a melhor parte: a espera."
+        titulo="Nenhum guia é igual"
+        linha="Cada um é feito para uma mãe só, com cuidado."
         nota="Demonstração das telas · o acesso abre em breve"
         frames={FECHO}
       />

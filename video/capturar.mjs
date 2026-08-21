@@ -89,20 +89,34 @@ await page.waitForTimeout(900);
 await tirar("6-escolha");
 
 /* Mais três escolhas, em silêncio, para o moodboard e a soma terem substância
- * na tela final. Um projeto com um item só não mostra o que o guia faz. */
-for (const item of ["Cômoda", "Poltrona", "Tapete"]) {
+ * na tela final. Um projeto com um item só não mostra o que o guia faz.
+ *
+ * Só entram itens que têm preço na curadoria de hoje. Item sem preço aparece
+ * como "Definir valor" na análise financeira, bem em cima da legenda que diz
+ * que a conta fica à vista, e uma tela desmente a outra. Daí a lista de
+ * candidatos: pega os três primeiros que tiverem opção com preço. Quando a
+ * curadoria crescer, qualquer um deles serve.
+ *
+ * A ordem também conta uma história de quarto: parede, chão, enxoval. */
+const CANDIDATOS = ["Papel de parede", "Tapete", "Enxoval berço", "Cortina", "Pendente"];
+let escolhidos = 0;
+for (const item of CANDIDATOS) {
+  if (escolhidos === 3) break;
   const link = page.locator(`.g2side a:has-text('${item}'), .g2side button:has-text('${item}')`).first();
   if (!(await link.count())) continue;
   await link.click();
   await page.waitForTimeout(700);
   await page.click(".g2opts button:has-text('Menina')").catch(() => {});
   await page.waitForTimeout(600);
-  // Só opções com preço: "Definir valor" na soma final estraga a tela que
-  // justamente mostra o orçamento do quarto fechando.
-  const comPreco = page.locator(".g2card", { hasText: "R$" }).locator("button:has-text('Escolher')").first();
-  const escolher = (await comPreco.count()) ? comPreco : page.locator(".g2card button:has-text('Escolher')").first();
-  if (await escolher.count()) await escolher.click();
+  const escolher = page.locator(".g2card", { hasText: "R$" }).locator("button:has-text('Escolher')").first();
+  if (!(await escolher.count())) {
+    console.log("sem preço, pulei:", item);
+    continue;
+  }
+  await escolher.click();
   await page.waitForTimeout(500);
+  escolhidos += 1;
+  console.log("escolhi:", item);
 }
 
 // O resultado: moodboard e lista de investimento.
