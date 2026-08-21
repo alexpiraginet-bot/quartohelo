@@ -1,0 +1,16 @@
+{
+  "name": "quartohelo-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Vídeo demonstrativo do Guia Digital. Projeto separado do site: as dependências do Remotion não entram no build da Vercel.",
+  "scripts": {
+    "render": "remotion render src/index.ts guia ../public/video/guia-demo.mp4 --codec=h264 --crf=26",
+    "studio": "remotion studio src/index.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.0"
+  }
+}
