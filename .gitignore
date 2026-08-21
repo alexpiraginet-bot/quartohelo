@@ -141,3 +141,7 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# projeto do vídeo: dependências e cache do Remotion
+video/node_modules/
+video/.remotion/

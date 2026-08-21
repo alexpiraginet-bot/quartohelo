@@ -871,12 +871,37 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 [data-lex-cta]{zoom:.7}
 
 .lpage-cta{margin-top:30px}
-/* O guia ainda não abriu, então no lugar do botão fica o aviso. Não é botão nem
-   card: é a mesma voz da frase de fecho do "Sobre nós" (Fraunces itálica, mesmo
-   corpo), centralizada na coluna. Em caramelo porque aqui o fundo é vinho. */
-.lpage-soon{display:block; text-align:center; margin:16px 0 4px;
-  font-family:"Fraunces",Georgia,serif; font-style:italic; font-size:clamp(19px,2.6vw,26px);
+/* O guia ainda não abriu, então no lugar do botão de entrar fica o aviso, na
+   mesma voz da frase de fecho do "Sobre nós" (Fraunces itálica, mesmo corpo).
+   Ele abre a demonstração, então precisa parecer clicável sem virar botão:
+   quem faz esse trabalho é o triângulo e a linha de apoio embaixo. */
+.lsoon-btn{display:flex; flex-direction:column; align-items:center; gap:6px; margin:16px auto 4px;
+  background:none; border:0; padding:8px 12px; cursor:pointer; font-family:inherit; color:inherit;
+  transition:transform .25s ease}
+.lsoon-btn:hover{transform:translateY(-2px)}
+.lsoon-play{width:0; height:0; border-left:13px solid var(--caramel);
+  border-top:8px solid transparent; border-bottom:8px solid transparent; margin-bottom:2px}
+.lsoon-t{font-family:"Fraunces",Georgia,serif; font-style:italic; font-size:clamp(19px,2.6vw,26px);
   line-height:1.3; color:var(--caramel)}
+.lsoon-hint{font-size:10.5px; letter-spacing:.26em; text-transform:uppercase; color:rgba(210,181,142,.72)}
+.lsoon-btn:hover .lsoon-hint{color:var(--caramel)}
+
+/* Player flutuante: fica sobre a página, sem levar ninguém para fora dela. */
+.vmodal{position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center;
+  padding:20px; background:rgba(28,8,12,.86); backdrop-filter:blur(6px)}
+.vmodal-in{position:relative; width:min(1040px,100%)}
+.vmodal-v{display:block; width:100%; max-height:78vh; border-radius:10px; background:#1C080C;
+  box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.vmodal-x{position:absolute; top:-14px; right:-8px; width:40px; height:40px; border-radius:50%;
+  border:1px solid rgba(239,227,203,.35); background:var(--wine); color:#F5EAD2; font-size:22px;
+  line-height:1; cursor:pointer; font-family:inherit}
+.vmodal-x:hover{background:var(--wine-soft)}
+.vmodal-nota{margin:12px 0 0; text-align:center; font-size:11px; letter-spacing:.2em;
+  text-transform:uppercase; color:rgba(239,227,203,.6)}
+@media (max-width:620px){
+  .vmodal{padding:14px}
+  .vmodal-x{top:-46px; right:0}
+}
 .lback{display:inline-block; margin-top:34px; color:var(--caramel); text-decoration:none; font-size:13px; letter-spacing:.1em}
 .lback:hover{color:#FBF2DC}
 

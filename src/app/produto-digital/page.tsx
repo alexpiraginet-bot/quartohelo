@@ -1,4 +1,5 @@
 import { getSiteContent } from "@/lib/content";
+import { VideoDemo } from "@/app/_components/VideoDemo";
 import { WA_MSG } from "@/lib/whatsapp";
 import { PageShell } from "../_components/PageShell";
 import type { SitePage } from "@/lib/types";
@@ -12,9 +13,10 @@ export default async function Page() {
   return (
     <PageShell page={s.digitalPage ?? FALLBACK} whatsapp={s.whatsapp} waMessage={WA_MSG.guia} footerTagline={s.footerTagline}>
       <div className="lpage-cta">
-        {/* O botão "Entrar no guia" sai enquanto o guia não abre. Quando abrir,
-            volta um <Link className="btn primary" href="/guia"> aqui. */}
-        <span className="lpage-soon">Em breve</span>
+        {/* O botão "Entrar no guia" sai enquanto o guia não abre. No lugar, o
+            aviso abre a demonstração em vídeo. Quando o guia abrir, volta um
+            <Link className="btn primary" href="/guia"> aqui. */}
+        <VideoDemo />
       </div>
     </PageShell>
   );
