@@ -311,7 +311,10 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .g2cards .c{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px clamp(18px,2.2vw,24px)}
 .g2cards .c .n{font-weight:400; font-size:30px; color:var(--rose); line-height:1; letter-spacing:.02em}
 .g2cards .c b{display:block; margin-top:14px; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--wine)}
-.g2cards .c span{display:block; margin-top:8px; color:var(--muted); font-size:14px; line-height:1.65}
+/* pre-line: o texto do card pode vir em linhas (as microetapas do Método).
+   Cards sem quebra de linha continuam iguais. */
+.g2cards .c span{display:block; margin-top:8px; color:var(--muted); font-size:14px; line-height:1.65;
+  white-space:pre-line}
 /* Citação de fechamento */
 .g2quote{margin:30px 0 0; padding:6px 0 6px 22px; border-left:2px solid var(--caramel); font-style:italic; font-weight:300; color:var(--wine); font-size:clamp(17px,2.2vw,21px); line-height:1.5; max-width:60ch}
 
@@ -976,11 +979,15 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .lport-head .lead{margin-top:14px}
 .lport-empty{margin-top:26px; color:var(--muted); font-style:italic; font-size:15px}
 .lport-carousel{margin-top:34px; position:relative}
+/* O acervo dos quartos é fotografado em pé (2:3). Num quadro deitado a foto
+   viraria uma tira do meio, então o quadro acompanha a foto e fica centralizado.
+   `contain` garante que nada seja cortado quando entrar uma foto deitada. */
 .lport-carousel .frame{position:relative; border-radius:20px; overflow:hidden; background:var(--bone);
-  border:1px solid var(--line); box-shadow:var(--shadow-sm); aspect-ratio:16/9}
+  border:1px solid var(--line); box-shadow:var(--shadow-sm); aspect-ratio:2/3;
+  max-width:520px; margin:0 auto}
 .lport-carousel .slide{position:absolute; inset:0; margin:0; opacity:0; transition:opacity .6s ease; pointer-events:none}
 .lport-carousel .slide.on{opacity:1; pointer-events:auto}
-.lport-carousel .slide img{width:100%; height:100%; object-fit:cover; display:block}
+.lport-carousel .slide img{width:100%; height:100%; object-fit:contain; display:block}
 .lport-carousel .pnav{position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%;
   border:1px solid rgba(74,23,31,.18); background:rgba(250,247,236,.86); color:var(--wine-deep);
   font-size:26px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
@@ -994,9 +1001,12 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
   background:transparent; cursor:pointer; padding:0; transition:background .2s, transform .2s}
 .lport-carousel .dots .d.on{background:var(--wine); transform:scale(1.2)}
 .lport-carousel .dots .d:focus-visible{outline:2px solid var(--wine-deep); outline-offset:2px}
+/* Acervo grande: no lugar de uma fileira de centenas de bolinhas, a posição. */
+.lport-carousel .pconta{margin-top:16px; text-align:center; font-size:12px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--olive)}
+.lport-carousel .pconta span{opacity:.5; margin:0 2px}
 @media (prefers-reduced-motion:reduce){ .lport-carousel .slide{transition:none} }
 @media (max-width:700px){
-  .lport-carousel .frame{aspect-ratio:4/3}
   .lport-carousel .pnav{width:38px; height:38px; font-size:22px}
 }
 .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
@@ -1009,6 +1019,23 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .adm-photoop{display:flex; flex-direction:column; gap:12px}
 .adm-portfolio{display:flex; flex-direction:column; gap:14px}
 .adm-portfolio .adm-empty{font-size:13.5px; color:var(--muted); font-style:italic; margin:0}
+/* Grade de curadoria: com um acervo grande, escolher o que fica é olhar as
+   fotos lado a lado, não rolar uma lista de centenas de linhas. */
+.adm-portbar{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.adm-portbar span{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--olive)}
+.adm-porthint{margin:0; font-size:12.5px; color:var(--muted)}
+.adm-portgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:10px}
+.adm-portgrid .tile{position:relative; aspect-ratio:2/3; border-radius:10px; overflow:hidden;
+  border:1px solid var(--line); background:#FDFBF4}
+.adm-portgrid .tile img{width:100%; height:100%; object-fit:cover; display:block}
+.adm-portgrid .tile .vazio{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:11px; color:var(--faint)}
+.adm-portgrid .tile .pos{position:absolute; left:6px; bottom:6px; padding:2px 6px; border-radius:6px;
+  background:rgba(250,247,236,.9); font-size:11px; color:var(--olive)}
+.adm-portgrid .tile .rm{position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%;
+  border:1px solid var(--line); background:rgba(255,255,255,.92); color:var(--wine-deep); cursor:pointer;
+  font-size:15px; line-height:1; padding:0}
+.adm-portgrid .tile .rm:hover{border-color:var(--wine); background:#fff}
 .adm-portrow{display:flex; gap:12px; align-items:flex-start; border:1px dashed var(--line);
   border-radius:12px; padding:12px; background:#fff}
 .adm-portrow .bd{flex:1; display:flex; flex-direction:column; gap:10px; min-width:0}
