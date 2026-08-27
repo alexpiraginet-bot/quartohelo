@@ -29,6 +29,11 @@ export function CardImageField({
   folder: string;
 }) {
   const [mode, setMode] = useState<CardImageMode>(value?.mode ?? "none");
+  /* A foto anexada mora aqui, e não só dentro do ImageField: em "Sem imagem" o
+   * anexador sai da tela, e quem guardasse a URL lá dentro a perderia. Quem
+   * anexasse uma foto, passasse por "Sem imagem" e voltasse salvaria o card sem
+   * imagem, com o arquivo já subido e órfão no Storage. */
+  const [url, setUrl] = useState(value?.url ?? "");
   // Opacidade já salva (quando é uma das oferecidas) ou o padrão do modo, para
   // um card que já estava configurado continuar exatamente como está.
   const saved = typeof value?.opacity === "number" ? value.opacity : null;
@@ -60,9 +65,10 @@ export function CardImageField({
           <ImageField
             name={`${prefix}_img_url`}
             label="Arquivo da imagem"
-            value={value?.url}
+            value={url}
             folder={folder}
             hint="Anexe a foto — ela é otimizada automaticamente."
+            onChange={setUrl}
           />
           <div className="adm-cardimg-op">
             <span className="lbl">Opacidade da foto</span>

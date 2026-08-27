@@ -26,6 +26,12 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
   const [reduced, setReduced] = useState(false);
   // Muda a cada interação manual, só para reiniciar o cronômetro do automático.
   const [tick, setTick] = useState(0);
+  // O automático só corre com o carrossel à vista e a aba na frente. Sem isso,
+  // uma página esquecida aberta iria trocando de foto sozinha e, de 6 em 6
+  // segundos, baixando mais uma: em quarenta minutos teria baixado o acervo
+  // inteiro, justamente o que a janela de três lâminas evita.
+  const [rodando, setRodando] = useState(true);
+  const caixa = useRef<HTMLDivElement>(null);
   const touchX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -43,26 +49,56 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
     }
   }, [total]);
 
-  // Troca automática: segue rodando mesmo com o mouse em cima ou depois de a
-  // pessoa usar a seta. Só não roda com uma foto só ou com movimento reduzido.
   useEffect(() => {
-    if (reduced || total < 2) return;
+    const el = caixa.current;
+    let naTela = true;
+    const aplicar = () => setRodando(naTela && !document.hidden);
+    const obs =
+      el && typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            ([e]) => {
+              naTela = e.isIntersecting;
+              aplicar();
+            },
+            { threshold: 0.2 },
+          )
+        : null;
+    if (obs && el) obs.observe(el);
+    document.addEventListener("visibilitychange", aplicar);
+    return () => {
+      obs?.disconnect();
+      document.removeEventListener("visibilitychange", aplicar);
+    };
+  }, []);
+
+  // Troca automática: segue rodando mesmo com o mouse em cima ou depois de a
+  // pessoa usar a seta. Não roda com uma foto só, com movimento reduzido, nem
+  // com o carrossel fora da vista.
+  useEffect(() => {
+    if (reduced || total < 2 || !rodando) return;
     const t = window.setInterval(() => setI((c) => (c + 1) % total), AUTOPLAY_MS);
     return () => window.clearInterval(t);
-  }, [reduced, total, tick]);
+  }, [reduced, total, tick, rodando]);
 
   if (!total) return null;
 
-  // Distância circular até a foto atual: 0 é a que está à vista, 1 são as
-  // vizinhas (que precisam estar montadas para a transição acontecer).
+  /* Distância circular até a foto atual: 0 é a que está à vista, 1 são as
+   * vizinhas (que precisam estar montadas para a transição acontecer).
+   *
+   * Enquanto há bolinhas, tudo fica montado: por elas dá para pular para
+   * qualquer posição, e uma lâmina que nasce já visível não faz transição
+   * nenhuma (o navegador não tem estilo anterior para animar) e ainda apareceria
+   * vazia até a foto baixar. A janela só entra quando as bolinhas saem, que é
+   * quando a navegação passa a ser de uma em uma. */
   const perto = (n: number) => {
-    if (total <= 3) return true;
+    if (total <= MAX_BOLINHAS) return true;
     const frente = (n - i + total) % total;
     return Math.min(frente, total - frente) <= 1;
   };
 
   return (
     <div
+      ref={caixa}
       className="lport-carousel"
       role="group"
       aria-roledescription="carrossel"
@@ -85,6 +121,11 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
         {photos.map((p, n) =>
           perto(n) ? (
             <figure key={`${p.url}-${n}`} className={`slide${n === i ? " on" : ""}`} aria-hidden={n !== i}>
+              {/* Fundo desfocado da própria foto: o quadro é em pé, como quase
+                  todo o acervo, então uma foto deitada sobraria faixa. Nas fotos
+                  em pé este fundo fica todo coberto e não muda nada. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="fundo" src={p.url} alt="" aria-hidden="true" draggable={false} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={p.url}
