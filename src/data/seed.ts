@@ -150,6 +150,48 @@ export const seedGuidePages: GuidePage[] = [
     order: 1,
   },
   {
+    slug: "metodo",
+    title: "O Método Quarto Assinado",
+    eyebrow: "Cinco passos, do sonho ao encanto",
+    paragraphs: [
+      "Todo quarto que a Helô assina percorre o mesmo caminho. São cinco passos, nesta ordem, do primeiro sonho até o dia de receber o bebê.",
+      "Você não precisa guardar isso. O guia te leva por eles, um de cada vez.",
+    ],
+    /* Cada card tem o objetivo do passo na primeira linha e as microetapas
+     * abaixo, uma por linha. As quebras de linha aparecem na tela porque o
+     * texto do card é renderizado com white-space:pre-line. */
+    cards: [
+      {
+        n: "01",
+        title: "Sonhar",
+        text: "Definir o quarto que você quer construir.\n· Entender o estilo desejado\n· Escolher entre menina, menino ou neutro\n· Visualizar o resultado final\n· Planejar orçamento e cronograma",
+      },
+      {
+        n: "02",
+        title: "Receber a curadoria",
+        text: "Tirar do caminho o excesso de opções e garantir fornecedor de qualidade.\n· Seleção de itens já filtrados\n· Modelos previamente escolhidos\n· Referências visuais aprovadas\n· Fornecedores confiáveis indicados",
+      },
+      {
+        n: "03",
+        title: "Comprar com segurança",
+        text: "Comprar o item certo sem medo de errar.\n· Escolha entre os fornecedores indicados\n· Comparação entre as faixas de investimento\n· Aplicação das recomendações do guia\n· Organização e cronograma das compras\n\nAqui a mudança não é escolher melhor. É comprar com confiança.",
+      },
+      {
+        n: "04",
+        title: "Montar na ordem certa",
+        text: "Evitar retrabalho, atraso e gasto desnecessário.\n· Seguir o cronograma de execução\n· Instalar cada elemento na sequência correta\n· Aplicar as orientações técnicas\n· Garantir funcionalidade e segurança",
+      },
+      {
+        n: "05",
+        title: "Encantar",
+        text: "Chegar ao quarto pronto.\n· Finalização dos detalhes\n· Organização do ambiente\n· Validação estética\n· Preparação para a chegada do bebê",
+      },
+    ],
+    closing: "Você não precisa pesquisar centenas de opções. Nós já fizemos isso por você.",
+    ready: true,
+    order: 2,
+  },
+  {
     slug: "como-usar",
     title: "Como usar este guia",
     eyebrow: "Introdução — como usar",
@@ -181,7 +223,7 @@ export const seedGuidePages: GuidePage[] = [
     closing:
       "O critério já foi aplicado. O filtro já existe. O que resta é a leveza da escolha para que o primeiro cenário de vida do seu filho seja um reflexo de primor, personalidade, cuidado e absoluta confiança no processo.",
     ready: true,
-    order: 2,
+    order: 3,
   },
   {
     slug: "antes-de-comecar",
@@ -208,7 +250,7 @@ export const seedGuidePages: GuidePage[] = [
       },
     },
     ready: true,
-    order: 3,
+    order: 4,
   },
   {
     slug: "cronograma",
@@ -219,7 +261,7 @@ export const seedGuidePages: GuidePage[] = [
       "Atenção aos prazos de produção: berço, marcenaria e peças personalizadas costumam levar de 30 a 90 dias. O cronograma oficial da Helô, com as janelas ideais por trimestre, entra nesta página em breve.",
     ],
     ready: false,
-    order: 4,
+    order: 5,
   },
   {
     slug: "meu-projeto",

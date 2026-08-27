@@ -8,9 +8,17 @@ import type { PortfolioPhoto } from "@/lib/types";
  * pela seta, pela bolinha, pelo teclado (← →) ou arrastando. Um toque manual
  * não desliga o automático: só reinicia a contagem, para a foto escolhida não
  * trocar logo em seguida. Quem prefere menos movimento
- * (prefers-reduced-motion) não recebe troca automática. */
+ * (prefers-reduced-motion) não recebe troca automática.
+ *
+ * Só três fotos ficam montadas por vez: a atual e as duas vizinhas. É isso que
+ * segura o peso da página. O acervo tem centenas de fotos e as lâminas ficam
+ * empilhadas dentro do mesmo quadro, então `loading="lazy"` não resolveria: o
+ * navegador entende que todas estão na tela e baixaria todas. Com a janela de
+ * três, quem visita baixa três, tendo o portfólio 8 fotos ou 400. */
 
 const AUTOPLAY_MS = 6000;
+// Acima disso a fileira de bolinhas vira um borrão: troca por um contador.
+const MAX_BOLINHAS = 12;
 
 export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
   const total = photos.length;
@@ -45,6 +53,14 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
 
   if (!total) return null;
 
+  // Distância circular até a foto atual: 0 é a que está à vista, 1 são as
+  // vizinhas (que precisam estar montadas para a transição acontecer).
+  const perto = (n: number) => {
+    if (total <= 3) return true;
+    const frente = (n - i + total) % total;
+    return Math.min(frente, total - frente) <= 1;
+  };
+
   return (
     <div
       className="lport-carousel"
@@ -66,17 +82,20 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
       }}
     >
       <div className="frame">
-        {photos.map((p, n) => (
-          <figure key={`${p.url}-${n}`} className={`slide${n === i ? " on" : ""}`} aria-hidden={n !== i}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={p.url}
-              alt={p.alt?.trim() ? p.alt : `Foto ${n + 1} de ${total} do portfólio`}
-              loading={n === 0 ? "eager" : "lazy"}
-              draggable={false}
-            />
-          </figure>
-        ))}
+        {photos.map((p, n) =>
+          perto(n) ? (
+            <figure key={`${p.url}-${n}`} className={`slide${n === i ? " on" : ""}`} aria-hidden={n !== i}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.url}
+                alt={p.alt?.trim() ? p.alt : `Foto ${n + 1} de ${total} do portfólio`}
+                loading={n === 0 ? "eager" : "lazy"}
+                decoding="async"
+                draggable={false}
+              />
+            </figure>
+          ) : null,
+        )}
 
         {total > 1 ? (
           <>
@@ -90,7 +109,7 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
         ) : null}
       </div>
 
-      {total > 1 ? (
+      {total > 1 && total <= MAX_BOLINHAS ? (
         <div className="dots" role="tablist" aria-label="Escolher foto">
           {photos.map((_, n) => (
             <button
@@ -104,6 +123,12 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
             />
           ))}
         </div>
+      ) : null}
+
+      {total > MAX_BOLINHAS ? (
+        <p className="pconta" aria-hidden="true">
+          {String(i + 1).padStart(2, "0")} <span>de</span> {total}
+        </p>
       ) : null}
 
       {/* Leitores de tela anunciam a troca sem precisar ver a transição. */}

@@ -43,12 +43,16 @@ export function ImageField({
   value,
   folder = "site",
   hint,
+  onChange,
 }: {
   name: string;
   label: string;
   value?: string | null;
   folder?: string;
   hint?: string;
+  /** Avisa quem contém o campo quando a foto troca. O Portfólio precisa disso
+   *  para manter a lista dele em dia e poder alternar entre lista e grade. */
+  onChange?: (url: string) => void;
 }) {
   const [url, setUrl] = useState(value ?? "");
   const [busy, setBusy] = useState(false);
@@ -69,6 +73,7 @@ export function ImageField({
       const r = await subirImagem(optimized, folder);
       if (r.ok && r.url) {
         setUrl(r.url);
+        onChange?.(r.url);
         setMsg({ ok: true, msg: "Imagem enviada e otimizada." });
       } else {
         setMsg({ ok: false, msg: r.msg ?? "Não consegui enviar a imagem." });
@@ -83,14 +88,20 @@ export function ImageField({
     <div className="adm-img">
       <span className="lbl">{label}</span>
       <div className="adm-img-row">
-        <div className="prev">{url ? <img src={url} alt="" /> : <span>sem imagem</span>}</div>
+        <div className="prev">
+          {url ? <img src={url} alt="" loading="lazy" decoding="async" /> : <span>sem imagem</span>}
+        </div>
         <div className="ops">
           <label className={`adm-btn soft up${busy ? " off" : ""}`}>
             {busy ? "Enviando…" : url ? "Trocar imagem" : "Anexar imagem"}
             <input type="file" accept="image/*" onChange={onFile} disabled={busy} />
           </label>
           {url ? (
-            <button type="button" className="adm-img-rm" onClick={() => { setUrl(""); setMsg(null); }}>
+            <button
+              type="button"
+              className="adm-img-rm"
+              onClick={() => { setUrl(""); setMsg(null); onChange?.(""); }}
+            >
               Remover
             </button>
           ) : null}
