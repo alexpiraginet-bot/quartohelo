@@ -6,6 +6,8 @@ import type { SitePage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = { title: "Produto digital" };
+
 const FALLBACK: SitePage = { eyebrow: "Produto digital", title: "O Fim da Dúvida", paragraphs: [] };
 
 export default async function Page() {

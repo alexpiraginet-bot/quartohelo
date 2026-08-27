@@ -271,14 +271,14 @@ export const seedGuidePages: GuidePage[] = [
     project: {
       howTitle: "Como funciona",
       howText:
-        "Tudo que você marca nas categorias aparece aqui na hora: a foto compõe o seu moodboard e o valor entra na análise financeira, somado automaticamente. Toque em qualquer valor para ajustar — o ajuste vale só para o seu projeto.",
+        "Tudo que você marca nas categorias aparece aqui na hora: a foto compõe o seu moodboard e o valor entra na análise financeira, somado automaticamente. Toque em qualquer valor para ajustar: o ajuste vale só para o seu projeto.",
       moodTitle: "Moodboard",
-      moodEmpty: "Seu moodboard ainda está em branco. Comece pelas categorias no menu — cada escolha aparece aqui na hora.",
+      moodEmpty: "Seu moodboard ainda está em branco. Comece pelas categorias no menu. Cada escolha aparece aqui na hora.",
       finTitle: "Análise financeira",
       finEmpty: "Os valores das suas escolhas aparecem aqui, item a item e somados.",
       totalLabel: "Total do projeto",
       finNote:
-        "Os valores têm como base os preços de {data}. Se algo mudou no fornecedor, toque no valor e ajuste — o total recalcula na hora.",
+        "Os valores têm como base os preços de {data}. Se algo mudou no fornecedor, toque no valor e ajuste. O total recalcula na hora.",
     },
     ready: true,
     order: 99,

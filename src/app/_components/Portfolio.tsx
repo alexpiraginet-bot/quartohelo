@@ -103,6 +103,9 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
       role="group"
       aria-roledescription="carrossel"
       aria-label="Fotos do portfólio"
+      // Sem isto as setas do teclado só funcionam depois de clicar numa das
+      // setas da tela: o div não recebia foco, então o onKeyDown nunca ouvia.
+      tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "ArrowRight") { e.preventDefault(); go(i + 1); }
         if (e.key === "ArrowLeft") { e.preventDefault(); go(i - 1); }
@@ -148,6 +151,15 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
             </button>
           </>
         ) : null}
+
+        {/* A posição fica dentro do quadro, e não abaixo dele: embaixo ela caía
+            atrás da barra flutuante de navegação no desktop. Aqui, se a foto
+            está à vista, a posição está junto. */}
+        {total > MAX_BOLINHAS ? (
+          <p className="pconta" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")} <span>de</span> {total}
+          </p>
+        ) : null}
       </div>
 
       {total > 1 && total <= MAX_BOLINHAS ? (
@@ -164,12 +176,6 @@ export function Portfolio({ photos }: { photos: PortfolioPhoto[] }) {
             />
           ))}
         </div>
-      ) : null}
-
-      {total > MAX_BOLINHAS ? (
-        <p className="pconta" aria-hidden="true">
-          {String(i + 1).padStart(2, "0")} <span>de</span> {total}
-        </p>
       ) : null}
 
       {/* Leitores de tela anunciam a troca sem precisar ver a transição. */}

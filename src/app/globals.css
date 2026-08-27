@@ -893,9 +893,12 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 .vmodal{position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center;
   padding:20px; background:rgba(28,8,12,.86); backdrop-filter:blur(6px)}
 .vmodal-in{position:relative; width:min(1040px,100%)}
-.vmodal-v{display:block; width:100%; max-height:78vh; border-radius:10px; background:#1C080C;
+/* O × precisa de camada própria: o <video> com controles nativos ganha a
+   disputa do ponteiro na parte em que os dois se encavalam, e o clique no meio
+   do botão caía no vídeo. */
+.vmodal-v{position:relative; z-index:0; display:block; width:100%; max-height:78vh; border-radius:10px; background:#1C080C;
   box-shadow:0 24px 70px rgba(0,0,0,.5)}
-.vmodal-x{position:absolute; top:-14px; right:-8px; width:40px; height:40px; border-radius:50%;
+.vmodal-x{position:absolute; z-index:2; top:-14px; right:-8px; width:40px; height:40px; border-radius:50%;
   border:1px solid rgba(239,227,203,.35); background:var(--wine); color:#F5EAD2; font-size:22px;
   line-height:1; cursor:pointer; font-family:inherit}
 .vmodal-x:hover{background:var(--wine-soft)}
@@ -982,15 +985,23 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
 /* O acervo dos quartos é fotografado em pé (2:3). Num quadro deitado a foto
    viraria uma tira do meio, então o quadro acompanha a foto e fica centralizado.
    `contain` garante que nada seja cortado quando entrar uma foto deitada. */
+/* A altura manda, e não a largura: um quadro 2:3 de 520 px daria 780 px de
+   altura, mais alto que a área livre entre a barra do topo e a barra flutuante
+   (772 px numa janela de 900) e mais alto que a janela inteira de um notebook
+   1366x768. Com a altura presa à tela, a foto e o contador cabem juntos. */
 .lport-carousel .frame{position:relative; border-radius:20px; overflow:hidden; background:var(--bone);
   border:1px solid var(--line); box-shadow:var(--shadow-sm); aspect-ratio:2/3;
-  max-width:520px; margin:0 auto}
+  height:min(70vh,780px); width:auto; max-width:min(100%,520px); margin:0 auto}
 .lport-carousel .slide{position:absolute; inset:0; margin:0; opacity:0; transition:opacity .6s ease; pointer-events:none}
 .lport-carousel .slide.on{opacity:1; pointer-events:auto}
-.lport-carousel .slide img{width:100%; height:100%; object-fit:contain; display:block}
+.lport-carousel .slide img{width:100%; height:100%; object-fit:contain; display:block;
+  position:relative; z-index:1}
 /* Foto deitada num quadro em pé sobraria faixa lisa. O fundo desfocado da
-   própria foto preenche. Em foto em pé ele fica coberto e não aparece. */
-.lport-carousel .slide .fundo{position:absolute; inset:0; object-fit:cover;
+   própria foto preenche. Em foto em pé ele fica coberto e não aparece.
+   O z-index é o que importa aqui: elemento posicionado é pintado depois dos
+   não posicionados, então sem isto o desfoque cobriria a foto, e não o
+   contrário. Vir antes no HTML não basta. */
+.lport-carousel .slide .fundo{position:absolute; inset:0; z-index:0; object-fit:cover;
   filter:blur(26px) saturate(.85); transform:scale(1.12); opacity:.6}
 .lport-carousel .pnav{position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%;
   border:1px solid rgba(74,23,31,.18); background:rgba(250,247,236,.86); color:var(--wine-deep);
@@ -1005,12 +1016,17 @@ html.jsrv .rv:not(.in){opacity:0; transform:translateY(16px)}
   background:transparent; cursor:pointer; padding:0; transition:background .2s, transform .2s}
 .lport-carousel .dots .d.on{background:var(--wine); transform:scale(1.2)}
 .lport-carousel .dots .d:focus-visible{outline:2px solid var(--wine-deep); outline-offset:2px}
-/* Acervo grande: no lugar de uma fileira de centenas de bolinhas, a posição. */
-.lport-carousel .pconta{margin-top:16px; text-align:center; font-size:12px; letter-spacing:.18em;
-  text-transform:uppercase; color:var(--olive)}
+/* Acervo grande: no lugar de uma fileira de centenas de bolinhas, a posição,
+   numa cápsula dentro do quadro (embaixo dele ela caía atrás da barra
+   flutuante de navegação no desktop). */
+.lport-carousel .pconta{position:absolute; z-index:2; top:12px; right:12px;
+  margin:0; padding:5px 12px; border-radius:999px; background:rgba(250,247,236,.88);
+  border:1px solid rgba(74,23,31,.12); font-size:11px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--wine-deep); white-space:nowrap}
 .lport-carousel .pconta span{opacity:.5; margin:0 2px}
 @media (prefers-reduced-motion:reduce){ .lport-carousel .slide{transition:none} }
 @media (max-width:700px){
+  .lport-carousel .frame{height:min(62vh,600px)}
   .lport-carousel .pnav{width:38px; height:38px; font-size:22px}
 }
 .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
