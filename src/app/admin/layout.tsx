@@ -5,6 +5,8 @@ import { sairDoPainel } from "./actions";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = { title: "Painel" };
+
 // Portão do painel: sem sessão, mostra o login; com sessão, o painel completo.
 // A senha é verificada no banco pela Edge Function — não depende de env na Vercel.
 

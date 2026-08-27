@@ -5,6 +5,8 @@ import type { SitePage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = { title: "Projeto Conceito" };
+
 const FALLBACK: SitePage = { eyebrow: "Como trabalhamos", title: "Projeto Conceito", paragraphs: [] };
 
 export default async function Page() {

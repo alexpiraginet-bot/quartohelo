@@ -4,6 +4,8 @@ import GuiaApp from "./GuiaApp";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = { title: "Guia Digital" };
+
 export default async function GuiaPage() {
   const { categories, guide, pages, options } = await getGuiaData();
   return (

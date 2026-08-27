@@ -3,7 +3,12 @@ import { ScriptsLex } from "./_components/ScriptsLex";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Quarto da Helô — Estúdio criativo de arquitetura e curadoria para a primeira infância",
+  // Cada página põe o seu nome no template; sem isso a aba, o favorito e o
+  // histórico ficam todos com o mesmo texto.
+  title: {
+    default: "Quarto da Helô · Estúdio criativo de arquitetura e curadoria para a primeira infância",
+    template: "%s · Quarto da Helô",
+  },
   description:
     "Estúdio criativo especializado em quartos infantis. Arquitetura, interiores, curadoria assinada e produção, com bossa, afeto e primor em cada detalhe.",
   robots: { index: false, follow: false }, // noindex enquanto não é o lançamento oficial
