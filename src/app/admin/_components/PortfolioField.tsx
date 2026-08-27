@@ -24,12 +24,14 @@ const MUITAS = 12;
 
 export function PortfolioField({ photos }: { photos: PortfolioPhoto[] }) {
   const uid = useRef(0);
+  const iniciais = useRef((photos ?? []).filter((p) => p?.url));
   const [rows, setRows] = useState<Row[]>(() =>
-    (photos ?? [])
-      .filter((p) => p?.url)
-      .map((p) => ({ uid: uid.current++, url: p.url, alt: p.alt ?? "" })),
+    iniciais.current.map((p) => ({ uid: uid.current++, url: p.url, alt: p.alt ?? "" })),
   );
-  const [grade, setGrade] = useState(() => (photos?.filter((p) => p?.url).length ?? 0) > MUITAS);
+  const [grade, setGrade] = useState(() => iniciais.current.length > MUITAS);
+  // Sem foto nenhuma não há o que ver em grade, e é a lista que traz o botão de
+  // anexar: em grade a tela ficaria sem saída depois de remover a última.
+  const emGrade = grade && rows.length > 0;
 
   const setAlt = (i: number, alt: string) =>
     setRows((prev) => prev.map((r, j) => (j === i ? { ...r, alt } : r)));
@@ -61,12 +63,12 @@ export function PortfolioField({ photos }: { photos: PortfolioPhoto[] }) {
             {rows.length} {rows.length === 1 ? "foto" : "fotos"}
           </span>
           <button type="button" className="adm-btn soft" onClick={() => setGrade((g) => !g)}>
-            {grade ? "abrir a lista" : "ver em grade"}
+            {emGrade ? "abrir a lista" : "ver em grade"}
           </button>
         </div>
       )}
 
-      {grade && rows.length ? (
+      {emGrade ? (
         <>
           <p className="adm-porthint">
             Clique no × para tirar a foto do site. A remoção vale quando você salvar a página.
@@ -88,7 +90,7 @@ export function PortfolioField({ photos }: { photos: PortfolioPhoto[] }) {
         </>
       ) : null}
 
-      {!grade
+      {!emGrade
         ? rows.map((r, i) => (
             // A chave é o uid: ao reordenar, cada linha leva junto a foto que já
             // estava anexada, e o nome do campo passa a ser o da nova posição.
@@ -121,7 +123,7 @@ export function PortfolioField({ photos }: { photos: PortfolioPhoto[] }) {
           ))
         : null}
 
-      {!grade ? (
+      {!emGrade ? (
         <button type="button" className="adm-btn soft add" onClick={add}>+ adicionar foto</button>
       ) : null}
     </div>
