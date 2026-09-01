@@ -352,10 +352,23 @@ Deno.serve(async (req) => {
       if (!itemSlug || !genero || !tier) return json({ ok: false, msg: "Opção inválida." });
       if (!name) return json({ ok: false, msg: "Dê um nome para a opção (ex.: Berço Lume)." });
       const id = body.id ? String(body.id) : crypto.randomUUID();
+      /* O teto depende de como o item mostra a curadoria: por faixa são 3 em
+       * cada faixa; por fornecedor, 3 no item todo; em grade, 9. */
+      const { data: itemRow } = await db.from("qh_items").select("layout").eq("slug", itemSlug).maybeSingle();
+      const layout = (itemRow?.layout as string | null) ?? "faixas";
       if (!body.id) {
-        const { count } = await db.from("qh_product_options").select("id", { count: "exact", head: true })
-          .eq("item_slug", itemSlug).eq("genero", genero).eq("tier", tier);
-        if ((count ?? 0) >= 3) return json({ ok: false, msg: "Esta faixa já tem 3 opções. Exclua uma antes de adicionar." });
+        const q = db.from("qh_product_options").select("id", { count: "exact", head: true })
+          .eq("item_slug", itemSlug).eq("genero", genero);
+        const { count } = await (layout === "faixas" ? q.eq("tier", tier) : q);
+        const teto = layout === "grade" ? 9 : 3;
+        if ((count ?? 0) >= teto) {
+          return json({
+            ok: false,
+            msg: layout === "faixas"
+              ? "Esta faixa já tem 3 opções. Exclua uma antes de adicionar."
+              : `Este item já tem ${teto} opções. Exclua uma antes de adicionar.`,
+          });
+        }
       }
       let photoUrl: string | null = null;
       if (typeof body.foto_url === "string" && body.foto_url.startsWith("http")) {
@@ -370,6 +383,13 @@ Deno.serve(async (req) => {
         url: S("url") || null, supplier: S("supplier") || null, note: null, exemplo: false, order: Number(body.order) || 0,
       };
       if (photoUrl) row.photo_url = photoUrl;
+      // Fotos do bloco de fornecedor (até 3). Lista vazia zera, que é como a
+      // pessoa tira uma foto do bloco.
+      if (Array.isArray(body.photos)) {
+        row.photos = (body.photos as unknown[])
+          .filter((u): u is string => typeof u === "string" && u.startsWith("http"))
+          .slice(0, 3);
+      }
       const { error } = await db.from("qh_product_options").upsert(row);
       if (error) return json({ ok: false, msg: "Não consegui salvar: " + error.message });
       return json({ ok: true, msg: photoUrl ? "Opção e foto salvas. Já estão no guia." : "Opção salva. Já está no guia." });

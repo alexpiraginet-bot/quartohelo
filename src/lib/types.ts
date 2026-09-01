@@ -18,6 +18,16 @@ export const GENERO_LABEL: Record<Genero, string> = {
   menino: "Menino",
 };
 
+/**
+ * Como um item mostra a curadoria.
+ *  · faixas (padrão): três faixas de investimento, até 3 produtos em cada.
+ *  · fornecedores: sem faixas. Até 3 fornecedores, cada um com até 3 fotos.
+ *    É o formato de papel de parede, arandela, kit higiene e afins, onde a
+ *    curadoria é do fornecedor e não de um produto solto.
+ *  · grade: sem faixas. Todas as opções numa grade só, no mesmo formato.
+ */
+export type ItemLayout = "faixas" | "fornecedores" | "grade";
+
 /** Fornecedor sugerido para um item, por faixa de investimento. */
 export interface Supplier {
   id: string;
@@ -42,6 +52,9 @@ export interface ProductOption {
   tier: PriceTier;
   name: string;
   photoUrl?: string | null;
+  /** Fotos do fornecedor (layout "fornecedores"): até 3, quadradas. Vazio nos
+   *  outros layouts, que usam `photoUrl`. */
+  photos?: string[] | null;
   /** Preço em centavos na data-base do guia; null = ainda sem preço. */
   priceCents: number | null;
   url?: string | null;
@@ -155,6 +168,8 @@ export interface Item {
   photoUrl?: string | null;
   decision: ItemDecision;
   suppliers: Supplier[];
+  /** Ausente = "faixas". */
+  layout?: ItemLayout | null;
   order: number;
   published: boolean;
 }

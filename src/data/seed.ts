@@ -5,10 +5,30 @@
 // Conteúdo (decisões, opções com foto e preço, textos das páginas) é preenchido
 // e editado pela Helô no painel, aos poucos — a estrutura já fica pronta aqui.
 
-import type { Category, GuideMeta, GuidePage, GuestProfile, Item, ProductOption, SiteContent } from "@/lib/types";
+import type { Category, GuideMeta, GuidePage, GuestProfile, Item, ItemLayout, ProductOption, SiteContent } from "@/lib/types";
 
 let seq = 0;
 const uid = (p: string) => `${p}-${(++seq).toString(36)}`;
+
+/* Itens que não se organizam por faixa de investimento.
+ *
+ * Nestes dez a curadoria é do fornecedor, e não de um produto solto: papel de
+ * parede, arandela, kit higiene e afins se escolhem pela casa que faz, com
+ * algumas fotos do trabalho dela. Adornos é uma grade só, sem faixa nenhuma.
+ * Quem não está aqui segue nas três faixas. */
+const LAYOUT_POR_ITEM: Record<string, ItemLayout> = {
+  "papel-de-parede": "fornecedores",
+  arandelas: "fornecedores",
+  "kit-higiene": "fornecedores",
+  "mala-maternidade": "fornecedores",
+  "enxoval-berco": "fornecedores",
+  "enxoval-cama": "fornecedores",
+  "almofadas-decorativas": "fornecedores",
+  "porta-treco": "fornecedores",
+  trocador: "fornecedores",
+  "almofada-de-amamentacao": "fornecedores",
+  adornos: "grade",
+};
 
 function item(categoryId: string, name: string, extra: Partial<Item> = {}, order = 0): Item {
   const slug = name
@@ -26,6 +46,7 @@ function item(categoryId: string, name: string, extra: Partial<Item> = {}, order
     photoUrl: extra.photoUrl ?? null,
     decision: extra.decision ?? {},
     suppliers: extra.suppliers ?? [],
+    layout: extra.layout ?? LAYOUT_POR_ITEM[slug] ?? null,
     order,
     published: true,
   };
@@ -84,7 +105,6 @@ export const seedCategories: Category[] = [
   ]),
   cat("texteis", "Têxteis", "O que traz maciez, cor e a textura que a foto não entrega.", 2, [
     "Tapete",
-    "Cortina",
     "Enxoval berço",
     "Enxoval cama",
     "Almofadas decorativas",
