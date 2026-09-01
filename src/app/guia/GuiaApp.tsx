@@ -592,6 +592,43 @@ export default function GuiaApp({
     const itemOpts = optionsBySlug.get(slug) ?? [];
     const chosenOpt = ch?.optionId ? optionById.get(ch.optionId) : undefined;
 
+    /* Como este item mostra a curadoria. Nos layouts sem faixa a ordem é a do
+     * painel, e só ela: o tier fica no banco por compatibilidade e não é lido. */
+    const layout = item.layout ?? "faixas";
+    const daVariacao = itemOpts.filter((o) => o.genero === genero).sort((a, b) => a.order - b.order);
+
+    const cardOpcao = (o: ProductOption) => {
+      const sel = ch?.optionId === o.id;
+      const shownPrice = sel && ch?.priceOverrideCents != null ? ch.priceOverrideCents : o.priceCents;
+      return (
+        <article className={`g2card${sel ? " sel" : ""}`} key={o.id}>
+          <div className="ph">
+            {o.photoUrl ? <img src={o.photoUrl} alt={o.name} loading="lazy" /> : <span className="serif">{o.name}</span>}
+            {o.exemplo ? <i className="ex">exemplo</i> : null}
+          </div>
+          <div className="bd">
+            <div className="nm">{o.name}</div>
+            <div className="pr serif">{shownPrice != null ? brl(shownPrice) : "Valor em definição"}</div>
+            {o.supplier ? <div className="sp">{o.supplier}</div> : null}
+            {o.url ? (
+              <a
+                className="lk"
+                href={o.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => evento("clique_fornecedor", { item: slug, url: o.url })}
+              >
+                Ver no fornecedor ↗
+              </a>
+            ) : null}
+            <button type="button" className={`pick${sel ? " on" : ""}`} onClick={() => chooseOption(slug, o)}>
+              {sel ? "✓ No meu projeto" : "Escolher"}
+            </button>
+          </div>
+        </article>
+      );
+    };
+
     return (
       <div className="g2view">
         <div className="eyebrow">{cat.name}</div>
@@ -659,6 +696,8 @@ export default function GuiaApp({
         {d.dicaHelo ? <DicaHelo body={d.dicaHelo} /> : null}
 
         <section className="g2opts">
+          {/* O mesmo cartão serve às faixas e à grade; o bloco de fornecedor
+              tem forma própria, mais abaixo. */}
           <div className="g2gen">
             <span className="lbl">Variação do quarto</span>
             <div className="pills">
@@ -675,60 +714,75 @@ export default function GuiaApp({
             </div>
           </div>
 
-          {TIER_ORDER.map((tier) => {
-            const row = itemOpts
-              .filter((o) => o.genero === genero && o.tier === tier)
-              .sort((a, b) => a.order - b.order)
-              .slice(0, 3);
-            return (
-              <div className="g2tier" key={tier}>
-                <div className="tl">{TIER_LABEL[tier]}</div>
-                <div className="row">
-                  {row.map((o) => {
-                    const sel = ch?.optionId === o.id;
-                    const shownPrice = sel && ch?.priceOverrideCents != null ? ch.priceOverrideCents : o.priceCents;
-                    return (
-                      <article className={`g2card${sel ? " sel" : ""}`} key={o.id}>
-                        <div className="ph">
-                          {o.photoUrl ? (
-                            <img src={o.photoUrl} alt={o.name} loading="lazy" />
-                          ) : (
-                            <span className="serif">{o.name}</span>
-                          )}
-                          {o.exemplo ? <i className="ex">exemplo</i> : null}
+          {layout === "faixas"
+            ? TIER_ORDER.map((tier) => {
+                const row = daVariacao.filter((o) => o.tier === tier).slice(0, 3);
+                return (
+                  <div className="g2tier" key={tier}>
+                    <div className="tl">{TIER_LABEL[tier]}</div>
+                    <div className="row">
+                      {row.map(cardOpcao)}
+                      {Array.from({ length: Math.max(0, 3 - row.length) }).map((_, i) => (
+                        <div className="g2slot" key={i}>
+                          <span>Em curadoria</span>
+                          <i>A seleção da Helô para esta faixa entra em breve.</i>
                         </div>
-                        <div className="bd">
-                          <div className="nm">{o.name}</div>
-                          <div className="pr serif">{shownPrice != null ? brl(shownPrice) : "Valor em definição"}</div>
-                          {o.supplier ? <div className="sp">{o.supplier}</div> : null}
-                          {o.url ? (
-                            <a
-                              className="lk"
-                              href={o.url}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={() => evento("clique_fornecedor", { item: slug, url: o.url })}
-                            >
-                              Ver no fornecedor ↗
-                            </a>
-                          ) : null}
-                          <button type="button" className={`pick${sel ? " on" : ""}`} onClick={() => chooseOption(slug, o)}>
-                            {sel ? "✓ No meu projeto" : "Escolher"}
-                          </button>
-                        </div>
-                      </article>
-                    );
-                  })}
-                  {Array.from({ length: Math.max(0, 3 - row.length) }).map((_, i) => (
-                    <div className="g2slot" key={i}>
-                      <span>Em curadoria</span>
-                      <i>A seleção da Helô para esta faixa entra em breve.</i>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+                  </div>
+                );
+              })
+            : null}
+
+          {/* Grade: sem faixa, todas as opções no mesmo formato. */}
+          {layout === "grade" ? <div className="g2grade">{daVariacao.map(cardOpcao)}</div> : null}
+
+          {/* Fornecedores: um bloco por fornecedor, com as fotos dele. Só entram
+              os que existem, então tirar um no painel fecha o buraco sozinho. */}
+          {layout === "fornecedores" ? (
+            <div className="g2forns">
+              {daVariacao.slice(0, 3).map((o, i) => {
+                const sel = ch?.optionId === o.id;
+                const shownPrice = sel && ch?.priceOverrideCents != null ? ch.priceOverrideCents : o.priceCents;
+                const fotos = (o.photos?.length ? o.photos : o.photoUrl ? [o.photoUrl] : []).slice(0, 3);
+                return (
+                  <article className={`g2forn${sel ? " sel" : ""}`} key={o.id}>
+                    <header>
+                      <span className="n">Fornecedor {i + 1}</span>
+                      <b className="serif">{o.name}</b>
+                    </header>
+                    {fotos.length ? (
+                      <div className="fotos">
+                        {fotos.map((src, j) => (
+                          <img key={src + j} src={src} alt={`${o.name}, foto ${j + 1}`} loading="lazy" decoding="async" />
+                        ))}
+                      </div>
+                    ) : null}
+                    <div className="bd">
+                      {shownPrice != null ? <div className="pr serif">{brl(shownPrice)}</div> : null}
+                      {o.url ? (
+                        <a
+                          className="lk"
+                          href={o.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={() => evento("clique_fornecedor", { item: slug, url: o.url })}
+                        >
+                          Ver no fornecedor ↗
+                        </a>
+                      ) : null}
+                      <button type="button" className={`pick${sel ? " on" : ""}`} onClick={() => chooseOption(slug, o)}>
+                        {sel ? "✓ No meu projeto" : "Escolher"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+              {daVariacao.length === 0 ? (
+                <p className="g2empty">A seleção de fornecedores desta variação entra em breve.</p>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="g2acts">
             <button

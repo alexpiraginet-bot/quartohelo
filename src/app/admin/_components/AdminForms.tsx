@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import type { CardImage, GuideDica, GuideMeta, GuidePage, Genero, Item, MeasureRow, PriceTier, ProductOption, ProjectTexts } from "@/lib/types";
+import type { CardImage, GuideDica, GuideMeta, GuidePage, Genero, Item, ItemLayout, MeasureRow, PriceTier, ProductOption, ProjectTexts } from "@/lib/types";
 import { GENERO_LABEL, TIER_LABEL } from "@/lib/types";
 import { CardImageField } from "./CardImageField";
 import { PreviewButton } from "./PreviewButton";
@@ -436,31 +436,54 @@ function OpcaoForm({
   tier,
   option,
   order,
+  layout = "faixas",
+  posicao,
+  foraDoGuia,
 }: {
   itemSlug: string;
   genero: Genero;
   tier: PriceTier;
   option?: ProductOption;
   order: number;
+  layout?: ItemLayout;
+  posicao?: number;
+  foraDoGuia?: boolean;
 }) {
   const [state, action] = useFormState(salvarOpcao, null);
   const [delState, delAction] = useFormState(excluirOpcao, null);
+  const porFornecedor = layout === "fornecedores";
+  const fotos = option?.photos?.length ? option.photos : option?.photoUrl ? [option.photoUrl] : [];
   return (
-    <div className={`adm-opt${option ? "" : " nova"}`}>
+    <div className={`adm-opt${option ? "" : " nova"}${foraDoGuia ? " fora" : ""}`}>
       <form action={action}>
         <input type="hidden" name="id" value={option?.id ?? ""} />
         <input type="hidden" name="itemSlug" value={itemSlug} />
         <input type="hidden" name="genero" value={genero} />
         <input type="hidden" name="tier" value={tier} />
         <input type="hidden" name="order" value={option?.order ?? order} />
-        <div className="foto">
-          <ImageField name="foto_url" label="Foto do produto" value={option?.photoUrl} folder={`opcoes/${itemSlug}`} hint="Anexe a foto — ela é otimizada automaticamente." />
-          {option?.exemplo ? <i className="ex">exemplo — vira real ao salvar</i> : null}
-        </div>
+        {porFornecedor ? (
+          // Três fotos quadradas, do mesmo tamanho no guia. As que ficarem em
+          // branco simplesmente não aparecem.
+          <div className="foto trio">
+            <span className="quem">Fornecedor {posicao ?? 1}</span>
+            <ImageField name="foto_url" label="Foto 1" value={fotos[0]} folder={`opcoes/${itemSlug}`} />
+            <ImageField name="foto_url_2" label="Foto 2" value={fotos[1]} folder={`opcoes/${itemSlug}`} />
+            <ImageField name="foto_url_3" label="Foto 3" value={fotos[2]} folder={`opcoes/${itemSlug}`} />
+          </div>
+        ) : (
+          <div className="foto">
+            <ImageField name="foto_url" label="Foto do produto" value={option?.photoUrl} folder={`opcoes/${itemSlug}`} hint="Anexe a foto — ela é otimizada automaticamente." />
+            {option?.exemplo ? <i className="ex">exemplo — vira real ao salvar</i> : null}
+          </div>
+        )}
         <div className="campos">
           <label>
-            Nome <Ajuda tarefa="opcoes" />
-            <input name="name" defaultValue={option?.name ?? ""} placeholder="Ex.: Berço Lume" />
+            {porFornecedor ? "Nome do fornecedor" : "Nome"} <Ajuda tarefa="opcoes" />
+            <input
+              name="name"
+              defaultValue={option?.name ?? ""}
+              placeholder={porFornecedor ? "Ex.: Grão de Gente" : "Ex.: Berço Lume"}
+            />
           </label>
           <div className="linha">
             <label>
@@ -472,10 +495,12 @@ function OpcaoForm({
                 placeholder="0,00"
               />
             </label>
-            <label>
-              Fornecedor (opcional)
-              <input name="supplier" defaultValue={option?.supplier ?? ""} />
-            </label>
+            {porFornecedor ? null : (
+              <label>
+                Fornecedor (opcional)
+                <input name="supplier" defaultValue={option?.supplier ?? ""} />
+              </label>
+            )}
           </div>
           <label>
             Link do produto (opcional)
@@ -501,8 +526,68 @@ function OpcaoForm({
   );
 }
 
+/* Itens sem faixa: fornecedores (até 3, com 3 fotos cada) e grade (até 9
+ * cartões iguais). A ordem é a da tela; a faixa não é lida no guia, e por isso
+ * as opções novas entram todas em "alto". */
+function SemFaixa({
+  item,
+  options,
+  genero,
+  limite,
+  titulo,
+  ajuda,
+}: {
+  item: Item;
+  options: ProductOption[];
+  genero: Genero;
+  limite: number;
+  titulo: string;
+  ajuda: string;
+}) {
+  const lista = options.filter((o) => o.genero === genero).sort((a, b) => a.order - b.order);
+  const sobrando = lista.length - limite;
+  return (
+    <section className="adm-faixa">
+      <h3>
+        {titulo} <span>{lista.length} de até {limite}</span>
+      </h3>
+      <p className="adm-porthint">{ajuda}</p>
+      {sobrando > 0 ? (
+        <p className="adm-aviso">
+          {sobrando === 1 ? "A última opção não aparece" : `As últimas ${sobrando} opções não aparecem`} no guia, que
+          mostra {limite}. Exclua o que sobrou ou reordene.
+        </p>
+      ) : null}
+      {lista.map((o, i) => (
+        <OpcaoForm
+          key={o.id}
+          itemSlug={item.slug}
+          genero={genero}
+          tier="alto"
+          option={o}
+          order={o.order}
+          layout={item.layout ?? "faixas"}
+          posicao={i + 1}
+          foraDoGuia={i >= limite}
+        />
+      ))}
+      {lista.length < limite ? (
+        <OpcaoForm
+          itemSlug={item.slug}
+          genero={genero}
+          tier="alto"
+          order={lista.length}
+          layout={item.layout ?? "faixas"}
+          posicao={lista.length + 1}
+        />
+      ) : null}
+    </section>
+  );
+}
+
 export function OpcoesEditor({ item, options }: { item: Item; options: ProductOption[] }) {
   const [genero, setGenero] = useState<Genero>("neutro");
+  const layout = item.layout ?? "faixas";
   return (
     <div className="adm-opcoes">
       <div className="adm-gen">
@@ -516,7 +601,30 @@ export function OpcoesEditor({ item, options }: { item: Item; options: ProductOp
           );
         })}
       </div>
-      {TIER_ORDER.map((tier) => {
+
+      {layout === "fornecedores" ? (
+        <SemFaixa
+          item={item}
+          options={options}
+          genero={genero}
+          limite={3}
+          titulo="Fornecedores"
+          ajuda="Este item não tem faixa de investimento. Cada bloco é um fornecedor, com até três fotos. Se usar só um, exclua os outros e o guia se reorganiza sozinho."
+        />
+      ) : null}
+
+      {layout === "grade" ? (
+        <SemFaixa
+          item={item}
+          options={options}
+          genero={genero}
+          limite={9}
+          titulo="Opções"
+          ajuda="Este item não tem faixa de investimento. As opções aparecem numa grade só, todas no mesmo formato."
+        />
+      ) : null}
+
+      {layout === "faixas" ? TIER_ORDER.map((tier) => {
         const row = options
           .filter((o) => o.genero === genero && o.tier === tier)
           .sort((a, b) => a.order - b.order);
@@ -533,7 +641,7 @@ export function OpcoesEditor({ item, options }: { item: Item; options: ProductOp
             ) : null}
           </section>
         );
-      })}
+      }) : null}
     </div>
   );
 }

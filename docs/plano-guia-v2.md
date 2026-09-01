@@ -56,11 +56,12 @@ Transcrição fiel → requisito rastreável. "R" = requisito.
   3. Antes de começar (págs. 5 e 6)
   4. Cronograma de montagem (pág. 7)
   5. **MEU PROJETO**
-- **R7 — 22 categorias de produto no menu (itens 6–27):** Papel de parede,
+- **R7 — 21 categorias de produto no menu:** Papel de parede,
   Berço, Cama auxiliar, Cômoda, Armário, Poltrona de amamentação, Mesa lateral,
-  Tapete, Cortina, Enxoval berço, Enxoval cama, Almofadas decorativas, Almofada
+  Tapete, Enxoval berço, Enxoval cama, Almofadas decorativas, Almofada
   de amamentação, Trocador, Porta treco, Arandelas, Abajur, Pendente, Kit
   higiene, Adornos, Mala maternidade, Bolsa de passeio.
+  Cortina saiu do catálogo a pedido da cliente.
 
 ### Dentro de cada categoria de produto
 - **R8 — Gênero clicável:** MENINA · NEUTRO · MENINO. Ao escolher, abrem as

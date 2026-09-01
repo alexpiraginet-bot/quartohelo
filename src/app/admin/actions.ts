@@ -280,6 +280,8 @@ export async function salvarOpcao(_prev: ActionState | null, fd: FormData): Prom
     supplier: str(fd, "supplier") || null,
     order: Number(str(fd, "order")) || 0,
     foto_url: str(fd, "foto_url") || null,
+    // Itens por fornecedor mandam três fotos; as vazias caem fora.
+    photos: [str(fd, "foto_url"), str(fd, "foto_url_2"), str(fd, "foto_url_3")].filter(Boolean),
   });
   if (r.ok) {
     refreshAll();
